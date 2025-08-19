@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Navbar } from "@qrmenu/ui";
 
 export const metadata: Metadata = {
   title: "QRMenu Tenant",
@@ -13,7 +14,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="tr">
-      <body>{children}</body>
+      <body>
+        <Navbar
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "Menü", href: "/menu" },
+          ]}
+        />
+        {children}
+      </body>
     </html>
   );
 }

@@ -1,0 +1,8 @@
+{
+  "name": "@qrmenu/config",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./styles/tailwind.css": "./styles/tailwind.css"
+  }
+}

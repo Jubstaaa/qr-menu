@@ -1,0 +1,3 @@
+@import "tailwindcss";
+@source "../../../shared/src";
+@source "../../node_modules/@qr-menu/shared";

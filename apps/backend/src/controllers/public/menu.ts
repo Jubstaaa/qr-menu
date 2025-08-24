@@ -7,6 +7,10 @@ export const publicMenuController = {
   async getMenuBySubdomain(req: Request, res: Response) {
     try {
       // Subdomain'i request'ten al
+      console.log(req.subdomains);
+      console.log(req.hostname);
+      console.log(req.get("host"));
+      console.log(req.headers.host);
       const host = req.headers.host || "";
       const subdomain = extractSubdomain(host);
 

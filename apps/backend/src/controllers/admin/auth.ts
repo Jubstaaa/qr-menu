@@ -56,9 +56,10 @@ export const adminAuthController = {
       res.cookie("auth_token", authData.session?.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: "none", // Cross-site için gerekli
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
         path: "/",
+        // Cross-domain için domain belirtmiyoruz
       });
 
       // Token'ı döndür
@@ -100,8 +101,9 @@ export const adminAuthController = {
       res.clearCookie("auth_token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: "none",
         path: "/",
+        // Cross-domain için domain belirtmiyoruz
       });
 
       res.json({

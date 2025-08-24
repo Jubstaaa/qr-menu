@@ -31,8 +31,10 @@ export const publicAuthController = {
       res.cookie("auth_token", authData.session?.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: "none", // Cross-site için gerekli
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 gün
+        path: "/", // Root path
+        // Cross-domain için domain belirtmiyoruz
       });
 
       res.json({
@@ -82,8 +84,10 @@ export const publicAuthController = {
       res.cookie("auth_token", authData.session?.access_token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
+        sameSite: "none", // Cross-site için gerekli
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 gün
+        path: "/", // Root path
+        // Cross-domain için domain belirtmiyoruz
       });
 
       res.status(201).json({
@@ -110,7 +114,13 @@ export const publicAuthController = {
   async logout(req: Request, res: Response) {
     try {
       // Cookie'yi temizle
-      res.clearCookie("auth_token");
+      res.clearCookie("auth_token", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        path: "/", // Root path
+        // Cross-domain için domain belirtmiyoruz
+      });
 
       res.json({
         message: "Çıkış başarılı",

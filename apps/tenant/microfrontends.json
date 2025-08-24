@@ -2,14 +2,14 @@
   "$schema": "https://openapi.vercel.sh/microfrontends.json",
   "applications": {
     "qr-menu-tenant": {
-      "package": "tenant",
+      "packageName": "tenant",
       "development": {
         "local": 3001,
         "fallback": "*.ilkerbalcilar.com.tr"
       }
     },
     "qr-menu-tenant-dashboard": {
-      "package": "tenant-dashboard",
+      "packageName": "tenant-dashboard",
       "development": {
         "local": 3002
       },

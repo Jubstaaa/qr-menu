@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "microfrontends proxy --local-apps tenant tenant-dashboard & next dev --turbo --port $(microfrontends port)",
+    "dev": "microfrontends proxy --local-apps qr-menu-tenant qr-menu-tenant-dashboard & next dev --turbo --port $(microfrontends port)",
     "build": "next build --turbopack",
     "start": "next start",
     "lint": "eslint"

@@ -19,6 +19,7 @@
     "@qr-menu/shared-config": "workspace:*",
     "@qr-menu/shared-types": "workspace:*",
     "@qr-menu/shared-utils": "workspace:*",
+    "@qr-menu/shared-styles": "workspace:*",
     "@vercel/microfrontends": "^2.0.0",
     "@vercel/toolbar": "^0.1.38",
     "lucide-react": "^0.541.0",

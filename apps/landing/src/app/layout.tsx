@@ -1,29 +1,39 @@
 import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Providers } from "../providers";
 import "./globals.css";
-import { Navbar, Footer } from "@qrmenu/ui";
+import { AuthNavbar } from "../components/AuthNavbar";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: "QRMenu - Dijital Menü Platformu",
-  description: "QR menü ile restoranınızı dijitalleştirin.",
+  title: "QR Menu - Modern Restaurant Menü Sistemi",
+  description:
+    "QR kod ile restaurant menü ve sipariş sistemi. Kolay kullanım, güzel tasarım.",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="tr">
-      <body>
-        <Navbar
-          items={[
-            { label: "Özellikler", href: "#features" },
-            { label: "Fiyatlandırma", href: "#pricing" },
-          ]}
-          cta={{ label: "Giriş Yap", href: "/login" }}
-        />
-        {children}
-        <Footer />
+    <html lang="tr" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <Providers>
+          <AuthNavbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );

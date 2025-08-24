@@ -1,2 +1,3 @@
-@import "@qrmenu/config/styles/tailwind.css";
-@source "../**/*";
+@import "tailwindcss";
+@import "@qr-menu/shared-styles";
+@source "./**/*";

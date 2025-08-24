@@ -1,0 +1,346 @@
+"use client";
+
+import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Button,
+  Input,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Tabs,
+  Tab,
+  Card,
+  CardBody,
+} from "@heroui/react";
+import { useAuth } from "../contexts/AuthContext";
+import { addToast } from "@heroui/react";
+
+// Zod schemas
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "Email adresi gerekli")
+    .email("Geçerli bir email adresi girin"),
+  password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
+});
+
+const registerSchema = z
+  .object({
+    email: z
+      .string()
+      .min(1, "Email adresi gerekli")
+      .email("Geçerli bir email adresi girin"),
+    password: z.string().min(6, "Şifre en az 6 karakter olmalıdır"),
+    confirmPassword: z.string().min(1, "Şifre tekrarı gerekli"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Şifreler eşleşmiyor",
+    path: ["confirmPassword"],
+  });
+
+type LoginFormData = z.infer<typeof loginSchema>;
+type RegisterFormData = z.infer<typeof registerSchema>;
+
+interface AuthModalProps {
+  children: (onOpen: () => void) => React.ReactNode;
+}
+
+export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
+  const [activeTab, setActiveTab] = useState("login");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { login, register } = useAuth();
+
+  // React Hook Form hooks
+  const {
+    control: loginControl,
+    handleSubmit: handleLoginSubmit,
+    reset: resetLogin,
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const {
+    control: registerControl,
+    handleSubmit: handleRegisterSubmit,
+    reset: resetRegister,
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  const onLoginSubmit = handleLoginSubmit(async (data) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      await login(data.email, data.password);
+      resetLogin();
+      onClose();
+      addToast({
+        title: "Başarılı!",
+        description: "Giriş yapıldı",
+        color: "success",
+      });
+    } catch (err: any) {
+      setError(err.message || "Giriş yapılamadı");
+      addToast({
+        title: "Hata!",
+        description: err.message || "Giriş yapılamadı",
+        color: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  const onRegisterSubmit = handleRegisterSubmit(async (data) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      await register(data.email, data.password);
+      resetRegister();
+      onClose();
+      addToast({
+        title: "Başarılı!",
+        description: "Kayıt yapıldı",
+        color: "success",
+      });
+    } catch (err: any) {
+      setError(err.message || "Kayıt yapılamadı");
+      addToast({
+        title: "Hata!",
+        description: err.message || "Kayıt yapılamadı",
+        color: "danger",
+      });
+    } finally {
+      setLoading(false);
+    }
+  });
+
+  const handleTabChange = (key: string) => {
+    setActiveTab(key);
+    setError("");
+    resetLogin();
+    resetRegister();
+  };
+
+  const handleClose = () => {
+    setError("");
+    resetLogin();
+    resetRegister();
+    onClose();
+  };
+
+  return (
+    <>
+      {children(onOpen)}
+
+      <Modal isOpen={isOpen} onClose={handleClose} size="md">
+        <ModalContent>
+          <ModalHeader className="flex flex-col gap-1">
+            <h2 className="text-xl font-bold">Giriş Yap / Kayıt Ol</h2>
+            <p className="text-gray-600">
+              Hesabınıza giriş yapın veya yeni hesap oluşturun
+            </p>
+          </ModalHeader>
+
+          <ModalBody>
+            <Tabs
+              selectedKey={activeTab}
+              onSelectionChange={(key) => handleTabChange(key as string)}
+              className="w-full"
+            >
+              <Tab key="login" title="Giriş Yap">
+                <Card>
+                  <CardBody>
+                    <form onSubmit={onLoginSubmit} className="space-y-4">
+                      {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                          {error}
+                        </div>
+                      )}
+
+                      <Controller
+                        control={loginControl}
+                        name="email"
+                        rules={{ required: "Email adresi gerekli" }}
+                        render={({
+                          field: { name, value, onChange, onBlur, ref },
+                          fieldState: { invalid, error },
+                        }) => (
+                          <Input
+                            ref={ref}
+                            isRequired
+                            errorMessage={error?.message}
+                            validationBehavior="aria"
+                            isInvalid={invalid}
+                            label="Email Adresi"
+                            name={name}
+                            value={value}
+                            onBlur={onBlur}
+                            onChange={onChange}
+                            type="email"
+                            placeholder="ornek@email.com"
+                          />
+                        )}
+                      />
+
+                      <Controller
+                        control={loginControl}
+                        name="password"
+                        rules={{ required: "Şifre gerekli" }}
+                        render={({
+                          field: { name, value, onChange, onBlur, ref },
+                          fieldState: { invalid, error },
+                        }) => (
+                          <Input
+                            ref={ref}
+                            isRequired
+                            errorMessage={error?.message}
+                            validationBehavior="aria"
+                            isInvalid={invalid}
+                            label="Şifre"
+                            name={name}
+                            value={value}
+                            onBlur={onBlur}
+                            onChange={onChange}
+                            type="password"
+                            placeholder="••••••••"
+                          />
+                        )}
+                      />
+
+                      <Button
+                        type="submit"
+                        color="primary"
+                        className="w-full"
+                        isLoading={loading}
+                      >
+                        Giriş Yap
+                      </Button>
+                    </form>
+                  </CardBody>
+                </Card>
+              </Tab>
+
+              <Tab key="register" title="Kayıt Ol">
+                <Card>
+                  <CardBody>
+                    <form onSubmit={onRegisterSubmit} className="space-y-4">
+                      {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                          {error}
+                        </div>
+                      )}
+
+                      <Controller
+                        control={registerControl}
+                        name="email"
+                        rules={{ required: "Email adresi gerekli" }}
+                        render={({
+                          field: { name, value, onChange, onBlur, ref },
+                          fieldState: { invalid, error },
+                        }) => (
+                          <Input
+                            ref={ref}
+                            isRequired
+                            errorMessage={error?.message}
+                            validationBehavior="aria"
+                            isInvalid={invalid}
+                            label="Email Adresi"
+                            name={name}
+                            value={value}
+                            onBlur={onBlur}
+                            onChange={onChange}
+                            type="email"
+                            placeholder="ornek@email.com"
+                          />
+                        )}
+                      />
+
+                      <Controller
+                        control={registerControl}
+                        name="password"
+                        rules={{ required: "Şifre gerekli" }}
+                        render={({
+                          field: { name, value, onChange, onBlur, ref },
+                          fieldState: { invalid, error },
+                        }) => (
+                          <Input
+                            ref={ref}
+                            isRequired
+                            errorMessage={error?.message}
+                            validationBehavior="aria"
+                            isInvalid={invalid}
+                            label="Şifre"
+                            name={name}
+                            value={value}
+                            onBlur={onBlur}
+                            onChange={onChange}
+                            type="password"
+                            placeholder="••••••••"
+                          />
+                        )}
+                      />
+
+                      <Controller
+                        control={registerControl}
+                        name="confirmPassword"
+                        rules={{ required: "Şifre tekrarı gerekli" }}
+                        render={({
+                          field: { name, value, onChange, onBlur, ref },
+                          fieldState: { invalid, error },
+                        }) => (
+                          <Input
+                            ref={ref}
+                            isRequired
+                            errorMessage={error?.message}
+                            validationBehavior="aria"
+                            isInvalid={invalid}
+                            label="Şifre Tekrarı"
+                            name={name}
+                            value={value}
+                            onBlur={onBlur}
+                            onChange={onChange}
+                            type="password"
+                            placeholder="••••••••"
+                          />
+                        )}
+                      />
+
+                      <Button
+                        type="submit"
+                        color="primary"
+                        className="w-full"
+                        isLoading={loading}
+                      >
+                        Kayıt Ol
+                      </Button>
+                    </form>
+                  </CardBody>
+                </Card>
+              </Tab>
+            </Tabs>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    </>
+  );
+};

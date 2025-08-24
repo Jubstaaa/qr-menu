@@ -1,0 +1,271 @@
+import { Request, Response } from "express";
+import { supabase } from "../../../supabase/supabase";
+
+export const menuController = {
+  // Create new menu
+  async createMenu(req: Request, res: Response) {
+    try {
+      const { name, subdomain } = req.body;
+
+      if (!name || !subdomain) {
+        return res.status(400).json({
+          error: "Restoran bilgileri ve subdomain gerekli",
+        });
+      }
+
+      if (!req.user) {
+        return res.status(401).json({
+          error: "Kullanıcı bilgisi bulunamadı",
+        });
+      }
+
+      // Check if subdomain already exists
+      const { data: existingMenu, error: checkError } = await supabase
+        .from("menus")
+        .select("id")
+        .eq("subdomain", subdomain)
+        .single();
+
+      if (existingMenu) {
+        return res.status(400).json({
+          error: "Bu subdomain zaten kullanılıyor",
+        });
+      }
+
+      // Create menu record
+      const { data: menu, error: createError } = await supabase
+        .from("menus")
+        .insert({
+          user_id: req.user.id,
+          restaurant_name: name,
+          subdomain: subdomain,
+          is_active: true,
+        })
+        .select()
+        .single();
+
+      if (createError) {
+        console.error("Menu creation error:", createError);
+        return res.status(500).json({
+          error: "Menü oluşturulamadı",
+        });
+      }
+
+      res.status(201).json({
+        message: "Menü başarıyla oluşturuldu!",
+        menu: {
+          id: menu.id,
+          subdomain: menu.subdomain,
+          restaurant_name: menu.restaurant_name,
+          is_active: menu.is_active,
+        },
+      });
+    } catch (error: any) {
+      console.error("Create menu error:", error);
+      res.status(500).json({
+        error: "Menü oluşturulamadı",
+      });
+    }
+  },
+
+  // Get menu by subdomain
+  async getMenuBySubdomain(req: Request, res: Response) {
+    try {
+      const { subdomain } = req.params;
+
+      const { data: menu, error } = await supabase
+        .from("menus")
+        .select(
+          `
+          id,
+          subdomain,
+          restaurant_name,
+          restaurant_description,
+          restaurant_address,
+          restaurant_phone,
+          restaurant_email,
+
+          brand_name,
+          menu_categories (
+            id,
+            name,
+            slug,
+            sort_order,
+            is_active,
+            created_at
+          )
+        `
+        )
+        .eq("subdomain", subdomain)
+        .eq("is_active", true)
+        .order("sort_order", {
+          ascending: true,
+          foreignTable: "menu_categories",
+        })
+        .single();
+
+      if (error || !menu) {
+        return res.status(404).json({
+          error: "Menü bulunamadı",
+        });
+      }
+
+      res.json(menu);
+    } catch (error: any) {
+      console.error("Get menu error:", error);
+      res.status(500).json({
+        error: "Menü getirilemedi",
+      });
+    }
+  },
+
+  // Get menus by user
+  async getMenusByUser(req: Request, res: Response) {
+    try {
+      const { data: menu, error } = await supabase
+        .from("menus")
+        .select("*")
+        .eq("id", req.userMenu!.id)
+        .single();
+
+      if (error) {
+        console.error("Get user menus error:", error);
+        return res.status(500).json({
+          error: "Menüler getirilemedi",
+        });
+      }
+
+      res.json({ data: menu || [] });
+    } catch (error: any) {
+      console.error("Get user menus error:", error);
+      res.status(500).json({
+        error: "Menüler getirilemedi",
+      });
+    }
+  },
+
+  // Get category with items by subdomain and slug or id (public)
+  async getCategoryBySubdomainAndSlug(req: Request, res: Response) {
+    try {
+      const { subdomain, slug } = req.params as {
+        subdomain: string;
+        slug: string;
+      };
+
+      const { data: menu, error: menuError } = await supabase
+        .from("menus")
+        .select("id, is_active")
+        .eq("subdomain", subdomain)
+        .eq("is_active", true)
+        .single();
+
+      if (menuError || !menu) {
+        return res.status(404).json({ error: "Menü bulunamadı" });
+      }
+
+      // First try by slug
+      let { data: category, error: catError } = await supabase
+        .from("menu_categories")
+        .select(
+          `
+          id,
+          name,
+          slug,
+          description,
+          sort_order,
+          is_active,
+          created_at,
+          menu_items (
+           *
+          )
+        `
+        )
+        .eq("menu_id", menu.id)
+        .eq("is_active", true)
+        .eq("slug", slug)
+        .order("sort_order", { ascending: true, foreignTable: "menu_items" })
+        .single();
+
+      // If not found by slug, and looks like UUID, try by id
+      const isUuid =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+          slug
+        );
+      if ((!category || catError) && isUuid) {
+        const resp = await supabase
+          .from("menu_categories")
+          .select(
+            `
+            id,
+            name,
+            slug,
+            description,
+            sort_order,
+            is_active,
+            created_at,
+            menu_items (
+              id,
+              name,
+              description,
+              price,
+              image_url,
+              sort_order,
+              is_available
+            )
+          `
+          )
+          .eq("menu_id", menu.id)
+          .eq("is_active", true)
+          .eq("id", slug)
+          .order("sort_order", { ascending: true, foreignTable: "menu_items" })
+          .single();
+        category = resp.data as any;
+        catError = resp.error as any;
+      }
+
+      if (catError || !category) {
+        return res.status(404).json({ error: "Kategori bulunamadı" });
+      }
+
+      return res.json({ category });
+    } catch (error: any) {
+      console.error("Get category by subdomain and slug error:", error);
+      return res.status(500).json({ error: "Kategori getirilemedi" });
+    }
+  },
+
+  // Update menu details
+  async updateMenu(req: Request, res: Response) {
+    try {
+      const updateData = req.body;
+
+      if (!req.userMenu) {
+        return res.status(401).json({ error: "Kullanıcı menüsü bulunamadı" });
+      }
+
+      // Update menu with new details
+      const { data: updatedMenu, error: updateError } = await supabase
+        .from("menus")
+        .update({
+          ...updateData,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", req.userMenu.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Menu update error:", updateError);
+        return res.status(500).json({ error: "Menü güncellenemedi" });
+      }
+
+      return res.json({
+        message: "Restoran başarıyla güncellendi",
+        data: updatedMenu,
+      });
+    } catch (error: any) {
+      console.error("Update menu error:", error);
+      return res.status(500).json({ error: "Menü güncellenemedi" });
+    }
+  },
+};

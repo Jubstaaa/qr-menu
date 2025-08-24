@@ -1,19 +1,43 @@
 {
-  "name": "qrmenu",
+  "name": "qr-menu-workspace",
+  "version": "1.0.0",
+  "description": "Modern QR Menu Management System - Monorepo",
   "private": true,
-  "packageManager": "npm@10.8.2",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
-    "lint": "turbo lint",
-    "start": "turbo start",
-    "clean": "turbo clean && rm -rf node_modules"
+    "dev": "turbo run dev",
+    "dev:proxy": "microfrontends proxy --local-apps tenant tenant-dashboard",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean",
+    "type-check": "turbo run type-check",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "prepare": "husky install"
   },
   "devDependencies": {
-    "turbo": "^2.0.0"
-  }
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "turbo": "^1.10.0",
+    "typescript": "^5.0.0"
+  },
+"packageManager": "pnpm@10.15.0",
+  "engines": {
+    "node": "20.x",
+    "pnpm": "10.15.0"
+  },
+  "license": "MIT",
+ "dependencies": {
+  "@qr-menu/shared-components": "workspace:*",
+  "@qr-menu/shared-config": "workspace:*",
+  "@qr-menu/shared-styles": "workspace:*",
+  "@qr-menu/shared-types": "workspace:*",
+  "@vercel/microfrontends": "^2.0.0"
+}
 }

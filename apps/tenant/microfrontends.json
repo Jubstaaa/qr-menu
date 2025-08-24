@@ -1,0 +1,22 @@
+{
+  "$schema": "https://openapi.vercel.sh/microfrontends.json",
+  "applications": {
+    "tenant": {
+      "development": {
+        "local": 3001,
+        "fallback": "localhost:3000"
+      }
+    },
+    "tenant-dashboard": {
+      "development": {
+        "local": 3002
+      },
+      "routing": [
+        {
+          "group": "dashboard",
+          "paths": ["/dashboard", "/dashboard/:path*", "/auth/login"]
+        }
+      ]
+    }
+  }
+}

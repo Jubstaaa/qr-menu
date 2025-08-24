@@ -20,7 +20,7 @@ import publicAuthRoutes from "../src/routes/public/auth";
 
 // Load environment variables
 dotenv.config({ path: "../../.env" });
-const app = express();
+const app: express.Application = express();
 
 // Middleware
 app.use(helmet());

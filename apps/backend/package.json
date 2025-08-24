@@ -2,7 +2,7 @@
   "name": "@qrmenu/backend",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",

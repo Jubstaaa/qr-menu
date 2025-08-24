@@ -6,17 +6,17 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
 // Admin routes
-import adminCategoryRoutes from "./routes/admin/category";
-import adminItemRoutes from "./routes/admin/item";
-import adminMenuRoutes from "./routes/admin/menu";
+import adminCategoryRoutes from "./routes/admin/category.js";
+import adminItemRoutes from "./routes/admin/item.js";
+import adminMenuRoutes from "./routes/admin/menu.js";
 import { adminSubscriptionRoutes } from "./routes/admin/subscription.js";
 import { adminAuthRoutes } from "./routes/admin/auth.js";
 
 // Public routes
-import publicCategoryRoutes from "./routes/public/category";
-import publicItemRoutes from "./routes/public/item";
-import publicMenuRoutes from "./routes/public/menu";
-import publicAuthRoutes from "./routes/public/auth";
+import publicCategoryRoutes from "./routes/public/category.js";
+import publicItemRoutes from "./routes/public/item.js";
+import publicMenuRoutes from "./routes/public/menu.js";
+import publicAuthRoutes from "./routes/public/auth.js";
 
 // Load environment variables
 dotenv.config({ path: "../../.env" });

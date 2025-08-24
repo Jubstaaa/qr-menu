@@ -6,12 +6,13 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "turbo run build --filter=@qr-menu/shared-types --filter=@qr-menu/shared-config --filter=@qr-menu/shared-utils && tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "clean": "rm -rf dist"
   },
   "dependencies": {
     "@qr-menu/shared-config": "workspace:*",
+    "@qr-menu/shared-types": "workspace:*",
     "@qr-menu/shared-utils": "workspace:*",
     "@supabase/supabase-js": "^2.56.0",
     "cookie-parser": "^1.4.7",

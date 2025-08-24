@@ -13,7 +13,8 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@qr-menu/shared-config": "workspace:*"
+    "@qr-menu/shared-config": "workspace:*",
+    "@qr-menu/shared-types": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

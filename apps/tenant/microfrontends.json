@@ -1,19 +1,20 @@
 {
   "$schema": "https://openapi.vercel.sh/microfrontends.json",
   "applications": {
-    "tenant": {
+    "qr-menu-tenant": {
+      "package": "tenant",
       "development": {
         "local": 3001,
-        "fallback": "localhost:3000"
+        "fallback": "*.ilkerbalcilar.com.tr"
       }
     },
-    "tenant-dashboard": {
+    "qr-menu-tenant-dashboard": {
+      "package": "tenant-dashboard",
       "development": {
         "local": 3002
       },
       "routing": [
         {
-          "group": "dashboard",
           "paths": ["/dashboard", "/dashboard/:path*", "/auth/login"]
         }
       ]

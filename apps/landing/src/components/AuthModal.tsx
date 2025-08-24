@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -60,9 +60,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
 
   // React Hook Form hooks
   const {
-    control: loginControl,
+    register: registerLogin,
     handleSubmit: handleLoginSubmit,
     reset: resetLogin,
+    formState: { errors: loginErrors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -72,9 +73,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
   });
 
   const {
-    control: registerControl,
+    register: registerRegister,
     handleSubmit: handleRegisterSubmit,
     reset: resetRegister,
+    formState: { errors: registerErrors },
   } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -177,54 +179,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
                         </div>
                       )}
 
-                      <Controller
-                        control={loginControl}
-                        name="email"
-                        rules={{ required: "Email adresi gerekli" }}
-                        render={({
-                          field: { name, value, onChange, onBlur, ref },
-                          fieldState: { invalid, error },
-                        }) => (
-                          <Input
-                            ref={ref}
-                            isRequired
-                            errorMessage={error?.message}
-                            validationBehavior="aria"
-                            isInvalid={invalid}
-                            label="Email Adresi"
-                            name={name}
-                            value={value}
-                            onBlur={onBlur}
-                            onChange={onChange}
-                            type="email"
-                            placeholder="ornek@email.com"
-                          />
-                        )}
+                      <Input
+                        {...registerLogin("email")}
+                        isRequired
+                        errorMessage={loginErrors.email?.message}
+                        validationBehavior="aria"
+                        isInvalid={!!loginErrors.email}
+                        label="Email Adresi"
+                        type="email"
+                        placeholder="ornek@email.com"
                       />
 
-                      <Controller
-                        control={loginControl}
-                        name="password"
-                        rules={{ required: "Şifre gerekli" }}
-                        render={({
-                          field: { name, value, onChange, onBlur, ref },
-                          fieldState: { invalid, error },
-                        }) => (
-                          <Input
-                            ref={ref}
-                            isRequired
-                            errorMessage={error?.message}
-                            validationBehavior="aria"
-                            isInvalid={invalid}
-                            label="Şifre"
-                            name={name}
-                            value={value}
-                            onBlur={onBlur}
-                            onChange={onChange}
-                            type="password"
-                            placeholder="••••••••"
-                          />
-                        )}
+                      <Input
+                        {...registerLogin("password")}
+                        isRequired
+                        errorMessage={loginErrors.password?.message}
+                        validationBehavior="aria"
+                        isInvalid={!!loginErrors.password}
+                        label="Şifre"
+                        type="password"
+                        placeholder="••••••••"
                       />
 
                       <Button
@@ -250,79 +224,37 @@ export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
                         </div>
                       )}
 
-                      <Controller
-                        control={registerControl}
-                        name="email"
-                        rules={{ required: "Email adresi gerekli" }}
-                        render={({
-                          field: { name, value, onChange, onBlur, ref },
-                          fieldState: { invalid, error },
-                        }) => (
-                          <Input
-                            ref={ref}
-                            isRequired
-                            errorMessage={error?.message}
-                            validationBehavior="aria"
-                            isInvalid={invalid}
-                            label="Email Adresi"
-                            name={name}
-                            value={value}
-                            onBlur={onBlur}
-                            onChange={onChange}
-                            type="email"
-                            placeholder="ornek@email.com"
-                          />
-                        )}
+                      <Input
+                        {...registerRegister("email")}
+                        isRequired
+                        errorMessage={registerErrors.email?.message}
+                        validationBehavior="aria"
+                        isInvalid={!!registerErrors.email}
+                        label="Email Adresi"
+                        type="email"
+                        placeholder="ornek@email.com"
                       />
 
-                      <Controller
-                        control={registerControl}
-                        name="password"
-                        rules={{ required: "Şifre gerekli" }}
-                        render={({
-                          field: { name, value, onChange, onBlur, ref },
-                          fieldState: { invalid, error },
-                        }) => (
-                          <Input
-                            ref={ref}
-                            isRequired
-                            errorMessage={error?.message}
-                            validationBehavior="aria"
-                            isInvalid={invalid}
-                            label="Şifre"
-                            name={name}
-                            value={value}
-                            onBlur={onBlur}
-                            onChange={onChange}
-                            type="password"
-                            placeholder="••••••••"
-                          />
-                        )}
+                      <Input
+                        {...registerRegister("password")}
+                        isRequired
+                        errorMessage={registerErrors.password?.message}
+                        validationBehavior="aria"
+                        isInvalid={!!registerErrors.password}
+                        label="Şifre"
+                        type="password"
+                        placeholder="••••••••"
                       />
 
-                      <Controller
-                        control={registerControl}
-                        name="confirmPassword"
-                        rules={{ required: "Şifre tekrarı gerekli" }}
-                        render={({
-                          field: { name, value, onChange, onBlur, ref },
-                          fieldState: { invalid, error },
-                        }) => (
-                          <Input
-                            ref={ref}
-                            isRequired
-                            errorMessage={error?.message}
-                            validationBehavior="aria"
-                            isInvalid={invalid}
-                            label="Şifre Tekrarı"
-                            name={name}
-                            value={value}
-                            onBlur={onBlur}
-                            onChange={onChange}
-                            type="password"
-                            placeholder="••••••••"
-                          />
-                        )}
+                      <Input
+                        {...registerRegister("confirmPassword")}
+                        isRequired
+                        errorMessage={registerErrors.confirmPassword?.message}
+                        validationBehavior="aria"
+                        isInvalid={!!registerErrors.confirmPassword}
+                        label="Şifre Tekrarı"
+                        type="password"
+                        placeholder="••••••••"
                       />
 
                       <Button

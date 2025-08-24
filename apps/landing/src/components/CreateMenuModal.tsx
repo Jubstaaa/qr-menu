@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
@@ -61,7 +61,7 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
 
   // React Hook Form hooks
   const {
-    control: restaurantControl,
+    register: registerRestaurant,
     handleSubmit: handleRestaurantSubmit,
     formState: { errors: restaurantErrors },
     watch: watchRestaurant,
@@ -141,66 +141,38 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
         </div>
 
         <div className="space-y-4">
-          <Controller
-            control={restaurantControl}
-            name="name"
-            rules={{ required: "Restoran adı gerekli" }}
-            render={({
-              field: { name, value, onChange, onBlur, ref },
-              fieldState: { invalid, error },
-            }) => (
-              <Input
-                ref={ref}
-                isRequired
-                errorMessage={error?.message}
-                validationBehavior="aria"
-                isInvalid={invalid}
-                label="Restoran Adı"
-                name={name}
-                value={value}
-                onBlur={onBlur}
-                onChange={onChange}
-                placeholder="Restoran adınızı girin"
-              />
-            )}
+          <Input
+            {...registerRestaurant("name")}
+            isRequired
+            errorMessage={restaurantErrors.name?.message}
+            validationBehavior="aria"
+            isInvalid={!!restaurantErrors.name}
+            label="Restoran Adı"
+            placeholder="Restoran adınızı girin"
           />
 
-          <Controller
-            control={restaurantControl}
-            name="subdomain"
-            rules={{ required: "Subdomain gerekli" }}
-            render={({
-              field: { name, value, onChange, onBlur, ref },
-              fieldState: { invalid, error },
-            }) => (
-              <div>
-                <Input
-                  ref={ref}
-                  isRequired
-                  errorMessage={error?.message}
-                  validationBehavior="aria"
-                  isInvalid={invalid}
-                  label="Subdomain"
-                  name={name}
-                  value={value}
-                  onBlur={onBlur}
-                  onChange={onChange}
-                  placeholder="restoran-adi"
-                  endContent={
-                    <div className="pointer-events-none flex items-center">
-                      <span className="text-default-400 text-small">
-                        .qrmenu.com
-                      </span>
-                    </div>
-                  }
-                />
-                <p className="text-sm text-gray-500 mt-1">
-                  Örnek: {watchRestaurant("subdomain") || "restoran-adi"}
-                  .qrmenu.com
-                </p>
-              </div>
-            )}
-          />
+          <div>
+            <Input
+              {...registerRestaurant("subdomain")}
+              isRequired
+              errorMessage={restaurantErrors.subdomain?.message}
+              validationBehavior="aria"
+              isInvalid={!!restaurantErrors.subdomain}
+              label="Subdomain"
+              placeholder="restoran-adi"
+              endContent={
+                <div className="pointer-events-none flex items-center">
+                  <span className="text-default-400 text-small">
+                    .qrmenu.com
+                  </span>
+                </div>
+              }
+            />
+            <p className="text-sm text-gray-500 mt-1">
+              Örnek: {watchRestaurant("subdomain") || "restoran-adi"}
+              .qrmenu.com
+            </p>
+          </div>
         </div>
       </div>
     </form>

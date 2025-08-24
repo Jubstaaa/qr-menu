@@ -27,17 +27,17 @@
     "turbo": "^1.10.0",
     "typescript": "^5.0.0"
   },
-"packageManager": "pnpm@10.15.0",
+  "packageManager": "pnpm@8.15.0",
   "engines": {
     "node": "20.x",
-    "pnpm": "10.15.0"
+    "pnpm": "8.15.0"
   },
   "license": "MIT",
- "dependencies": {
-  "@qr-menu/shared-components": "workspace:*",
-  "@qr-menu/shared-config": "workspace:*",
-  "@qr-menu/shared-styles": "workspace:*",
-  "@qr-menu/shared-types": "workspace:*",
-  "@vercel/microfrontends": "^2.0.0"
-}
+  "dependencies": {
+    "@qr-menu/shared-components": "workspace:*",
+    "@qr-menu/shared-config": "workspace:*",
+    "@qr-menu/shared-styles": "workspace:*",
+    "@qr-menu/shared-types": "workspace:*",
+    "@vercel/microfrontends": "^2.0.0"
+  }
 }

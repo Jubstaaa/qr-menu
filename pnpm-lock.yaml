@@ -276,6 +276,9 @@ importers:
       '@qr-menu/shared-config':
         specifier: workspace:*
         version: link:../../packages/shared-config
+      '@qr-menu/shared-styles':
+        specifier: workspace:*
+        version: link:../../packages/shared-styles
       '@qr-menu/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types

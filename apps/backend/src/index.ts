@@ -28,17 +28,40 @@ app.set("trust proxy", true);
 
 // Middleware
 app.use(helmet());
-// CORS origins from environment variable
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",")
-  : ["http://localhost:3000", "http://localhost:3024"];
+// CORS configuration
+const corsOptions = {
+  origin: function (origin: string | undefined, callback: any) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-);
+    // Get allowed domains from environment
+    const allowedDomains = process.env.ALLOWED_DOMAINS
+      ? process.env.ALLOWED_DOMAINS.split(",").map((d) => d.trim())
+      : ["localhost:3000", "localhost:3024", "ilkerbalcilar.com.tr"];
+
+    // Check if origin matches any allowed domain
+    const isAllowed = allowedDomains.some((domain) => {
+      // Exact match
+      if (origin === `https://${domain}` || origin === `http://${domain}`) {
+        return true;
+      }
+      // Subdomain match (e.g., ilker-cafe.ilkerbalcilar.com.tr)
+      if (origin.includes(`.${domain}`)) {
+        return true;
+      }
+      return false;
+    });
+
+    if (isAllowed) {
+      return callback(null, true);
+    }
+
+    callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 app.use(morgan("combined"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

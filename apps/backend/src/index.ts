@@ -18,7 +18,8 @@ import publicItemRoutes from "./routes/public/item";
 import publicMenuRoutes from "./routes/public/menu";
 
 // Load environment variables
-dotenv.config({ path: [".env", "../../.env"] });
+dotenv.config({ path: "../../.env" });
+
 const app = express();
 const PORT = process.env.PORT || 4000;
 console.log(process.env);

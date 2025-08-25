@@ -36,7 +36,7 @@ const corsOptions = {
     // Get allowed domains from environment
     const allowedDomains = process.env.ALLOWED_DOMAINS
       ? process.env.ALLOWED_DOMAINS.split(",").map((d) => d.trim())
-      : ["localhost:3000", "localhost:3024", "ilkerbalcilar.com.tr"];
+      : ["localhost:3000", "localhost:3024"];
 
     // Check if origin matches any allowed domain
     const isAllowed = allowedDomains.some((domain) => {
@@ -44,7 +44,6 @@ const corsOptions = {
       if (origin === `https://${domain}` || origin === `http://${domain}`) {
         return true;
       }
-      // Subdomain match (e.g., ilker-cafe.ilkerbalcilar.com.tr)
       if (origin.includes(`.${domain}`)) {
         return true;
       }

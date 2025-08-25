@@ -1,5 +1,13 @@
-import { Request, Response } from "express";
+import { CookieOptions, Request, Response } from "express";
 import { supabase } from "../../supabase/supabase";
+
+const isProd = process.env.NODE_ENV === "production";
+
+const cookieConfig: Pick<CookieOptions, "secure" | "sameSite" | "domain"> = {
+  secure: isProd,
+  sameSite: isProd ? "none" : "lax",
+  domain: isProd ? `.${process.env.COOKIE_DOMAIN}` : undefined,
+};
 
 export const authController = {
   // Login - hem public hem admin için
@@ -33,13 +41,11 @@ export const authController = {
         });
       }
 
-      // Cookie'yi set et
       res.cookie("auth_token", authData.session?.access_token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
+        ...cookieConfig,
         path: "/",
+        maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
       // Kullanıcının menülerini getir
@@ -103,8 +109,7 @@ export const authController = {
       // Cookie'yi set et
       res.cookie("auth_token", authData.session?.access_token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        ...cookieConfig,
         maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
         path: "/",
       });
@@ -141,8 +146,7 @@ export const authController = {
       // Cookie'yi temizle
       res.clearCookie("auth_token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+        ...cookieConfig,
         path: "/",
       });
 

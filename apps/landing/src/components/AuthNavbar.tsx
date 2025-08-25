@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Button,
   Navbar,
@@ -17,7 +17,7 @@ import {
   User,
   Switch,
 } from "@heroui/react";
-import { FaQrcode, FaSun, FaMoon } from "react-icons/fa";
+import { FaQrcode } from "react-icons/fa";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "./AuthModal";
 import { CreateMenuModal } from "./CreateMenuModal";
@@ -32,6 +32,13 @@ export const AuthNavbar: React.FC = () => {
     logout();
     setIsMenuOpen(false);
   };
+
+  const host = typeof window !== "undefined" ? window.location.host : "";
+
+  const menuUrl = useMemo(() => {
+    if (!user?.menuSubdomain || !host) return "#";
+    return `https://${user.menuSubdomain}.${host}`;
+  }, [user?.menuSubdomain, host]);
 
   return (
     <Navbar onMenuOpenChange={setIsMenuOpen} isBordered>
@@ -101,12 +108,9 @@ export const AuthNavbar: React.FC = () => {
                   <DropdownItem
                     key="menu"
                     color="default"
-                    onClick={() => {
-                      window.open(
-                        `http://${user.menuSubdomain}.localhost:3000`,
-                        "_blank"
-                      );
-                    }}
+                    as={Link}
+                    href={menuUrl}
+                    target="_blank"
                   >
                     Menüme Git
                   </DropdownItem>
@@ -149,12 +153,7 @@ export const AuthNavbar: React.FC = () => {
           <>
             <NavbarItem>
               {user?.menuSubdomain ? (
-                <Button
-                  color="primary"
-                  variant="flat"
-                  as={Link}
-                  href={`https://${user.menuSubdomain}.ilkerbalcilar.com.tr`}
-                >
+                <Button color="primary" variant="flat" as={Link} href={menuUrl}>
                   Menüme Git
                 </Button>
               ) : (
@@ -228,10 +227,9 @@ export const AuthNavbar: React.FC = () => {
                   color="primary"
                   variant="flat"
                   onPress={() => {
-                    window.open(
-                      `http://${user.menuSubdomain}.localhost:3000`,
-                      "_blank"
-                    );
+                    if (menuUrl !== "#" && typeof window !== "undefined") {
+                      window.open(menuUrl, "_blank");
+                    }
                   }}
                   className="w-full"
                 >

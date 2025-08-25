@@ -47,6 +47,8 @@ const steps = [
   },
 ];
 
+const host = typeof window !== "undefined" ? window.location.host : "";
+
 interface CreateMenuModalProps {
   children: (onOpen: () => void) => React.ReactNode;
 }
@@ -99,7 +101,7 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
         // Show success toast
         addToast({
           title: "Başarılı!",
-          description: `Menü başarıyla oluşturuldu! URL: ${menuResponse.data.menu.subdomain}.qrmenu.com`,
+          description: `Menü başarıyla oluşturuldu! URL: https://${menuResponse.data.menu.subdomain}.${host}`,
           color: "success",
         });
       } catch (err: any) {
@@ -162,15 +164,12 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
               placeholder="restoran-adi"
               endContent={
                 <div className="pointer-events-none flex items-center">
-                  <span className="text-default-400 text-small">
-                    .qrmenu.com
-                  </span>
+                  <span className="text-default-400 text-small">.{host}</span>
                 </div>
               }
             />
             <p className="text-sm text-gray-500 mt-1">
-              Örnek: {watchRestaurant("subdomain") || "restoran-adi"}
-              .qrmenu.com
+              Örnek: {watchRestaurant("subdomain") || "restoran-adi"}.{host}
             </p>
           </div>
         </div>

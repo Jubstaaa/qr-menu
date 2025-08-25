@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-dotenv.config({ path: "../../.env" });
+dotenv.config({ path: [".env", "../../.env"] });
 
 export interface EnvironmentConfig {
   NODE_ENV: "development" | "production" | "test";

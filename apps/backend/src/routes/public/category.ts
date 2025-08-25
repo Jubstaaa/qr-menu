@@ -5,7 +5,7 @@ const router: Router = Router();
 
 // Public category routes - no authentication required
 
-// GET /api/public/categories/:slug - Get category with items by subdomain and slug
+// GET /api/public/categories/:slug?subdomain=xxx - Get category with items by subdomain and slug
 router.get("/:slug", publicCategoryController.getCategoryBySubdomainAndSlug);
 
 export default router;

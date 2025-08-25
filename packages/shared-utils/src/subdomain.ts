@@ -27,6 +27,13 @@ export const extractSubdomain = (host: string): string => {
 };
 
 export const getSubdomainFromHeaders = (headers: Headers): string => {
+  // Önce x-subdomain header'ını kontrol et (middleware'den gelir)
+  const subdomainHeader = headers.get("x-subdomain");
+  if (subdomainHeader) {
+    return subdomainHeader;
+  }
+
+  // Fallback olarak host'tan çıkar
   const host = headers.get("host") || "";
   return extractSubdomain(host);
 };

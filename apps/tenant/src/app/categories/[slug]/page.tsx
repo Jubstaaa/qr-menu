@@ -1,7 +1,6 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import Image from "next/image";
-import { getSubdomainFromHeaders, apiClient } from "@qr-menu/shared-utils";
+import { apiClient } from "@qr-menu/shared-utils";
 import Link from "next/link";
 import ProductGrid from "../../../components/ProductGrid";
 
@@ -13,15 +12,19 @@ export default async function CategoryDetailPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  // Get hostname from headers and extract subdomain
+  // Get subdomain from x-subdomain header (middleware'den gelir)
   const headersList = await headers();
-  const subdomain = getSubdomainFromHeaders(headersList);
+  const subdomain = headersList.get("x-subdomain");
 
   try {
     // Get category with items using new public API
     const { slug } = await params;
-    const { data: categoryData } =
-      await apiClient.getCategoryBySlugPublic(slug);
+    const { data: categoryData } = await apiClient.getCategoryBySlugPublic(
+      slug,
+      {
+        subdomain: subdomain || undefined,
+      }
+    );
 
     if (!categoryData) {
       notFound();

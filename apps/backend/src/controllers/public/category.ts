@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
-import { extractSubdomain } from "@qr-menu/shared-utils";
 
 export const publicCategoryController = {
   // Get active categories by subdomain
@@ -9,10 +8,22 @@ export const publicCategoryController = {
   async getCategoryBySubdomainAndSlug(req: Request, res: Response) {
     try {
       const { slug } = req.params;
+      const subdomain = req.headers["x-subdomain"] as string;
 
-      // Subdomain'i request'ten al
-      const host = req.headers.host || "";
-      const subdomain = extractSubdomain(host);
+      if (!subdomain) {
+        return res.status(400).json({
+          error: "X-Subdomain header'ı gerekli",
+        });
+      }
+
+      if (!slug) {
+        return res.status(400).json({
+          error: "Slug parametresi gerekli",
+        });
+      }
+
+      console.log("Using subdomain from header:", subdomain, "slug:", slug);
+
       // Önce subdomain'e ait menüyü bul
       const { data: menu, error: menuError } = await supabase
         .from("menus")
@@ -21,7 +32,7 @@ export const publicCategoryController = {
         .eq("is_active", true)
         .single();
 
-      console.log(menu);
+      console.log("Found menu:", menu);
 
       if (menuError || !menu) {
         return res.status(404).json({

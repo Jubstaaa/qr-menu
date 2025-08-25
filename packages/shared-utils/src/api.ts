@@ -1,4 +1,10 @@
+// Global window type for browser environment
+declare global {
+  var window: Window & typeof globalThis;
+}
+
 import { config } from "@qr-menu/shared-config";
+import { extractSubdomain } from "./subdomain";
 import {
   ApiResponse,
   ApiErrorResponse,
@@ -28,6 +34,7 @@ export interface RequestOptions {
   method?: HttpMethod;
   headers?: Record<string, string>;
   body?: any;
+  subdomain?: string; // Server-side için subdomain parametresi
   cache?:
     | "default"
     | "no-store"
@@ -123,6 +130,15 @@ export const apiRequest = async <T = any>(
   // Cookie tabanlı auth için Authorization header'a gerek yok
   const headers = { ...finalOptions.headers };
 
+  // Subdomain header'ını ekle (server-side veya client-side)
+  if (finalOptions.subdomain) {
+    // Server-side'da parametre olarak verilen subdomain
+    headers["x-subdomain"] = finalOptions.subdomain;
+  } else if (typeof window !== "undefined") {
+    // Client-side'da hostname'den çıkarılan subdomain
+    headers["x-subdomain"] = extractSubdomain(window.location.host);
+  }
+
   // Prepare request config
   const requestConfig: RequestInit = {
     method: finalOptions.method,
@@ -198,11 +214,16 @@ export const apiClient = {
   getCategoriesByMenu: (): Promise<ApiResponse<CategoriesResponse>> =>
     apiGet<CategoriesResponse>(`${config.API_ENDPOINTS.ADMIN.CATEGORY}`),
 
-  getMenuBySubdomainPublic: (): Promise<ApiResponse<MenuWithCategories>> =>
-    apiGet<MenuWithCategories>(config.API_ENDPOINTS.PUBLIC.MENU),
+  getMenuBySubdomainPublic: (
+    options?: RequestOptions
+  ): Promise<ApiResponse<MenuWithCategories>> =>
+    apiRequest<MenuWithCategories>(config.API_ENDPOINTS.PUBLIC.MENU, options),
 
-  getCategoryBySlugPublic: (slug: string): Promise<ApiResponse<any>> =>
-    apiGet<any>(`${config.API_ENDPOINTS.PUBLIC.CATEGORY}/${slug}`),
+  getCategoryBySlugPublic: (
+    slug: string,
+    options?: RequestOptions
+  ): Promise<ApiResponse<any>> =>
+    apiRequest<any>(`${config.API_ENDPOINTS.PUBLIC.CATEGORY}/${slug}`, options),
 
   // Public Auth operations
   publicLogin: (

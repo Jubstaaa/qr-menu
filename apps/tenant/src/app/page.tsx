@@ -1,21 +1,21 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import Image from "next/image";
-import { CategoriesResponse } from "@qr-menu/shared-types";
-import { getSubdomainFromHeaders, apiClient } from "@qr-menu/shared-utils";
+import { apiClient } from "@qr-menu/shared-utils";
 import Link from "next/link";
 
 // Force dynamic rendering for this page
 export const dynamic = "force-dynamic";
 
 export default async function TenantMenuPage() {
-  // Get hostname from headers and extract subdomain
+  // Get subdomain from x-subdomain header (middleware'den gelir)
   const headersList = await headers();
-  const subdomain = getSubdomainFromHeaders(headersList);
+  const subdomain = headersList.get("x-subdomain");
 
   try {
     // Get menu with categories by subdomain using single API
-    const menuResponse = await apiClient.getMenuBySubdomainPublic();
+    const menuResponse = await apiClient.getMenuBySubdomainPublic({
+      subdomain: subdomain || undefined,
+    });
     const menu = menuResponse.data;
 
     if (!menu || !menu.menu_categories || menu.menu_categories.length === 0) {

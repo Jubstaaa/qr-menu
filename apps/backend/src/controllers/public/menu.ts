@@ -1,25 +1,19 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
-import { SubdomainRequest } from "../../middleware/subdomain";
 
 export const publicMenuController = {
   // Get menu by subdomain (public)
-  async getMenuBySubdomain(req: SubdomainRequest, res: Response) {
+  async getMenuBySubdomain(req: Request, res: Response) {
     try {
-      // Subdomain middleware'den gelen subdomain'i kullan
-      const subdomain = req.subdomain;
-      // Subdomain'i request'ten al
-      console.log(req.subdomains);
-      console.log(req.hostname);
-      console.log(req.get("host"));
-      console.log(req.headers.host);
+      const subdomain = req.headers["x-subdomain"] as string;
+
       if (!subdomain) {
         return res.status(400).json({
-          error: "Subdomain bilgisi bulunamadı",
+          error: "X-Subdomain header'ı gerekli",
         });
       }
 
-      console.log("Using subdomain from middleware:", subdomain);
+      console.log("Using subdomain from header:", subdomain);
 
       // Menüyü subdomain ile bul (kategorilerle birlikte)
       const { data: menu, error } = await supabase

@@ -18,14 +18,11 @@ export default async function TenantMenuPage() {
     });
     const menu = menuResponse.data;
 
-    if (!menu || !menu.menu_categories || menu.menu_categories.length === 0) {
+    if (!menu) {
       notFound();
     }
 
     // Filter active categories
-    const categories = menu.menu_categories.filter(
-      (category: any) => category.is_active
-    );
 
     return (
       <div className="min-h-screen bg-gray-50">
@@ -85,7 +82,7 @@ export default async function TenantMenuPage() {
             </p>
           </div>
 
-          {categories.length === 0 ? (
+          {!menu.menu_categories || menu.menu_categories.length === 0 ? (
             <div className="text-center py-16">
               <div className="text-gray-400 text-8xl mb-6">🍽️</div>
               <h3 className="text-2xl font-medium text-gray-900 mb-3">
@@ -97,7 +94,7 @@ export default async function TenantMenuPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {categories.map((category: any) => (
+              {menu.menu_categories?.map((category: any) => (
                 <Link
                   key={category.id}
                   href={`/categories/${category.slug || category.id}`}

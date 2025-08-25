@@ -6,6 +6,7 @@ export function middleware(request: NextRequest) {
 
   if (pathname.startsWith("/dashboard")) {
     const authToken = request.cookies.get("auth_token")?.value;
+    console.log(request.cookies);
 
     if (!authToken) {
       const loginUrl = new URL("/auth/login", request.url);

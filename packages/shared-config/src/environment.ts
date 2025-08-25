@@ -10,8 +10,9 @@ export interface EnvironmentConfig {
   TEST_SUBDOMAIN?: string;
   MICROFRONTENDS_PROXY?: string;
   API_ENDPOINTS: {
-    ADMIN_AUTH: {
+    AUTH: {
       LOGIN: string;
+      REGISTER: string;
       LOGOUT: string;
       CHECK: string;
       MENUS: string;
@@ -26,7 +27,6 @@ export interface EnvironmentConfig {
       CATEGORY: string;
       ITEM: string;
       MENU: string;
-      AUTH: string;
     };
   };
 }
@@ -40,11 +40,12 @@ export const config: EnvironmentConfig = {
   TEST_SUBDOMAIN: process.env.TEST_SUBDOMAIN,
   MICROFRONTENDS_PROXY: process.env.MICROFRONTENDS_PROXY,
   API_ENDPOINTS: {
-    ADMIN_AUTH: {
-      LOGIN: "/api/admin/auth/login",
-      LOGOUT: "/api/admin/auth/logout",
-      CHECK: "/api/admin/auth/check",
-      MENUS: "/api/admin/auth/menus",
+    AUTH: {
+      LOGIN: "/api/auth/login",
+      REGISTER: "/api/auth/register",
+      LOGOUT: "/api/auth/logout",
+      CHECK: "/api/auth/check",
+      MENUS: "/api/auth/menus",
     },
     ADMIN: {
       CATEGORY: "/api/admin/categories",
@@ -56,7 +57,6 @@ export const config: EnvironmentConfig = {
       CATEGORY: "/api/public/categories",
       ITEM: "/api/public/items",
       MENU: "/api/public/menu",
-      AUTH: "/api/public/auth",
     },
   },
 };

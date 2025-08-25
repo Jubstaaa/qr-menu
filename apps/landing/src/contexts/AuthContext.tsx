@@ -31,7 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const checkAuth = async () => {
     try {
-      const { data } = await apiClient.publicCheckAuth();
+      const { data } = await apiClient.checkAuth();
       setUser(data);
       setIsAuthenticated(true);
     } catch (error) {
@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const login = async (email: string, password: string) => {
     try {
-      const { data } = await apiClient.publicLogin(email, password);
+      const { data } = await apiClient.login(email, password);
       setUser(data.user);
       setIsAuthenticated(true);
     } catch (error: any) {
@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const register = async (email: string, password: string) => {
     try {
-      const { data } = await apiClient.publicRegister(email, password);
+      const { data } = await apiClient.register(email, password);
       setUser(data.user);
       setIsAuthenticated(true);
     } catch (error: any) {
@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     try {
-      await apiClient.publicLogout();
+      await apiClient.logout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {

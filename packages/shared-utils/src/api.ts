@@ -225,27 +225,30 @@ export const apiClient = {
   ): Promise<ApiResponse<any>> =>
     apiRequest<any>(`${config.API_ENDPOINTS.PUBLIC.CATEGORY}/${slug}`, options),
 
-  // Public Auth operations
-  publicLogin: (
+  // Auth operations (hem public hem admin için)
+  login: (
     email: string,
     password: string
   ): Promise<ApiResponse<LoginResponse>> =>
-    apiPost(`${config.API_ENDPOINTS.PUBLIC.AUTH}/login`, { email, password }),
+    apiPost(`${config.API_ENDPOINTS.AUTH.LOGIN}`, { email, password }),
 
-  publicRegister: (
+  register: (
     email: string,
     password: string
   ): Promise<ApiResponse<RegisterResponse>> =>
-    apiPost(`${config.API_ENDPOINTS.PUBLIC.AUTH}/register`, {
+    apiPost(`${config.API_ENDPOINTS.AUTH.REGISTER}`, {
       email,
       password,
     }),
 
-  publicLogout: (): Promise<ApiResponse<void>> =>
-    apiPost(`${config.API_ENDPOINTS.PUBLIC.AUTH}/logout`, {}),
+  logout: (): Promise<ApiResponse<void>> =>
+    apiPost(`${config.API_ENDPOINTS.AUTH.LOGOUT}`, {}),
 
-  publicCheckAuth: (): Promise<ApiResponse<User>> =>
-    apiGet<User>(`${config.API_ENDPOINTS.PUBLIC.AUTH}/check`),
+  checkAuth: (): Promise<ApiResponse<User>> =>
+    apiGet<User>(`${config.API_ENDPOINTS.AUTH.CHECK}`),
+
+  getUserMenus: (): Promise<ApiResponse<AdminGetUserMenusResponse>> =>
+    apiGet(config.API_ENDPOINTS.AUTH.MENUS),
 
   getItemsByCategory: (
     categoryId: string
@@ -256,25 +259,6 @@ export const apiClient = {
 
   getItemsByMenu: (): Promise<ApiResponse<ItemsResponse>> =>
     apiGet<ItemsResponse>(`${config.API_ENDPOINTS.ADMIN.ITEM}`),
-
-  // Admin Auth operations
-  adminLogin: (
-    email: string,
-    password: string
-  ): Promise<ApiResponse<AdminLoginResponse>> =>
-    apiPost(config.API_ENDPOINTS.ADMIN_AUTH.LOGIN, {
-      email,
-      password,
-    }),
-
-  adminLogout: (): Promise<ApiResponse<void>> =>
-    apiPost(config.API_ENDPOINTS.ADMIN_AUTH.LOGOUT, {}),
-
-  adminCheckAuth: (): Promise<ApiResponse<AdminAuthCheckResponse>> =>
-    apiGet(config.API_ENDPOINTS.ADMIN_AUTH.CHECK),
-
-  adminGetUserMenus: (): Promise<ApiResponse<AdminGetUserMenusResponse>> =>
-    apiGet(config.API_ENDPOINTS.ADMIN_AUTH.MENUS),
 
   // Admin Menu operations
   adminCreateMenu: (

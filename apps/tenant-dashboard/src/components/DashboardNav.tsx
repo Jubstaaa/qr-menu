@@ -12,7 +12,7 @@ export default function DashboardNav() {
 
   const handleLogout = async () => {
     try {
-      await apiClient.publicLogout();
+      await apiClient.logout();
       router.replace("/auth/login");
     } catch (error) {
       console.error("Logout error:", error);

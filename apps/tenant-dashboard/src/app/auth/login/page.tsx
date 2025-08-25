@@ -30,7 +30,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const { data, message } = await apiClient.adminLogin(email, password);
+      const { data, message } = await apiClient.login(email, password);
       if (data?.access_token) {
         // Token'ı localStorage'a kaydet (cookie backend tarafından otomatik set ediliyor)
 

@@ -21,10 +21,7 @@ import publicMenuRoutes from "./routes/public/menu";
 dotenv.config({ path: [".env", "../../.env"] });
 const app = express();
 const PORT = process.env.PORT || 4000;
-
-// Trust proxy - reverse proxy arkasında çalışırken gerekli
-app.set("trust proxy", true);
-
+console.log(process.env);
 // Middleware
 app.use(helmet());
 // CORS configuration

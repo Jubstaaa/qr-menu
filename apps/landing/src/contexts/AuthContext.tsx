@@ -1,16 +1,29 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@qr-menu/shared-utils";
-import { User } from "@qr-menu/shared-types";
+import { AuthModal } from "../components/AuthModal";
+import {
+  ApiErrorResponse,
+  ApiResponse,
+  AuthResponseDto,
+  LoginDto,
+  RegisterDto,
+} from "@qr-menu/shared-types";
 
 interface AuthContextType {
-  user: User | null;
+  isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-  checkAuth: () => void;
+  user: AuthResponseDto["user"] | null;
+  menu: AuthResponseDto["menu"] | null;
+  login: (data: LoginDto) => Promise<ApiResponse<AuthResponseDto>>;
+  register: (data: RegisterDto) => Promise<ApiResponse<AuthResponseDto>>;
+  logout: () => Promise<void>;
+  isMutationLoading: boolean;
+  isAuthModalOpen: boolean;
+  openAuthModal: () => void;
+  closeAuthModal: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,64 +39,96 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const queryClient = useQueryClient();
+  const [isAuthModalOpen, setIsAuthModalOpen] = React.useState(false);
 
-  const checkAuth = async () => {
-    try {
-      const { data } = await apiClient.checkAuth();
-      setUser(data);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error("Auth check error:", error);
-      setUser(null);
-      setIsAuthenticated(false);
+  const openAuthModal = () => setIsAuthModalOpen(true);
+  const closeAuthModal = () => setIsAuthModalOpen(false);
+
+  // Auth check query
+  const { data: authData, isLoading } = useQuery<
+    AuthResponseDto,
+    ApiErrorResponse
+  >({
+    queryKey: ["auth"],
+    queryFn: async () => {
+      const response = await apiClient.checkAuth();
+      return response.data;
+    },
+    retry: false,
+  });
+
+  // Login mutation
+  const loginMutation = useMutation<
+    ApiResponse<AuthResponseDto>,
+    ApiErrorResponse,
+    LoginDto
+  >({
+    mutationFn: async (data: LoginDto) => {
+      const response = await apiClient.login(data);
+      return response;
+    },
+    onSuccess: (response: ApiResponse<AuthResponseDto>) => {
+      queryClient.setQueryData<AuthResponseDto>(["auth"], response.data);
+      closeAuthModal();
+    },
+  });
+
+  // Register mutation
+  const registerMutation = useMutation<
+    ApiResponse<AuthResponseDto>,
+    ApiErrorResponse,
+    RegisterDto
+  >({
+    mutationFn: async (data: RegisterDto) => {
+      const response = await apiClient.register(data);
+      return response;
+    },
+    onSuccess: (response: ApiResponse<AuthResponseDto>) => {
+      queryClient.setQueryData<AuthResponseDto>(["auth"], response.data);
+      closeAuthModal();
+    },
+  });
+
+  const logoutMutation = useMutation<ApiResponse<void>, ApiErrorResponse, void>(
+    {
+      mutationFn: async () => {
+        const response = await apiClient.logout();
+        return response;
+      },
+      onSuccess: () => {
+        queryClient.setQueryData<AuthResponseDto | null>(["auth"], null);
+      },
     }
-  };
-
-  const login = async (email: string, password: string) => {
-    try {
-      const { data } = await apiClient.login(email, password);
-      setUser(data.user);
-      setIsAuthenticated(true);
-    } catch (error: any) {
-      throw error;
-    }
-  };
-
-  const register = async (email: string, password: string) => {
-    try {
-      const { data } = await apiClient.register(email, password);
-      setUser(data.user);
-      setIsAuthenticated(true);
-    } catch (error: any) {
-      throw error;
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await apiClient.logout();
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      setUser(null);
-      setIsAuthenticated(false);
-    }
-  };
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  );
 
   const value: AuthContextType = {
-    user,
-    isAuthenticated,
-    login,
-    register,
-    logout,
-    checkAuth,
+    isLoading,
+    isAuthenticated: !!authData?.user,
+    user: authData?.user || null,
+    menu: authData?.menu || null,
+    login: async (data: LoginDto) => {
+      return await loginMutation.mutateAsync(data);
+    },
+    register: async (data: RegisterDto) => {
+      return await registerMutation.mutateAsync(data);
+    },
+    logout: async () => {
+      await logoutMutation.mutateAsync();
+    },
+    isMutationLoading:
+      loginMutation.isPending ||
+      registerMutation.isPending ||
+      logoutMutation.isPending,
+    isAuthModalOpen,
+    openAuthModal,
+    closeAuthModal,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      <AuthModal />
+    </AuthContext.Provider>
+  );
 };

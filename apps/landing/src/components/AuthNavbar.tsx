@@ -17,7 +17,7 @@ import {
   User,
   Switch,
 } from "@heroui/react";
-import { FaQrcode } from "react-icons/fa";
+import { QrCode } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthModal } from "./AuthModal";
 import { CreateMenuModal } from "./CreateMenuModal";
@@ -26,35 +26,44 @@ import Link from "next/link";
 
 export const AuthNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated, user, logout } = useAuth();
+  const { user, menu, logout, openAuthModal, isAuthenticated, isLoading } =
+    useAuth();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setIsMenuOpen(false);
   };
 
   const host = typeof window !== "undefined" ? window.location.host : "";
 
   const menuUrl = useMemo(() => {
-    if (!user?.menuSubdomain || !host) return "#";
-    return `https://${user.menuSubdomain}.${host}`;
-  }, [user?.menuSubdomain, host]);
+    if (!menu?.subdomain || !host) return "#";
+    return `https://${menu.subdomain}.${host}`;
+  }, [menu?.subdomain, host]);
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen} isBordered>
+    <Navbar
+      onMenuOpenChange={setIsMenuOpen}
+      isBordered
+      className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
+    >
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-          className="sm:hidden"
+          className="sm:hidden text-gray-700 dark:text-gray-200"
         />
         <NavbarBrand>
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-500 rounded-lg">
-              <FaQrcode className="text-white text-xl" />
+              <QrCode className="text-white text-xl" />
             </div>
             <div>
-              <p className="font-bold text-inherit">QR Menu</p>
-              <p className="text-xs text-gray-500">Dijital Menü Sistemi</p>
+              <p className="font-bold text-gray-900 dark:text-gray-100">
+                QR Menu
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Dijital Menü Sistemi
+              </p>
             </div>
           </div>
         </NavbarBrand>
@@ -62,125 +71,136 @@ export const AuthNavbar: React.FC = () => {
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
-          <Button variant="light" color="default">
+          <Button
+            variant="light"
+            color="default"
+            className="dark:text-gray-200"
+            as={Link}
+            href="/features"
+          >
             Özellikler
           </Button>
         </NavbarItem>
         <NavbarItem>
-          <Button variant="light" color="default">
+          <Button
+            variant="light"
+            color="default"
+            className="dark:text-gray-200"
+            as={Link}
+            href="/pricing"
+          >
             Fiyatlandırma
           </Button>
         </NavbarItem>
         <NavbarItem>
-          <Button variant="light" color="default">
+          <Button
+            variant="light"
+            color="default"
+            className="dark:text-gray-200"
+            as={Link}
+            href="/contact"
+          >
             İletişim
           </Button>
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarContent justify="end">
-        <NavbarItem>
-          <ThemeSwitcher />
-        </NavbarItem>
-
-        {isAuthenticated ? (
+      {!isLoading && (
+        <NavbarContent justify="end">
           <NavbarItem>
-            <Dropdown placement="bottom-end">
-              <DropdownTrigger>
-                <User
-                  as="button"
-                  avatarProps={{
-                    isBordered: true,
-                    src: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`,
-                  }}
-                  className="transition-transform cursor-pointer"
-                  description={user?.email}
-                  name="Kullanıcı"
-                />
-              </DropdownTrigger>
-              <DropdownMenu aria-label="Profile Actions" variant="flat">
-                <DropdownItem key="profile" color="default">
-                  <p className="font-semibold">
-                    Merhaba, {user?.restaurant_name || user?.email}
-                  </p>
-                </DropdownItem>
-                {user?.menuSubdomain && (
-                  <DropdownItem
-                    key="menu"
-                    color="default"
+            <ThemeSwitcher />
+          </NavbarItem>
+
+          {isAuthenticated && (
+            <>
+              <NavbarItem>
+                {menu?.subdomain ? (
+                  <Button
+                    color="primary"
+                    variant="flat"
                     as={Link}
                     href={menuUrl}
                     target="_blank"
                   >
                     Menüme Git
-                  </DropdownItem>
+                  </Button>
+                ) : (
+                  <CreateMenuModal>
+                    {(onOpen) => (
+                      <Button color="primary" onPress={onOpen}>
+                        Menü Oluştur
+                      </Button>
+                    )}
+                  </CreateMenuModal>
                 )}
-                <DropdownItem
-                  key="logout"
-                  color="danger"
-                  onClick={handleLogout}
+              </NavbarItem>
+            </>
+          )}
+          {isAuthenticated ? (
+            <NavbarItem>
+              <Dropdown placement="bottom-end">
+                <DropdownTrigger>
+                  <User
+                    as="button"
+                    avatarProps={{
+                      isBordered: true,
+                      src: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`,
+                    }}
+                    className="transition-transform cursor-pointer"
+                    description={user?.email}
+                    name="Kullanıcı"
+                  />
+                </DropdownTrigger>
+                <DropdownMenu
+                  aria-label="Profile Actions"
+                  variant="flat"
+                  className="dark:bg-gray-800 dark:text-gray-100"
                 >
-                  Çıkış Yap
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          </NavbarItem>
-        ) : (
-          <NavbarItem>
-            <AuthModal>
-              {(onOpen) => (
-                <Button color="primary" variant="flat" onPress={onOpen}>
-                  Giriş Yap
-                </Button>
-              )}
-            </AuthModal>
-          </NavbarItem>
-        )}
-
-        {!isAuthenticated && (
-          <NavbarItem>
-            <AuthModal>
-              {(onOpen) => (
-                <Button color="primary" onPress={onOpen}>
-                  Ücretsiz Başla
-                </Button>
-              )}
-            </AuthModal>
-          </NavbarItem>
-        )}
-
-        {isAuthenticated && (
-          <>
-            <NavbarItem>
-              {user?.menuSubdomain ? (
-                <Button color="primary" variant="flat" as={Link} href={menuUrl}>
-                  Menüme Git
-                </Button>
-              ) : (
-                <CreateMenuModal>
-                  {(onOpen) => (
-                    <Button color="primary" onPress={onOpen}>
-                      Menü Oluştur
-                    </Button>
-                  )}
-                </CreateMenuModal>
-              )}
+                  <DropdownItem
+                    key="profile"
+                    color="default"
+                    className="dark:text-gray-100"
+                  >
+                    <p className="font-semibold">Merhaba, {user?.email}</p>
+                  </DropdownItem>
+                  {menu?.subdomain ? (
+                    <DropdownItem
+                      key="menu"
+                      color="default"
+                      as={Link}
+                      href={menuUrl}
+                      target="_blank"
+                      className="dark:text-gray-100"
+                    >
+                      Menüme Git
+                    </DropdownItem>
+                  ) : null}
+                  <DropdownItem
+                    key="logout"
+                    color="danger"
+                    onClick={handleLogout}
+                  >
+                    Çıkış Yap
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             </NavbarItem>
+          ) : (
             <NavbarItem>
-              <Button variant="bordered" color="danger" onPress={handleLogout}>
-                Çıkış Yap
+              <Button color="primary" variant="flat" onPress={openAuthModal}>
+                Giriş Yap
               </Button>
             </NavbarItem>
-          </>
-        )}
-      </NavbarContent>
+          )}
+        </NavbarContent>
+      )}
 
-      <NavbarMenu>
+      <NavbarMenu className="dark:bg-gray-900">
         <NavbarMenuItem>
           <Button
             variant="light"
             color="default"
-            className="w-full justify-start"
+            className="w-full justify-start dark:text-gray-200"
           >
             Özellikler
           </Button>
@@ -189,7 +209,7 @@ export const AuthNavbar: React.FC = () => {
           <Button
             variant="light"
             color="default"
-            className="w-full justify-start"
+            className="w-full justify-start dark:text-gray-200"
           >
             Fiyatlandırma
           </Button>
@@ -198,31 +218,33 @@ export const AuthNavbar: React.FC = () => {
           <Button
             variant="light"
             color="default"
-            className="w-full justify-start"
+            className="w-full justify-start dark:text-gray-200"
           >
             İletişim
           </Button>
         </NavbarMenuItem>
 
-        <div className="border-t pt-4 mt-4">
+        <div className="border-t pt-4 mt-4 dark:border-gray-800">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm text-gray-500">Tema</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              Tema
+            </span>
             <ThemeSwitcher />
           </div>
 
-          {isAuthenticated ? (
+          {isAuthenticated && (
             <div className="space-y-3">
-              <p className="text-sm text-gray-500 text-center">
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
                 Merhaba, {user?.email}
               </p>
               <Button
                 variant="bordered"
                 onClick={handleLogout}
-                className="w-full"
+                className="w-full dark:border-gray-700 dark:text-gray-200"
               >
                 Çıkış
               </Button>
-              {user?.menuSubdomain ? (
+              {menu ? (
                 <Button
                   color="primary"
                   variant="flat"
@@ -245,14 +267,6 @@ export const AuthNavbar: React.FC = () => {
                 </CreateMenuModal>
               )}
             </div>
-          ) : (
-            <AuthModal>
-              {(onOpen) => (
-                <Button color="primary" onPress={onOpen}>
-                  Giriş Yap
-                </Button>
-              )}
-            </AuthModal>
           )}
         </div>
       </NavbarMenu>

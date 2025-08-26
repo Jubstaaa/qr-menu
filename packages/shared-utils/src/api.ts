@@ -8,22 +8,20 @@ import { extractSubdomain } from "./subdomain";
 import {
   ApiResponse,
   ApiErrorResponse,
-  MenuWithCategoriesResponse,
-  CategoriesResponse,
-  ItemsResponse,
-  CategoryWithItemsResponse,
-  Item,
-  Category,
+  AuthResponseDto,
+  LoginDto,
+  RegisterDto,
+  CreateMenuDto,
+  CreateMenuResponseDto,
+  CategoryBySlugParams,
   Menu,
-  MenuWithCategories,
-  User,
+  Category,
+  Item,
   Subscription,
-  LoginResponse,
-  RegisterResponse,
-  AuthCheckResponse,
-  AdminLoginResponse,
-  AdminAuthCheckResponse,
-  AdminGetUserMenusResponse,
+  MenuWithCategoriesDto,
+  CategoryWithItemsDto,
+  CategoryDto,
+  ItemDto,
 } from "@qr-menu/shared-types";
 
 // HTTP Methods
@@ -84,19 +82,11 @@ const handleResponse = async <T>(
 ): Promise<ApiResponse<T>> => {
   if (!response.ok) {
     try {
-      const errorData = (await response.json()) as ApiErrorResponse;
+      const error = (await response.json()) as ApiErrorResponse;
 
-      throw {
-        error: errorData.error,
-        message: errorData.message,
-        status: response.status,
-      } as ApiErrorResponse;
-    } catch {
-      throw {
-        error: "API Error",
-        message: `HTTP ${response.status}`,
-        status: response.status,
-      } as ApiErrorResponse;
+      throw error;
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -105,13 +95,10 @@ const handleResponse = async <T>(
     return {
       data: responseData.data,
       message: responseData.message,
-      status: response.status,
     };
   } catch {
     throw {
-      error: "Invalid Response",
       message: "Response format is invalid",
-      status: response.status,
     } as ApiErrorResponse;
   }
 };
@@ -155,11 +142,7 @@ export const apiRequest = async <T = any>(
     const response = await fetch(url, requestConfig);
     return await handleResponse<T>(response);
   } catch (error) {
-    throw {
-      error: "Network Error",
-      message: error instanceof Error ? error.message : "Unknown error",
-      status: 0,
-    } as any;
+    throw error;
   }
 };
 
@@ -167,108 +150,88 @@ export const apiRequest = async <T = any>(
 export const apiGet = <T = any>(
   endpoint: string,
   params?: Record<string, string>
-): Promise<ApiResponse<T>> => {
+) => {
   return apiRequest<T>(endpoint, { method: "GET" }, params);
 };
 
-export const apiPost = <T = any>(
-  endpoint: string,
-  data?: any
-): Promise<ApiResponse<T>> => {
+export const apiPost = <T = any>(endpoint: string, data?: any) => {
   return apiRequest<T>(endpoint, { method: "POST", body: data });
 };
 
-export const apiPut = <T = any>(
-  endpoint: string,
-  data?: any
-): Promise<ApiResponse<T>> => {
+export const apiPut = <T = any>(endpoint: string, data?: any) => {
   return apiRequest<T>(endpoint, { method: "PUT", body: data });
 };
 
-export const apiDelete = <T = any>(
-  endpoint: string
-): Promise<ApiResponse<T>> => {
+export const apiDelete = <T = any>(endpoint: string) => {
   return apiRequest<T>(endpoint, { method: "DELETE" });
 };
 
-export const apiPatch = <T = any>(
-  endpoint: string,
-  data?: any
-): Promise<ApiResponse<T>> => {
+export const apiPatch = <T = any>(endpoint: string, data?: any) => {
   return apiRequest<T>(endpoint, { method: "PATCH", body: data });
 };
 
 // Specific API functions for common operations with proper types
 export const apiClient = {
   // Menu operations
-
   getMenuByUser: (): Promise<ApiResponse<Menu>> =>
     apiGet<Menu>(`${config.API_ENDPOINTS.ADMIN.MENU}`),
 
   updateMenu: (data: Partial<Menu>): Promise<ApiResponse<Menu>> =>
     apiPut<Menu>(`${config.API_ENDPOINTS.ADMIN.MENU}`, data),
 
-  getCategories: (): Promise<ApiResponse<CategoryWithItemsResponse>> =>
-    apiGet<CategoryWithItemsResponse>(`${config.API_ENDPOINTS.ADMIN.CATEGORY}`),
+  getCategories: (): Promise<ApiResponse<CategoryWithItemsDto>> =>
+    apiGet<CategoryWithItemsDto>(`${config.API_ENDPOINTS.ADMIN.CATEGORY}`),
 
-  getCategoriesByMenu: (): Promise<ApiResponse<CategoriesResponse>> =>
-    apiGet<CategoriesResponse>(`${config.API_ENDPOINTS.ADMIN.CATEGORY}`),
+  getCategoriesByMenu: (): Promise<ApiResponse<CategoryDto>> =>
+    apiGet<CategoryDto>(`${config.API_ENDPOINTS.ADMIN.CATEGORY}`),
 
   getMenuBySubdomainPublic: (
     options?: RequestOptions
-  ): Promise<ApiResponse<MenuWithCategories>> =>
-    apiRequest<MenuWithCategories>(config.API_ENDPOINTS.PUBLIC.MENU, options),
+  ): Promise<ApiResponse<MenuWithCategoriesDto>> =>
+    apiRequest<MenuWithCategoriesDto>(
+      config.API_ENDPOINTS.PUBLIC.MENU,
+      options
+    ),
 
   getCategoryBySlugPublic: (
-    slug: string,
+    params: CategoryBySlugParams,
     options?: RequestOptions
-  ): Promise<ApiResponse<any>> =>
-    apiRequest<any>(`${config.API_ENDPOINTS.PUBLIC.CATEGORY}/${slug}`, options),
+  ): Promise<ApiResponse<CategoryWithItemsDto>> =>
+    apiRequest<CategoryWithItemsDto>(
+      `${config.API_ENDPOINTS.PUBLIC.CATEGORY}/${params.slug}`,
+      options
+    ),
 
-  // Auth operations (hem public hem admin için)
-  login: (
-    email: string,
-    password: string
-  ): Promise<ApiResponse<LoginResponse>> =>
-    apiPost(`${config.API_ENDPOINTS.AUTH.LOGIN}`, { email, password }),
+  // Auth operations
+  login: (data: LoginDto): Promise<ApiResponse<AuthResponseDto>> =>
+    apiPost(`${config.API_ENDPOINTS.AUTH.LOGIN}`, data),
 
-  register: (
-    email: string,
-    password: string
-  ): Promise<ApiResponse<RegisterResponse>> =>
-    apiPost(`${config.API_ENDPOINTS.AUTH.REGISTER}`, {
-      email,
-      password,
-    }),
+  register: (data: RegisterDto): Promise<ApiResponse<AuthResponseDto>> =>
+    apiPost(`${config.API_ENDPOINTS.AUTH.REGISTER}`, data),
 
   logout: (): Promise<ApiResponse<void>> =>
     apiPost(`${config.API_ENDPOINTS.AUTH.LOGOUT}`, {}),
 
-  checkAuth: (): Promise<ApiResponse<User>> =>
-    apiGet<User>(`${config.API_ENDPOINTS.AUTH.CHECK}`),
+  checkAuth: (): Promise<ApiResponse<AuthResponseDto>> =>
+    apiGet<AuthResponseDto>(`${config.API_ENDPOINTS.AUTH.CHECK}`),
 
-  getUserMenus: (): Promise<ApiResponse<AdminGetUserMenusResponse>> =>
+  getUserMenus: (): Promise<ApiResponse<AuthResponseDto>> =>
     apiGet(config.API_ENDPOINTS.AUTH.MENUS),
 
-  getItemsByCategory: (
-    categoryId: string
-  ): Promise<ApiResponse<ItemsResponse>> =>
-    apiGet<ItemsResponse>(
+  // Item operations
+  getItemsByCategory: (categoryId: string): Promise<ApiResponse<ItemDto>> =>
+    apiGet<ItemDto>(
       `${config.API_ENDPOINTS.ADMIN.ITEM}/categories/${categoryId}`
     ),
 
-  getItemsByMenu: (): Promise<ApiResponse<ItemsResponse>> =>
-    apiGet<ItemsResponse>(`${config.API_ENDPOINTS.ADMIN.ITEM}`),
+  getItemsByMenu: (): Promise<ApiResponse<ItemDto>> =>
+    apiGet<ItemDto>(`${config.API_ENDPOINTS.ADMIN.ITEM}`),
 
   // Admin Menu operations
   adminCreateMenu: (
-    name: string,
-    subdomain: string
-  ): Promise<ApiResponse<any>> =>
-    apiPost(config.API_ENDPOINTS.ADMIN.MENU, {
-      name,
-      subdomain,
-    }),
+    data: CreateMenuDto
+  ): Promise<ApiResponse<CreateMenuResponseDto>> =>
+    apiPost(config.API_ENDPOINTS.ADMIN.MENU, data),
 
   // Category operations
   createCategory: (data: Partial<Category>): Promise<ApiResponse<Category>> =>
@@ -286,9 +249,7 @@ export const apiClient = {
   reorderCategories: (
     changes: Array<{ id: string; newSortOrder: number }>
   ): Promise<ApiResponse<{ updatedCount: number }>> =>
-    apiPut(`${config.API_ENDPOINTS.ADMIN.CATEGORY}/reorder`, {
-      changes,
-    }),
+    apiPut(`${config.API_ENDPOINTS.ADMIN.CATEGORY}/reorder`, { changes }),
 
   // Item operations
   createItem: (data: Partial<Item>): Promise<ApiResponse<Item>> =>
@@ -306,9 +267,7 @@ export const apiClient = {
   reorderItemsInCategory: (
     changes: Array<{ id: string; newSortOrder: number }>
   ): Promise<ApiResponse<{ updatedCount: number }>> =>
-    apiPut(`${config.API_ENDPOINTS.ADMIN.ITEM}/reorder`, {
-      changes,
-    }),
+    apiPut(`${config.API_ENDPOINTS.ADMIN.ITEM}/reorder`, { changes }),
 
   // Subscription operations
   getUserSubscription: (): Promise<

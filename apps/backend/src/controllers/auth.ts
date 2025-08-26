@@ -1,5 +1,6 @@
 import { CookieOptions, Request, Response } from "express";
 import { supabase } from "../../supabase/supabase";
+import { ApiResult, AuthResponseDto, LoginDto, RegisterDto } from "@qr-menu/shared-types";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -10,14 +11,16 @@ const cookieConfig: Pick<CookieOptions, "secure" | "sameSite" | "domain"> = {
 };
 
 export const authController = {
-  // Login - hem public hem admin için
-  async login(req: Request, res: Response) {
+  async login(
+    req: Request<{}, {}, LoginDto>,
+    res: Response<ApiResult<AuthResponseDto>>
+  ) {
     try {
       const { email, password } = req.body;
 
       if (!email || !password) {
         return res.status(400).json({
-          error: "Email ve şifre gerekli",
+          message: "Email ve şifre gerekli",
         });
       }
 
@@ -31,13 +34,13 @@ export const authController = {
       if (authError) {
         console.error("Login error:", authError);
         return res.status(401).json({
-          error: "Geçersiz email veya şifre",
+          message: "Geçersiz email veya şifre",
         });
       }
 
       if (!authData.user) {
         return res.status(401).json({
-          error: "Kullanıcı bulunamadı",
+          message: "Kullanıcı bulunamadı",
         });
       }
 
@@ -48,7 +51,6 @@ export const authController = {
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
-      // Kullanıcının menülerini getir
       const { data: menu } = await supabase
         .from("menus")
         .select("id, restaurant_name, subdomain, is_active")
@@ -60,30 +62,31 @@ export const authController = {
         message: "Giriş başarılı",
         data: {
           user: {
-            id: authData.user.id,
             email: authData.user.email,
-            created_at: authData.user.created_at,
           },
-          menu: menu,
-          access_token: authData.session?.access_token,
+          menu: {
+            subdomain: menu?.subdomain,
+          },
         },
       });
     } catch (error: any) {
-      console.error("Login error:", error);
       res.status(500).json({
-        error: "Giriş yapılamadı",
+        message: "Giriş yapılamadı",
       });
     }
   },
 
   // Register - sadece public için
-  async register(req: Request, res: Response) {
+  async register(
+    req: Request<{}, {}, RegisterDto>,
+    res: Response<ApiResult<AuthResponseDto>>
+  ) {
     try {
       const { email, password } = req.body;
 
       if (!email || !password) {
         return res.status(400).json({
-          error: "Email ve şifre gerekli",
+          message: "Email ve şifre gerekli",
         });
       }
 
@@ -96,13 +99,13 @@ export const authController = {
       if (authError) {
         console.error("Register error:", authError);
         return res.status(400).json({
-          error: "Kayıt oluşturulamadı",
+          message: "Kayıt oluşturulamadı",
         });
       }
 
       if (!authData.user) {
         return res.status(400).json({
-          error: "Kullanıcı oluşturulamadı",
+          message: "Kullanıcı oluşturulamadı",
         });
       }
 
@@ -118,32 +121,26 @@ export const authController = {
         message: "Kayıt başarılı",
         data: {
           user: {
-            id: authData.user.id,
-            email: authData.user.email,
-            created_at: authData.user.created_at,
-            hasMenu: false,
+            email: authData.user.email || "",
           },
-          menus: [],
-          access_token: authData.session?.access_token,
         },
       });
     } catch (error: any) {
       console.error("Register error:", error);
       res.status(500).json({
-        error: "Kayıt oluşturulamadı",
+        message: "Kayıt oluşturulamadı",
       });
     }
   },
 
   // Logout - hem public hem admin için
-  async logout(req: Request, res: Response) {
+  async logout(req: Request, res: Response<ApiResult<void>>) {
     try {
       const token = req.cookies.auth_token;
       if (token) {
         await supabase.auth.signOut();
       }
 
-      // Cookie'yi temizle
       res.clearCookie("auth_token", {
         httpOnly: true,
         ...cookieConfig,
@@ -156,18 +153,18 @@ export const authController = {
     } catch (error: any) {
       console.error("Logout error:", error);
       res.status(500).json({
-        error: "Çıkış yapılamadı",
+        message: "Çıkış yapılamadı",
       });
     }
   },
 
   // Check auth - hem public hem admin için
-  async checkAuth(req: Request, res: Response) {
+  async checkAuth(req: Request, res: Response<ApiResult<AuthResponseDto>>) {
     try {
       const token = req.cookies.auth_token;
       if (!token) {
         return res.status(401).json({
-          error: "Token bulunamadı",
+          message: "Token bulunamadı",
         });
       }
 
@@ -179,34 +176,36 @@ export const authController = {
 
       if (error || !user) {
         return res.status(401).json({
-          error: "Geçersiz token",
+          message: "Geçersiz token",
         });
       }
 
+      console.log(user);
+
       // Kullanıcının menülerini getir
       const { data: menu } = await supabase
-        .from("menu")
+        .from("menus")
         .select("id, restaurant_name, subdomain, is_active")
         .eq("user_id", user.id)
         .eq("is_active", true)
         .single();
 
+      console.log(user.id);
+
       res.json({
         message: "Token geçerli",
         data: {
           user: {
-            id: user.id,
             email: user.email,
-            created_at: user.created_at,
           },
-          menu: menu,
-          hasMenu: menu ? true : false,
+          menu: {
+            subdomain: menu?.subdomain,
+          },
         },
       });
     } catch (error: any) {
-      console.error("Check auth error:", error);
       res.status(500).json({
-        error: "Token kontrol edilemedi",
+        message: "Token kontrol edilemedi",
       });
     }
   },

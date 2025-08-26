@@ -9,17 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@heroui/react": "^2.8.2",
     "@qr-menu/shared-components": "workspace:*",
     "@qr-menu/shared-config": "workspace:*",
+    "@qr-menu/shared-styles": "workspace:*",
     "@qr-menu/shared-types": "workspace:*",
     "@qr-menu/shared-utils": "workspace:*",
-    "@qr-menu/shared-styles": "workspace:*",
     "@vercel/microfrontends": "^2.0.0",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.541.0",
     "next": "15.5.0",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "framer-motion": "^12.23.12",
-    "@heroui/react": "^2.8.2"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -76,15 +76,6 @@ export default function RestaurantForm({
   React.useEffect(() => {
     if (restaurant) {
       // Convert timestamp to time format (HH:mm)
-      const formatTimeFromTimestamp = (timestamp: string | null) => {
-        if (!timestamp) return "";
-        try {
-          const date = new Date(timestamp);
-          return date.toTimeString().slice(0, 5); // Get HH:mm part
-        } catch {
-          return "";
-        }
-      };
 
       reset({
         restaurant_name: restaurant.restaurant_name,
@@ -93,8 +84,8 @@ export default function RestaurantForm({
         restaurant_phone: restaurant.restaurant_phone || "",
         restaurant_email: restaurant.restaurant_email || "",
 
-        opening_time: formatTimeFromTimestamp(restaurant.opening_time),
-        closing_time: formatTimeFromTimestamp(restaurant.closing_time),
+        opening_time: restaurant.opening_time || "",
+        closing_time: restaurant.closing_time || "",
         wifi_ssid: restaurant.wifi_ssid || "",
         wifi_password: restaurant.wifi_password || "",
       });

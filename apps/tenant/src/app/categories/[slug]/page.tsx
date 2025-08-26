@@ -20,7 +20,7 @@ export default async function CategoryDetailPage({
     // Get category with items using new public API
     const { slug } = await params;
     const { data: categoryData } = await apiClient.getCategoryBySlugPublic(
-      slug,
+      { slug },
       {
         subdomain: subdomain || undefined,
       }

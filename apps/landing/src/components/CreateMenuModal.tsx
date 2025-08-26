@@ -22,10 +22,17 @@ import {
   Chip,
   Spinner,
 } from "@heroui/react";
-import { FaQrcode, FaStore, FaCreditCard } from "react-icons/fa";
+import { QrCode, Store } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
-import { addToast } from "@heroui/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@qr-menu/shared-utils";
+import {
+  ApiResponse,
+  ApiErrorResponse,
+  CreateMenuDto,
+  CreateMenuResponseDto,
+  AuthResponseDto,
+} from "@qr-menu/shared-types";
 
 // Zod schemas
 const restaurantSchema = z.object({
@@ -43,7 +50,7 @@ const steps = [
   {
     title: "Restoran Bilgileri",
     description: "Restoran adı ve subdomain girin",
-    icon: FaStore,
+    icon: Store,
   },
 ];
 
@@ -56,10 +63,35 @@ interface CreateMenuModalProps {
 export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
   children,
 }) => {
-  const [loading, setLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const { user } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const queryClient = useQueryClient();
+
+  const createMenuMutation = useMutation<
+    ApiResponse<CreateMenuResponseDto>,
+    ApiErrorResponse,
+    CreateMenuDto
+  >({
+    mutationFn: async (data: CreateMenuDto) => {
+      const response = await apiClient.adminCreateMenu(data);
+      return response;
+    },
+    onSuccess: (response) => {
+      queryClient.setQueryData<AuthResponseDto>(
+        ["auth"],
+        (oldData: AuthResponseDto | null) => {
+          if (!oldData) return null;
+          return {
+            ...oldData,
+            menu: { subdomain: response.data.subdomain },
+          };
+        }
+      );
+      resetRestaurant();
+      onClose();
+    },
+  });
 
   // React Hook Form hooks
   const {
@@ -73,59 +105,14 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
     defaultValues: {
       name: "",
       subdomain: "",
-    },
+    } as CreateMenuDto,
   });
 
-  const onRestaurantSubmit = handleRestaurantSubmit(
-    async (data) => {
-      setLoading(true);
-
-      try {
-        // Check if user is authenticated
-        if (!user) {
-          throw new Error("Giriş yapmanız gerekiyor");
-        }
-
-        // Create menu via API
-        const menuResponse = await apiClient.adminCreateMenu(
-          data.name,
-          data.subdomain
-        );
-
-        console.log("Menu created:", menuResponse);
-
-        // Success - reset form and close modal
-        resetRestaurant();
-        onClose();
-
-        // Show success toast
-        addToast({
-          title: "Başarılı!",
-          description: `Menü başarıyla oluşturuldu! URL: https://${menuResponse.data.menu.subdomain}.${host}`,
-          color: "success",
-        });
-      } catch (err: any) {
-        console.error("Menu creation failed:", err);
-        const errorMessage =
-          err.message || "Menü oluşturulamadı. Lütfen tekrar deneyin.";
-
-        // Show error toast
-        addToast({
-          title: "Hata!",
-          description: errorMessage,
-          color: "danger",
-        });
-      } finally {
-        setLoading(false);
-      }
-    },
-    (errors) => {
-      console.log("Restaurant form errors:", errors);
-    }
-  );
+  const onRestaurantSubmit = handleRestaurantSubmit(async (data) => {
+    await createMenuMutation.mutateAsync(data);
+  });
 
   const handleClose = () => {
-    // Reset form when modal closes
     resetRestaurant();
     onClose();
   };
@@ -185,7 +172,7 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
             <div className="flex items-center gap-3">
-              <FaQrcode className="text-blue-600 text-xl" />
+              <QrCode className="text-blue-600 text-xl" />
               <span className="text-xl font-bold">QR Menü Oluştur</span>
             </div>
             <p className="text-gray-600">Adım adım menünüzü oluşturun</p>
@@ -245,12 +232,12 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
                 isDisabled={
                   !watchRestaurant("name") ||
                   !watchRestaurant("subdomain") ||
-                  loading
+                  createMenuMutation.isPending
                 }
                 className="flex-1"
-                isLoading={loading}
+                isLoading={createMenuMutation.isPending}
               >
-                {loading ? "İşleniyor..." : "Menü Oluştur"}
+                {createMenuMutation.isPending ? "İşleniyor..." : "Menü Oluştur"}
               </Button>
             </div>
           </ModalFooter>

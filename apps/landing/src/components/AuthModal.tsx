@@ -47,15 +47,11 @@ const registerSchema = z
 type LoginFormData = z.infer<typeof loginSchema>;
 type RegisterFormData = z.infer<typeof registerSchema>;
 
-interface AuthModalProps {
-  children: (onOpen: () => void) => React.ReactNode;
-}
+interface AuthModalProps {}
 
-export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
+export const AuthModal: React.FC<AuthModalProps> = () => {
   const [activeTab, setActiveTab] = useState("login");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isAuthModalOpen, closeAuthModal, isMutationLoading } = useAuth();
   const { login, register } = useAuth();
 
   // React Hook Form hooks
@@ -87,74 +83,39 @@ export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
   });
 
   const onLoginSubmit = handleLoginSubmit(async (data) => {
-    setLoading(true);
-    setError("");
-
     try {
-      await login(data.email, data.password);
+      await login(data);
       resetLogin();
-      onClose();
-      addToast({
-        title: "Başarılı!",
-        description: "Giriş yapıldı",
-        color: "success",
-      });
-    } catch (err: any) {
-      setError(err.message || "Giriş yapılamadı");
-      addToast({
-        title: "Hata!",
-        description: err.message || "Giriş yapılamadı",
-        color: "danger",
-      });
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      throw error;
     }
   });
 
   const onRegisterSubmit = handleRegisterSubmit(async (data) => {
-    setLoading(true);
-    setError("");
-
     try {
-      await register(data.email, data.password);
+      await register(data);
       resetRegister();
-      onClose();
-      addToast({
-        title: "Başarılı!",
-        description: "Kayıt yapıldı",
-        color: "success",
-      });
-    } catch (err: any) {
-      setError(err.message || "Kayıt yapılamadı");
-      addToast({
-        title: "Hata!",
-        description: err.message || "Kayıt yapılamadı",
-        color: "danger",
-      });
-    } finally {
-      setLoading(false);
+      closeAuthModal();
+    } catch (error: any) {
+      throw error;
     }
   });
 
   const handleTabChange = (key: string) => {
     setActiveTab(key);
-    setError("");
     resetLogin();
     resetRegister();
   };
 
   const handleClose = () => {
-    setError("");
     resetLogin();
     resetRegister();
-    onClose();
+    closeAuthModal();
   };
 
   return (
     <>
-      {children(onOpen)}
-
-      <Modal isOpen={isOpen} onClose={handleClose} size="md">
+      <Modal isOpen={isAuthModalOpen} onClose={handleClose} size="md">
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
             <h2 className="text-xl font-bold">Giriş Yap / Kayıt Ol</h2>
@@ -173,12 +134,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
                 <Card>
                   <CardBody>
                     <form onSubmit={onLoginSubmit} className="space-y-4">
-                      {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                          {error}
-                        </div>
-                      )}
-
                       <Input
                         {...registerLogin("email")}
                         isRequired
@@ -205,7 +160,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
                         type="submit"
                         color="primary"
                         className="w-full"
-                        isLoading={loading}
+                        isLoading={isMutationLoading}
                       >
                         Giriş Yap
                       </Button>
@@ -218,12 +173,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
                 <Card>
                   <CardBody>
                     <form onSubmit={onRegisterSubmit} className="space-y-4">
-                      {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                          {error}
-                        </div>
-                      )}
-
                       <Input
                         {...registerRegister("email")}
                         isRequired
@@ -261,7 +210,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ children }) => {
                         type="submit"
                         color="primary"
                         className="w-full"
-                        isLoading={loading}
+                        isLoading={isMutationLoading}
                       >
                         Kayıt Ol
                       </Button>

@@ -1,3 +1,4 @@
 @import "tailwindcss";
 @import "@qr-menu/shared-styles";
 @source "./**/*";
+@custom-variant dark (&:is(.dark *));

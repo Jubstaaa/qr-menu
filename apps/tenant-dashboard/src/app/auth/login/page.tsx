@@ -30,19 +30,15 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const { data, message } = await apiClient.login(email, password);
-      if (data?.access_token) {
-        // Token'ı localStorage'a kaydet (cookie backend tarafından otomatik set ediliyor)
+      const { message } = await apiClient.login({ email, password });
+      // Başarı mesajını göster
+      addToast({
+        title: message,
+        color: "success",
+      });
 
-        // Başarı mesajını göster
-        addToast({
-          title: message,
-          color: "success",
-        });
-
-        // Dashboard'a yönlendir
-        router.push("/dashboard");
-      }
+      // Dashboard'a yönlendir
+      router.push("/dashboard");
     } catch (err: unknown) {
       const errorMessage =
         err instanceof Error ? err.message : "Giriş yapılırken bir hata oluştu";

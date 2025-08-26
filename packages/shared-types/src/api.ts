@@ -1,38 +1,14 @@
-import { Menu, Category, Item } from "./menu";
-
-// API Response types
-export interface MenuWithCategoriesResponse extends Menu {
-  menu_categories: Array<Category>;
-}
-
-export interface CategoryWithItemsResponse extends Category {
-  menu_items: Array<Item>;
-}
-
-export interface CategoriesResponse extends Array<Category> {}
-
-export interface ItemsResponse extends Array<Item> {}
+export type ApiResult<T> = ApiResponse<T> | ApiErrorResponse;
 
 // Generic API Response wrapper
 export interface ApiResponse<T> {
   data: T;
   message: string;
-  status: number;
 }
 
 export interface ApiErrorResponse {
-  error: string;
   message: string;
-  status: number;
 }
-
-// Specific API Response types
-export type MenuApiResponse = ApiResponse<MenuWithCategoriesResponse>;
-export type CategoriesApiResponse = ApiResponse<CategoriesResponse>;
-export type ItemsApiResponse = ApiResponse<ItemsResponse>;
-export type CategoryWithItemsApiResponse = ApiResponse<{
-  category: CategoryWithItemsResponse;
-}>;
 
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {
   pagination: {

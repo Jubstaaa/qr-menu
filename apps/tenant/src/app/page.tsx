@@ -4,7 +4,6 @@ import { apiClient } from "@qr-menu/shared-utils";
 import Link from "next/link";
 
 // Force dynamic rendering for this page
-export const dynamic = "force-dynamic";
 
 export default async function TenantMenuPage() {
   // Get subdomain from x-subdomain header (middleware'den gelir)

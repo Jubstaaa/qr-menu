@@ -15,7 +15,8 @@ import {
   Category,
   Item,
   Menu,
-  CategoryWithItemsResponse,
+  CategoryWithItemsDto,
+  ItemDto,
 } from "@qr-menu/shared-types";
 import { CategoryFormData, ItemFormData } from "../../../lib/schemas";
 
@@ -101,8 +102,7 @@ export default function MenuManagementPage() {
               cat.id === editingCategory.id
                 ? {
                     ...updatedCategory,
-                    menu_items:
-                      (cat as CategoryWithItemsResponse).menu_items || [],
+                    menu_items: (cat as CategoryWithItemsDto).menu_items || [],
                   }
                 : cat
             )
@@ -163,7 +163,7 @@ export default function MenuManagementPage() {
           setCategories((prev) =>
             prev.map((cat) => {
               const currentItems =
-                (cat as CategoryWithItemsResponse).menu_items || [];
+                (cat as CategoryWithItemsDto).menu_items || [];
 
               // If this is the old category, remove the item
               if (
@@ -173,7 +173,7 @@ export default function MenuManagementPage() {
                 return {
                   ...cat,
                   menu_items: currentItems.filter(
-                    (item: Item) => item.id !== editingItem.id
+                    (item: ItemDto) => item.id !== editingItem.id
                   ),
                 };
               }
@@ -182,14 +182,14 @@ export default function MenuManagementPage() {
               if (cat.id === data.category_id) {
                 // Check if item already exists in this category
                 const existingItemIndex = currentItems.findIndex(
-                  (item: Item) => item.id === editingItem.id
+                  (item: ItemDto) => item.id === editingItem.id
                 );
 
                 if (existingItemIndex >= 0) {
                   // Update existing item
                   return {
                     ...cat,
-                    menu_items: currentItems.map((item: Item) =>
+                    menu_items: currentItems.map((item: ItemDto) =>
                       item.id === editingItem.id ? updatedItem : item
                     ),
                   };
@@ -221,10 +221,10 @@ export default function MenuManagementPage() {
               menu_items:
                 cat.id === data.category_id
                   ? [
-                      ...((cat as CategoryWithItemsResponse).menu_items || []),
+                      ...((cat as CategoryWithItemsDto).menu_items || []),
                       newItem,
                     ]
-                  : (cat as CategoryWithItemsResponse).menu_items || [],
+                  : (cat as CategoryWithItemsDto).menu_items || [],
             }))
           );
           addToast({
@@ -345,7 +345,7 @@ export default function MenuManagementPage() {
           menu_items:
             cat.id === selectedCategory.id
               ? reorderedItems
-              : (cat as CategoryWithItemsResponse).menu_items || [],
+              : (cat as CategoryWithItemsDto).menu_items || [],
         }))
       );
 
@@ -391,8 +391,8 @@ export default function MenuManagementPage() {
           prev.map((cat) => ({
             ...cat,
             menu_items:
-              (cat as CategoryWithItemsResponse).menu_items?.filter(
-                (item: Item) => item.id !== deleteTarget.id
+              (cat as CategoryWithItemsDto).menu_items?.filter(
+                (item: ItemDto) => item.id !== deleteTarget.id
               ) || [],
           }))
         );
@@ -431,7 +431,7 @@ export default function MenuManagementPage() {
   // Get items by category
   const getItemsByCategory = (categoryId: string) => {
     const category = categories.find((cat) => cat.id === categoryId);
-    return (category as CategoryWithItemsResponse)?.menu_items || [];
+    return (category as CategoryWithItemsDto)?.menu_items || [];
   };
 
   if (loading) {
@@ -522,7 +522,7 @@ export default function MenuManagementPage() {
                 <div>
                   {getItemsByCategory(selectedCategory.id).length > 0 ? (
                     <SortableItems
-                      items={getItemsByCategory(selectedCategory.id)}
+                      items={getItemsByCategory(selectedCategory.id) as Item[]}
                       onReorder={handleItemReorder}
                       onEdit={handleItemEdit}
                       onDelete={handleItemDelete}

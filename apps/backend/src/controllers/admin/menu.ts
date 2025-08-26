@@ -1,21 +1,31 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
+import {
+  ApiResult,
+  CreateMenuDto,
+  UpdateMenuDto,
+  CreateMenuResponseDto,
+  MenuWithCategoriesDto,
+  CategoryWithItemsDto,
+} from "@qr-menu/shared-types";
 
 export const menuController = {
-  // Create new menu
-  async createMenu(req: Request, res: Response) {
+  async createMenu(
+    req: Request<{}, {}, CreateMenuDto>,
+    res: Response<ApiResult<CreateMenuResponseDto>>
+  ) {
     try {
       const { name, subdomain } = req.body;
 
       if (!name || !subdomain) {
         return res.status(400).json({
-          error: "Restoran bilgileri ve subdomain gerekli",
+          message: "Restoran bilgileri ve subdomain gerekli",
         });
       }
 
       if (!req.user) {
         return res.status(401).json({
-          error: "Kullanıcı bilgisi bulunamadı",
+          message: "Kullanıcı bilgisi bulunamadı",
         });
       }
 
@@ -28,7 +38,7 @@ export const menuController = {
 
       if (existingMenu) {
         return res.status(400).json({
-          error: "Bu subdomain zaten kullanılıyor",
+          message: "Bu subdomain zaten kullanılıyor",
         });
       }
 
@@ -47,29 +57,29 @@ export const menuController = {
       if (createError) {
         console.error("Menu creation error:", createError);
         return res.status(500).json({
-          error: "Menü oluşturulamadı",
+          message: "Menü oluşturulamadı",
         });
       }
 
       res.status(201).json({
         message: "Menü başarıyla oluşturuldu!",
-        menu: {
-          id: menu.id,
+        data: {
           subdomain: menu.subdomain,
-          restaurant_name: menu.restaurant_name,
-          is_active: menu.is_active,
         },
       });
     } catch (error: any) {
       console.error("Create menu error:", error);
       res.status(500).json({
-        error: "Menü oluşturulamadı",
+        message: "Menü oluşturulamadı",
       });
     }
   },
 
   // Get menu by subdomain
-  async getMenuBySubdomain(req: Request, res: Response) {
+  async getMenuBySubdomain(
+    req: Request<{ subdomain: string }>,
+    res: Response<ApiResult<MenuWithCategoriesDto>>
+  ) {
     try {
       const { subdomain } = req.params;
 
@@ -106,15 +116,17 @@ export const menuController = {
 
       if (error || !menu) {
         return res.status(404).json({
-          error: "Menü bulunamadı",
+          message: "Menü bulunamadı",
         });
       }
 
-      res.json(menu);
+      res.json({
+        message: "Menü başarıyla getirildi",
+        data: menu as MenuWithCategoriesDto,
+      });
     } catch (error: any) {
-      console.error("Get menu error:", error);
       res.status(500).json({
-        error: "Menü getirilemedi",
+        message: "Menü getirilemedi",
       });
     }
   },

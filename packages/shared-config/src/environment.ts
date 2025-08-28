@@ -69,15 +69,31 @@ export const isDevelopment = () => process.env.NODE_ENV === "development";
 export const isProduction = () => process.env.NODE_ENV === "production";
 export const isTest = () => process.env.NODE_ENV === "test";
 
-export const getNextImagesConfig = () => ({
-  images: {
-    remotePatterns: [
-      {
-        protocol: "https" as const,
-        hostname: config.SUPABASE_HOSTNAME,
-        port: "",
-        pathname: "/storage/v1/object/public/**",
-      },
-    ],
-  },
-});
+export const getNextImagesConfig = () => {
+  let hostname = config.SUPABASE_HOSTNAME?.trim();
+  if (!hostname && config.SUPABASE_URL) {
+    try {
+      const parsed = new URL(config.SUPABASE_URL);
+      hostname = parsed.hostname;
+    } catch (_err) {
+      hostname = "";
+    }
+  }
+
+  if (!hostname) {
+    return {} as const;
+  }
+
+  return {
+    images: {
+      remotePatterns: [
+        {
+          protocol: "https" as const,
+          hostname,
+          port: "",
+          pathname: "/storage/v1/object/public/**",
+        },
+      ],
+    },
+  } as const;
+};

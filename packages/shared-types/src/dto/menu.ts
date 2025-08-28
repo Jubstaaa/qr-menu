@@ -1,6 +1,5 @@
 import { CategoryDto } from "./category";
 
-// Menu DTOs
 export interface CreateMenuDto {
   name: string;
   subdomain: string;
@@ -13,9 +12,13 @@ export interface UpdateMenuDto {
   restaurant_phone?: string;
   restaurant_email?: string;
   brand_name?: string;
+  logo_url?: string;
+  opening_time?: string;
+  closing_time?: string;
+  wifi_ssid?: string;
+  wifi_password?: string;
 }
 
-// Response DTOs
 export interface CreateMenuResponseDto {
   subdomain: string;
 }

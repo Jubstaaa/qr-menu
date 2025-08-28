@@ -2,7 +2,6 @@ import { cookies } from "next/headers";
 import { Button } from "@heroui/react";
 import Link from "next/link";
 
-// Force dynamic rendering for this page
 export const dynamic = "force-dynamic";
 
 export default async function AuthCallbackPage({
@@ -11,10 +10,8 @@ export default async function AuthCallbackPage({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
   try {
-    // Get search params from Promise
     const params = await searchParams;
 
-    // Get access token from URL hash (this will be passed as query param from the client)
     const accessToken = params.access_token as string;
     const refreshToken = params.refresh_token as string;
     const type = params.type as string;
@@ -24,14 +21,13 @@ export default async function AuthCallbackPage({
     }
 
     if (type === "signup") {
-      // Set cookies with httpOnly and secure flags
       const cookieStore = await cookies();
 
       cookieStore.set("access_token", accessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 7, // 7 days
+        maxAge: 60 * 60 * 24 * 7,
         path: "/",
       });
 
@@ -40,12 +36,11 @@ export default async function AuthCallbackPage({
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
-          maxAge: 60 * 60 * 24 * 30, // 30 days
+          maxAge: 60 * 60 * 24 * 30,
           path: "/",
         });
       }
 
-      // Show success message
       return (
         <div className="min-h-screen flex items-center justify-center">
           <div className="max-w-md w-full mx-4 text-center">
@@ -72,7 +67,6 @@ export default async function AuthCallbackPage({
   } catch (error: any) {
     console.error("Auth callback error:", error);
 
-    // Show error message
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="max-w-md w-full mx-4 text-center">

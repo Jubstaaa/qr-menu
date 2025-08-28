@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
 import { Category } from "@qr-menu/shared-types";
+import { uploadImage, deleteImage } from "../../utils/upload";
+import { validateUpdateCategory } from "@qr-menu/shared-validation";
 
 export const adminCategoryController = {
-  // Get all categories by menu (admin - all categories)
   async getCategories(req: Request, res: Response) {
     try {
       const { data: categories, error } = await supabase
@@ -37,7 +38,6 @@ export const adminCategoryController = {
     }
   },
 
-  // Create category
   async createCategory(req: Request, res: Response) {
     try {
       const data: Partial<Category> = req.body;
@@ -48,13 +48,24 @@ export const adminCategoryController = {
         });
       }
 
-      // Create category
+      let uploadedUrl: string | null = null;
+      try {
+        uploadedUrl = await uploadImage({
+          req,
+          folder: "categories",
+          menuId: req.userMenu!.id,
+        });
+      } catch (e) {
+        console.error("Category image upload error:", e);
+      }
+
       const { data: category, error: createError } = await supabase
         .from("menu_categories")
         .insert({
           ...data,
           menu_id: req.userMenu!.id,
           sort_order: data.sort_order || 0,
+          image_url: uploadedUrl ?? data.image_url ?? null,
         })
         .select()
         .single();
@@ -78,29 +89,75 @@ export const adminCategoryController = {
     }
   },
 
-  // Update category
   async updateCategory(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data: Partial<Category> = req.body;
 
-      // Check if category exists and user owns it
-      const { data: category, error: categoryError } = await supabase
+      let updateData;
+      try {
+        updateData = validateUpdateCategory(req.body);
+      } catch (validationError: any) {
+        return res.status(400).json({
+          error: "Geçersiz veri formatı",
+          details: validationError.errors,
+        });
+      }
+
+      const { data: existingCategory, error: categoryError } = await supabase
         .from("menu_categories")
-        .select("id, menu_id")
+        .select("id, menu_id, image_url")
         .eq("id", id)
         .single();
 
-      if (categoryError || !category) {
+      if (categoryError || !existingCategory) {
         return res.status(404).json({
           error: "Kategori bulunamadı",
         });
       }
 
+      let finalImageUrl: string | null = updateData.image_url as any;
+
+      const hasNewFile = (req as any).file;
+
+      if (hasNewFile) {
+        try {
+          const uploadedUrl = await uploadImage({
+            req,
+            folder: "categories",
+            menuId: req.userMenu!.id,
+          });
+
+          if (uploadedUrl) {
+            finalImageUrl = uploadedUrl;
+
+            if (existingCategory.image_url) {
+              await deleteImage({
+                imageUrl: existingCategory.image_url,
+                folder: "categories",
+                menuId: req.userMenu!.id,
+              });
+            }
+          }
+        } catch (uploadError: any) {
+          console.error("Category image upload error:", uploadError);
+        }
+      } else if (updateData.image_url === null) {
+        finalImageUrl = null;
+
+        if (existingCategory.image_url) {
+          await deleteImage({
+            imageUrl: existingCategory.image_url,
+            folder: "categories",
+            menuId: req.userMenu!.id,
+          });
+        }
+      }
+
       const { data: updatedCategory, error: updateError } = await supabase
         .from("menu_categories")
         .update({
-          ...data,
+          ...updateData,
+          image_url: finalImageUrl,
           updated_at: new Date().toISOString(),
         })
         .eq("id", id)
@@ -108,7 +165,6 @@ export const adminCategoryController = {
         .single();
 
       if (updateError) {
-        console.error("Category update error:", updateError);
         return res.status(500).json({
           error: "Kategori güncellenemedi",
         });
@@ -126,7 +182,6 @@ export const adminCategoryController = {
     }
   },
 
-  // Reorder categories
   async reorderCategories(req: Request, res: Response) {
     try {
       const { changes } = req.body as {
@@ -139,7 +194,6 @@ export const adminCategoryController = {
         });
       }
 
-      // Check if all categories belong to user's menu
       const categoryIds = changes.map((c) => c.id);
       const { data: existingCategories, error: fetchError } = await supabase
         .from("menu_categories")
@@ -160,7 +214,6 @@ export const adminCategoryController = {
         });
       }
 
-      // Update sort_order for each category
       const updates = [];
       for (const change of changes) {
         const { error: updateError } = await supabase
@@ -187,12 +240,10 @@ export const adminCategoryController = {
     }
   },
 
-  // Delete category
   async deleteCategory(req: Request, res: Response) {
     try {
       const { id } = req.params;
 
-      // Check if category exists and user owns it
       const { data: category, error: categoryError } = await supabase
         .from("menu_categories")
         .select("id, menu_id")
@@ -205,7 +256,6 @@ export const adminCategoryController = {
         });
       }
 
-      // Delete category
       const { error: deleteError } = await supabase
         .from("menu_categories")
         .delete()

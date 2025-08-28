@@ -1,30 +1,28 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
+import { ApiResult, CategoryWithItemsDto } from "@qr-menu/shared-types";
 
 export const publicCategoryController = {
-  // Get active categories by subdomain
-
-  // Get category with items by subdomain and slug
-  async getCategoryBySubdomainAndSlug(req: Request, res: Response) {
+  async getCategoryBySubdomainAndSlug(
+    req: Request,
+    res: Response<ApiResult<CategoryWithItemsDto>>
+  ) {
     try {
       const { slug } = req.params;
       const subdomain = req.headers["x-subdomain"] as string;
 
       if (!subdomain) {
         return res.status(400).json({
-          error: "X-Subdomain header'ı gerekli",
+          message: "X-Subdomain header'ı gerekli",
         });
       }
 
       if (!slug) {
         return res.status(400).json({
-          error: "Slug parametresi gerekli",
+          message: "Slug parametresi gerekli",
         });
       }
 
-      console.log("Using subdomain from header:", subdomain, "slug:", slug);
-
-      // Önce subdomain'e ait menüyü bul
       const { data: menu, error: menuError } = await supabase
         .from("menus")
         .select("id, restaurant_name, is_active")
@@ -32,15 +30,12 @@ export const publicCategoryController = {
         .eq("is_active", true)
         .single();
 
-      console.log("Found menu:", menu);
-
       if (menuError || !menu) {
         return res.status(404).json({
-          error: "Menü bulunamadı",
+          message: "Menü bulunamadı",
         });
       }
 
-      // Kategoriyi slug ile bul
       const { data: category, error } = await supabase
         .from("menu_categories")
         .select(
@@ -49,45 +44,32 @@ export const publicCategoryController = {
           name,
           description,
           slug,
-          sort_order,
-          menu_items(
-            id,
-            name,
-            description,
-            price,
-            image_url,
-            is_available,
-            sort_order
-          )
+          image_url,
+          menu_items(*)
         `
         )
         .eq("menu_id", menu.id)
         .eq("slug", slug)
         .eq("is_active", true)
+        .eq("menu_items.is_available", true)
+        .order("sort_order", { ascending: true })
+        .order("sort_order", { foreignTable: "menu_items", ascending: true })
         .single();
 
       if (error || !category) {
         return res.status(404).json({
-          error: "Kategori bulunamadı",
+          message: "Kategori bulunamadı",
         });
       }
 
-      // Sadece mevcut ürünleri filtrele
-      const availableItems = category.menu_items?.filter(
-        (item) => item.is_available
-      );
-
       res.json({
         message: "Kategori başarıyla getirildi",
-        data: {
-          ...category,
-          menu_items: availableItems || [],
-        },
+        data: category as CategoryWithItemsDto,
       });
     } catch (error: any) {
       console.error("Get category by slug error:", error);
       res.status(500).json({
-        error: "Kategori getirilemedi",
+        message: "Kategori getirilemedi",
       });
     }
   },

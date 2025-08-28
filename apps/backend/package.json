@@ -14,14 +14,19 @@
     "@qr-menu/shared-config": "workspace:*",
     "@qr-menu/shared-types": "workspace:*",
     "@qr-menu/shared-utils": "workspace:*",
+    "@qr-menu/shared-validation": "workspace:*",
     "@supabase/supabase-js": "^2.56.0",
+    "@types/multer": "^2.0.0",
+    "@types/sharp": "^0.32.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
     "express": "^4.18.2",
     "helmet": "^7.2.0",
     "lucide-react": "^0.541.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "multer": "^2.0.2",
+    "sharp": "^0.34.3"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.9",

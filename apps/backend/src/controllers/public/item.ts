@@ -3,14 +3,11 @@ import { supabase } from "../../../supabase/supabase";
 import { extractSubdomain } from "@qr-menu/shared-utils";
 
 export const publicItemController = {
-  // Get active items by subdomain
   async getActiveItemsBySubdomain(req: Request, res: Response) {
     try {
-      // Subdomain'i request'ten al
       const host = req.headers.host || "";
       const subdomain = extractSubdomain(host);
 
-      // Önce subdomain'e ait menüyü bul
       const { data: menu, error: menuError } = await supabase
         .from("menus")
         .select("id, restaurant_name, status")
@@ -24,7 +21,6 @@ export const publicItemController = {
         });
       }
 
-      // Aktif ürünleri getir (aktif kategorilerden)
       const { data: items, error } = await supabase
         .from("menu_items")
         .select(
@@ -75,16 +71,13 @@ export const publicItemController = {
     }
   },
 
-  // Get item by subdomain and item ID
   async getItemBySubdomainAndId(req: Request, res: Response) {
     try {
       const { itemId } = req.params;
 
-      // Subdomain'i request'ten al
       const host = req.headers.host || "";
       const subdomain = extractSubdomain(host);
 
-      // Önce subdomain'e ait menüyü bul
       const { data: menu, error: menuError } = await supabase
         .from("menus")
         .select("id, restaurant_name, status")
@@ -98,7 +91,6 @@ export const publicItemController = {
         });
       }
 
-      // Ürünü ID ile bul
       const { data: item, error } = await supabase
         .from("menu_items")
         .select(
@@ -148,14 +140,11 @@ export const publicItemController = {
     }
   },
 
-  // Get popular items by subdomain
   async getPopularItemsBySubdomain(req: Request, res: Response) {
     try {
-      // Subdomain'i request'ten al
       const host = req.headers.host || "";
       const subdomain = extractSubdomain(host);
 
-      // Önce subdomain'e ait menüyü bul
       const { data: menu, error: menuError } = await supabase
         .from("menus")
         .select("id, restaurant_name, status")
@@ -169,7 +158,6 @@ export const publicItemController = {
         });
       }
 
-      // Popüler ürünleri getir
       const { data: items, error } = await supabase
         .from("menu_items")
         .select(

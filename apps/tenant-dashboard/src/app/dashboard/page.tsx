@@ -34,7 +34,6 @@ export default function DashboardPage() {
   const [subscription, setSubscription] = useState<any>(null);
   const router = useRouter();
 
-  // Modal states
   const {
     isOpen: isRestaurantModalOpen,
     onOpen: onRestaurantModalOpen,
@@ -49,16 +48,13 @@ export default function DashboardPage() {
     try {
       setLoading(true);
 
-      // Menü bilgilerini yükle
       const menuResponse = await apiClient.getMenuByUser();
       if (menuResponse.data) {
         setMenu(menuResponse.data);
       }
 
-      // Abonelik bilgilerini yükle
       try {
         const subscriptionResponse = await apiClient.getUserSubscription();
-        console.log(subscriptionResponse);
         if (subscriptionResponse.data) {
           setSubscription(subscriptionResponse.data);
         }
@@ -82,7 +78,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Başlık */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
@@ -106,7 +101,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Abonelik Bilgileri */}
       {subscription && (
         <Card>
           <CardHeader className="pb-3">
@@ -158,7 +152,6 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* Restoran Bilgileri */}
       {menu && (
         <Card>
           <CardHeader className="pb-3">
@@ -254,36 +247,24 @@ export default function DashboardPage() {
         </Card>
       )}
 
-      {/* RestaurantForm Modal */}
-      <RestaurantForm
-        isOpen={isRestaurantModalOpen}
-        onClose={onRestaurantModalClose}
-        onSubmit={async (data) => {
-          try {
-            // API çağrısı yap
-            const response = await apiClient.updateMenu(data);
-            if (response.data) {
-              setMenu(response.data);
-              // Başarı mesajı göster
-              addToast({
-                title: "Başarılı",
-                description: "Restoran bilgileri başarıyla güncellendi",
-                color: "success",
-              });
+      {menu && (
+        <RestaurantForm
+          isOpen={isRestaurantModalOpen}
+          onClose={onRestaurantModalClose}
+          onSubmit={async (data) => {
+            try {
+              const response = await apiClient.updateMenu(data);
+              if (response.data) {
+                setMenu(response.data);
+              }
+              onRestaurantModalClose();
+            } catch (error) {
+              console.error("Error updating restaurant:", error);
             }
-            onRestaurantModalClose();
-          } catch (error) {
-            console.error("Error updating restaurant:", error);
-            // Hata mesajı göster
-            addToast({
-              title: "Hata",
-              description: "Restoran güncellenirken hata oluştu",
-              color: "danger",
-            });
-          }
-        }}
-        restaurant={menu}
-      />
+          }}
+          editingRestaurant={menu}
+        />
+      )}
     </div>
   );
 }

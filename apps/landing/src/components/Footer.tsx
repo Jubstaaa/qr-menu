@@ -7,7 +7,6 @@ export const Footer: React.FC = () => {
     <footer className="bg-gray-900 dark:bg-black text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-blue-500 rounded-lg">
@@ -19,19 +18,18 @@ export const Footer: React.FC = () => {
               </div>
             </div>
             <p className="text-gray-400 text-sm max-w-xs">
-              Restoranların dijital dönüşümüne öncülük eden teknoloji şirketi. 
+              Restoranların dijital dönüşümüne öncülük eden teknoloji şirketi.
               Modern ve kullanıcı dostu QR menü çözümleri.
             </p>
           </div>
 
-          {/* Contact Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">İletişim</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-blue-400" />
-                <a 
-                  href="mailto:ilkerbalcilartr@gmail.com" 
+                <a
+                  href="mailto:ilkerbalcilartr@gmail.com"
                   className="text-gray-300 hover:text-white transition-colors"
                 >
                   ilkerbalcilartr@gmail.com
@@ -40,7 +38,6 @@ export const Footer: React.FC = () => {
             </div>
           </div>
 
-          {/* Company Info */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Şirket</h3>
             <div className="space-y-2 text-sm text-gray-400">
@@ -51,7 +48,6 @@ export const Footer: React.FC = () => {
           </div>
         </div>
 
-        {/* Bottom Section */}
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm">

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
 
 export const publicMenuController = {
-  // Get menu by subdomain (public)
   async getMenuBySubdomain(req: Request, res: Response) {
     try {
       const subdomain = req.headers["x-subdomain"] as string;
@@ -13,9 +12,6 @@ export const publicMenuController = {
         });
       }
 
-      console.log("Using subdomain from header:", subdomain);
-
-      // Menüyü subdomain ile bul (kategorilerle birlikte)
       const { data: menu, error } = await supabase
         .from("menus")
         .select(
@@ -29,6 +25,7 @@ export const publicMenuController = {
           closing_time,
           is_active,
           subdomain,
+          logo_url,
           menu_categories (
             id,
             name,
@@ -36,6 +33,7 @@ export const publicMenuController = {
             description,
             sort_order,
             is_active,
+            image_url,
             menu_items (
               id,
               name,

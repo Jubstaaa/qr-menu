@@ -4,7 +4,7 @@
   "description": "Modern QR Menu Management System - Monorepo",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --concurrency 11",
     "dev:proxy": "microfrontends proxy --local-apps tenant tenant-dashboard",
     "build": "turbo run build",
     "test": "turbo run test",

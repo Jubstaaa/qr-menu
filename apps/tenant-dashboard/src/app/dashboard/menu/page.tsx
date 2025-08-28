@@ -11,16 +11,13 @@ import {
 } from "@heroui/react";
 import { Plus } from "lucide-react";
 import { apiClient } from "@qr-menu/shared-utils";
+import { Category, Item, Menu, ItemDto } from "@qr-menu/shared-types";
 import {
-  Category,
-  Item,
-  Menu,
-  CategoryWithItemsDto,
-  ItemDto,
-} from "@qr-menu/shared-types";
-import { CategoryFormData, ItemFormData } from "../../../lib/schemas";
+  CreateCategoryDto,
+  UpdateCategoryDto,
+  CreateItemDto,
+} from "@qr-menu/shared-validation";
 
-// Components
 import CategoryForm from "../../../components/forms/CategoryForm";
 import ItemForm from "../../../components/forms/ItemForm";
 import DeleteConfirmModal from "../../../components/modals/DeleteConfirmModal";
@@ -28,7 +25,6 @@ import SortableCategories from "../../../components/dnd/SortableCategories";
 import SortableItems from "../../../components/dnd/SortableItems";
 
 export default function MenuManagementPage() {
-  // State
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
@@ -36,7 +32,6 @@ export default function MenuManagementPage() {
   const [loading, setLoading] = useState(true);
   const [menu, setMenu] = useState<Menu | null>(null);
 
-  // Modal states
   const {
     isOpen: isCategoryModalOpen,
     onOpen: onCategoryModalOpen,
@@ -53,7 +48,6 @@ export default function MenuManagementPage() {
     onClose: onDeleteModalClose,
   } = useDisclosure();
 
-  // Editing states
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{
@@ -63,7 +57,6 @@ export default function MenuManagementPage() {
   } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Load data
   useEffect(() => {
     loadData();
   }, []);
@@ -90,8 +83,11 @@ export default function MenuManagementPage() {
     }
   };
 
-  // Category operations
-  const handleCategorySubmit = async (data: CategoryFormData) => {
+  const handleCategorySubmit = async (
+    data:
+      | CreateCategoryDto
+      | (UpdateCategoryDto & { file?: File; image_url?: string })
+  ) => {
     try {
       if (editingCategory) {
         const { data: updatedCategory, message } =
@@ -102,7 +98,7 @@ export default function MenuManagementPage() {
               cat.id === editingCategory.id
                 ? {
                     ...updatedCategory,
-                    menu_items: (cat as CategoryWithItemsDto).menu_items || [],
+                    menu_items: (cat as any).menu_items || [],
                   }
                 : cat
             )
@@ -150,8 +146,9 @@ export default function MenuManagementPage() {
     onDeleteModalOpen();
   };
 
-  // Item operations
-  const handleItemSubmit = async (data: ItemFormData) => {
+  const handleItemSubmit = async (
+    data: CreateItemDto & { file?: File; image_url?: string }
+  ) => {
     try {
       if (editingItem) {
         const { data: updatedItem, message } = await apiClient.updateItem(
@@ -159,13 +156,10 @@ export default function MenuManagementPage() {
           data
         );
         if (updatedItem) {
-          // Update the item and handle category change if needed
           setCategories((prev) =>
             prev.map((cat) => {
-              const currentItems =
-                (cat as CategoryWithItemsDto).menu_items || [];
+              const currentItems = (cat as any).menu_items || [];
 
-              // If this is the old category, remove the item
               if (
                 cat.id === editingItem.category_id &&
                 editingItem.category_id !== data.category_id
@@ -178,15 +172,12 @@ export default function MenuManagementPage() {
                 };
               }
 
-              // If this is the new category, add the updated item
               if (cat.id === data.category_id) {
-                // Check if item already exists in this category
                 const existingItemIndex = currentItems.findIndex(
                   (item: ItemDto) => item.id === editingItem.id
                 );
 
                 if (existingItemIndex >= 0) {
-                  // Update existing item
                   return {
                     ...cat,
                     menu_items: currentItems.map((item: ItemDto) =>
@@ -194,7 +185,6 @@ export default function MenuManagementPage() {
                     ),
                   };
                 } else {
-                  // Add new item to this category
                   return {
                     ...cat,
                     menu_items: [...currentItems, updatedItem],
@@ -202,7 +192,6 @@ export default function MenuManagementPage() {
                 }
               }
 
-              // For other categories, keep items unchanged
               return cat;
             })
           );
@@ -214,17 +203,13 @@ export default function MenuManagementPage() {
       } else {
         const { data: newItem, message } = await apiClient.createItem(data);
         if (newItem) {
-          // Add the new item to the selected category
           setCategories((prev) =>
             prev.map((cat) => ({
               ...cat,
               menu_items:
                 cat.id === data.category_id
-                  ? [
-                      ...((cat as CategoryWithItemsDto).menu_items || []),
-                      newItem,
-                    ]
-                  : (cat as CategoryWithItemsDto).menu_items || [],
+                  ? [...((cat as any).menu_items || []), newItem]
+                  : (cat as any).menu_items || [],
             }))
           );
           addToast({
@@ -255,14 +240,10 @@ export default function MenuManagementPage() {
     onDeleteModalOpen();
   };
 
-  // Handle item reordering
-  // Handle category reordering
   const handleCategoryReorder = async (reorderedCategories: Category[]) => {
     try {
-      // Get current categories to compare
       const currentCategories = categories;
 
-      // Find only the categories that actually changed position
       const changes = reorderedCategories
         .map((category, newIndex) => {
           const currentIndex = currentCategories.findIndex(
@@ -276,15 +257,12 @@ export default function MenuManagementPage() {
           newSortOrder: newIndex,
         }));
 
-      // If no changes, don't make API call
       if (changes.length === 0) {
         return;
       }
 
-      // Update local state immediately for better UX
       setCategories(reorderedCategories);
 
-      // Update selected category if it changed position
       if (selectedCategory) {
         const newSelectedCategory = reorderedCategories.find(
           (c) => c.id === selectedCategory.id
@@ -294,7 +272,6 @@ export default function MenuManagementPage() {
         }
       }
 
-      // Send only the changes to backend
       await apiClient.reorderCategories(changes);
 
       addToast({
@@ -318,13 +295,13 @@ export default function MenuManagementPage() {
     if (!selectedCategory) return;
 
     try {
-      // Get current items to compare
       const currentItems = getItemsByCategory(selectedCategory.id);
 
-      // Find only the items that actually changed position
       const changes = reorderedItems
         .map((item, newIndex) => {
-          const currentIndex = currentItems.findIndex((i) => i.id === item.id);
+          const currentIndex = currentItems.findIndex(
+            (i: ItemDto) => i.id === item.id
+          );
           return { item, newIndex, currentIndex };
         })
         .filter(({ newIndex, currentIndex }) => newIndex !== currentIndex)
@@ -333,23 +310,20 @@ export default function MenuManagementPage() {
           newSortOrder: newIndex,
         }));
 
-      // If no changes, don't make API call
       if (changes.length === 0) {
         return;
       }
 
-      // Update local state immediately for better UX
       setCategories((prev) =>
         prev.map((cat) => ({
           ...cat,
           menu_items:
             cat.id === selectedCategory.id
               ? reorderedItems
-              : (cat as CategoryWithItemsDto).menu_items || [],
+              : (cat as any).menu_items || [],
         }))
       );
 
-      // Send only the changes to backend
       await apiClient.reorderItemsInCategory(changes);
 
       addToast({
@@ -369,7 +343,6 @@ export default function MenuManagementPage() {
     }
   };
 
-  // Delete confirmation
   const handleDeleteConfirm = async () => {
     if (!deleteTarget) return;
 
@@ -386,12 +359,12 @@ export default function MenuManagementPage() {
         });
       } else {
         const { message } = await apiClient.deleteItem(deleteTarget.id);
-        // Remove the item from the category
+
         setCategories((prev) =>
           prev.map((cat) => ({
             ...cat,
             menu_items:
-              (cat as CategoryWithItemsDto).menu_items?.filter(
+              (cat as any).menu_items?.filter(
                 (item: ItemDto) => item.id !== deleteTarget.id
               ) || [],
           }))
@@ -417,7 +390,6 @@ export default function MenuManagementPage() {
     }
   };
 
-  // Modal close handlers
   const handleCategoryModalClose = () => {
     setEditingCategory(null);
     onCategoryModalClose();
@@ -428,10 +400,9 @@ export default function MenuManagementPage() {
     onItemModalClose();
   };
 
-  // Get items by category
   const getItemsByCategory = (categoryId: string) => {
     const category = categories.find((cat) => cat.id === categoryId);
-    return (category as CategoryWithItemsDto)?.menu_items || [];
+    return (category as any)?.menu_items || [];
   };
 
   if (loading) {
@@ -452,7 +423,6 @@ export default function MenuManagementPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Categories Panel */}
         <div className="lg:col-span-1">
           <Card>
             <CardHeader className="flex justify-between items-center">
@@ -496,7 +466,6 @@ export default function MenuManagementPage() {
           </Card>
         </div>
 
-        {/* Items Panel */}
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="flex justify-between items-center">
@@ -547,7 +516,6 @@ export default function MenuManagementPage() {
         </div>
       </div>
 
-      {/* Modals */}
       <CategoryForm
         isOpen={isCategoryModalOpen}
         onClose={handleCategoryModalClose}

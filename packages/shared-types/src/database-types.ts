@@ -1,7 +1,5 @@
-// Database types from Supabase
 import type { Database } from "./database";
 
-// Extract table types
 export type Menu = Database["public"]["Tables"]["menus"]["Row"];
 export type Category = Database["public"]["Tables"]["menu_categories"]["Row"];
 export type Item = Database["public"]["Tables"]["menu_items"]["Row"];

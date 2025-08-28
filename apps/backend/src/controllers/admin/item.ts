@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
 import { Item } from "@qr-menu/shared-types";
+import { uploadImage, deleteImage } from "../../utils/upload";
+import { validateUpdateItem } from "@qr-menu/shared-validation";
 
 export const adminItemController = {
-  // Get all items by menu (admin - all items)
   async getItemsByMenu(req: Request, res: Response) {
     try {
       const { data: items, error } = await supabase
@@ -40,7 +41,6 @@ export const adminItemController = {
     }
   },
 
-  // Create item
   async createItem(req: Request, res: Response) {
     try {
       const data: Partial<Item> = req.body;
@@ -51,7 +51,6 @@ export const adminItemController = {
         });
       }
 
-      // Check if category exists and belongs to user's menu
       const { data: category, error: categoryError } = await supabase
         .from("menu_categories")
         .select("id")
@@ -65,12 +64,23 @@ export const adminItemController = {
         });
       }
 
-      // Create item
+      let uploadedUrl: string | null = null;
+      try {
+        uploadedUrl = await uploadImage({
+          req,
+          folder: "items",
+          menuId: req.userMenu!.id,
+        });
+      } catch (e) {
+        console.error("Item image upload error:", e);
+      }
+
       const { data: item, error: createError } = await supabase
         .from("menu_items")
         .insert({
           ...data,
           sort_order: data.sort_order || 0,
+          image_url: uploadedUrl ?? data.image_url ?? null,
         })
         .select()
         .single();
@@ -94,29 +104,78 @@ export const adminItemController = {
     }
   },
 
-  // Update item
   async updateItem(req: Request, res: Response) {
     try {
       const { id } = req.params;
-      const data = req.body;
 
-      // Check if item exists and user owns it
-      const { data: item, error: itemError } = await supabase
+      let updateData;
+      try {
+        updateData = validateUpdateItem(req.body);
+      } catch (validationError: any) {
+        return res.status(400).json({
+          error: "Geçersiz veri formatı",
+          details: validationError.errors,
+        });
+      }
+
+      const { data: existingItem, error: itemError } = await supabase
         .from("menu_items")
         .select("*")
         .eq("id", id)
         .single();
 
-      if (itemError || !item) {
+      if (itemError || !existingItem) {
         return res.status(404).json({
           error: "Ürün bulunamadı",
         });
       }
 
-      // Update item
+      let finalImageUrl: string | null = updateData.image_url as any;
+
+      const hasNewFile = (req as any).file;
+
+      if (hasNewFile) {
+        try {
+          const uploadedUrl = await uploadImage({
+            req,
+            folder: "items",
+            menuId: req.userMenu!.id,
+          });
+
+          if (uploadedUrl) {
+            finalImageUrl = uploadedUrl;
+
+            if (existingItem.image_url) {
+              await deleteImage({
+                imageUrl: existingItem.image_url,
+                folder: "items",
+                menuId: req.userMenu!.id,
+              });
+            }
+          }
+        } catch (uploadError: any) {
+          return res.status(500).json({
+            error: "Ürün resmi yüklenemedi",
+          });
+        }
+      } else if (updateData.image_url === null) {
+        finalImageUrl = null;
+
+        if (existingItem.image_url) {
+          await deleteImage({
+            imageUrl: existingItem.image_url,
+            folder: "items",
+            menuId: req.userMenu!.id,
+          });
+        }
+      }
+
       const { data: updatedItem, error: updateError } = await supabase
         .from("menu_items")
-        .update(data)
+        .update({
+          ...updateData,
+          image_url: finalImageUrl,
+        })
         .eq("id", id)
         .select()
         .single();
@@ -140,7 +199,6 @@ export const adminItemController = {
     }
   },
 
-  // Reorder items in category
   async reorderItemsInCategory(req: Request, res: Response) {
     try {
       const { changes } = req.body as {
@@ -153,7 +211,6 @@ export const adminItemController = {
         });
       }
 
-      // Check if all items belong to user's menu and same category
       const itemIds = changes.map((c) => c.id);
       const { data: existingItems, error: fetchError } = await supabase
         .from("menu_items")
@@ -174,15 +231,15 @@ export const adminItemController = {
         });
       }
 
-      // Check if all items are in the same category
-      const categoryIds = [...new Set(existingItems.map((item) => item.category_id))];
+      const categoryIds = [
+        ...new Set(existingItems.map((item) => item.category_id)),
+      ];
       if (categoryIds.length > 1) {
         return res.status(400).json({
           error: "Tüm ürünler aynı kategoride olmalı",
         });
       }
 
-      // Update sort_order for each item
       const updates = [];
       for (const change of changes) {
         const { error: updateError } = await supabase
@@ -209,12 +266,10 @@ export const adminItemController = {
     }
   },
 
-  // Delete item
   async deleteItem(req: Request, res: Response) {
     try {
       const { id } = req.params;
 
-      // Check if item exists and user owns it
       const { data: item, error: itemError } = await supabase
         .from("menu_items")
         .select("id")
@@ -227,7 +282,6 @@ export const adminItemController = {
         });
       }
 
-      // Delete item
       const { error: deleteError } = await supabase
         .from("menu_items")
         .delete()

@@ -9,7 +9,6 @@ export const CTASection: React.FC = () => {
 
   return (
     <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-700 dark:via-purple-700 dark:to-indigo-800 py-20 relative overflow-hidden">
-      {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/10 rounded-full blur-3xl"></div>
@@ -19,12 +18,10 @@ export const CTASection: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center space-y-8">
-          {/* Icon */}
           <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full">
             <QrCode className="w-10 h-10 text-white" />
           </div>
 
-          {/* Main Content */}
           <div className="space-y-6">
             <h2 className="text-4xl md:text-6xl font-bold text-white max-w-4xl mx-auto leading-tight">
               Hemen{" "}
@@ -39,7 +36,6 @@ export const CTASection: React.FC = () => {
             </p>
           </div>
 
-          {/* CTA Buttons */}
           <div className="flex flex-wrap gap-4 justify-center">
             <Button
               color="primary"
@@ -64,7 +60,6 @@ export const CTASection: React.FC = () => {
             </Button>
           </div>
 
-          {/* Trust Indicators */}
           <div className="pt-8 border-t border-white/20">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
               <div className="space-y-2">

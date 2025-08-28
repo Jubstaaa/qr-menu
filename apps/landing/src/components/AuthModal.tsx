@@ -21,7 +21,6 @@ import {
 import { useAuth } from "../contexts/AuthContext";
 import { addToast } from "@heroui/react";
 
-// Zod schemas
 const loginSchema = z.object({
   email: z
     .string()
@@ -54,7 +53,6 @@ export const AuthModal: React.FC<AuthModalProps> = () => {
   const { isAuthModalOpen, closeAuthModal, isMutationLoading } = useAuth();
   const { login, register } = useAuth();
 
-  // React Hook Form hooks
   const {
     register: registerLogin,
     handleSubmit: handleLoginSubmit,

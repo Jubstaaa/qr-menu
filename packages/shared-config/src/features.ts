@@ -17,7 +17,6 @@ export const DEFAULT_FEATURE_FLAGS: FeatureFlags = {
 };
 
 export const getFeatureFlags = (): FeatureFlags => {
-  // Environment-based feature flags
   const envFlags: Partial<FeatureFlags> = {
     darkMode: process.env.NEXT_PUBLIC_DARK_MODE === "true",
     microfrontends: process.env.NEXT_PUBLIC_MICROFRONTENDS === "true",

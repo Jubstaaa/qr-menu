@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
+import { getNextImagesConfig } from "@qr-menu/shared-config";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  ...getNextImagesConfig(),
 };
 
 export default nextConfig;

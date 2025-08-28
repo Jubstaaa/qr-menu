@@ -1,6 +1,11 @@
 import { CookieOptions, Request, Response } from "express";
 import { supabase } from "../../supabase/supabase";
-import { ApiResult, AuthResponseDto, LoginDto, RegisterDto } from "@qr-menu/shared-types";
+import {
+  ApiResult,
+  AuthResponseDto,
+  LoginDto,
+  RegisterDto,
+} from "@qr-menu/shared-types";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -24,7 +29,6 @@ export const authController = {
         });
       }
 
-      // Kullanıcıyı doğrula
       const { data: authData, error: authError } =
         await supabase.auth.signInWithPassword({
           email,
@@ -76,7 +80,6 @@ export const authController = {
     }
   },
 
-  // Register - sadece public için
   async register(
     req: Request<{}, {}, RegisterDto>,
     res: Response<ApiResult<AuthResponseDto>>
@@ -90,7 +93,6 @@ export const authController = {
         });
       }
 
-      // Kullanıcıyı oluştur
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
@@ -109,11 +111,10 @@ export const authController = {
         });
       }
 
-      // Cookie'yi set et
       res.cookie("auth_token", authData.session?.access_token, {
         httpOnly: true,
         ...cookieConfig,
-        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 gün
+        maxAge: 30 * 24 * 60 * 60 * 1000,
         path: "/",
       });
 
@@ -133,7 +134,6 @@ export const authController = {
     }
   },
 
-  // Logout - hem public hem admin için
   async logout(req: Request, res: Response<ApiResult<void>>) {
     try {
       const token = req.cookies.auth_token;
@@ -158,7 +158,6 @@ export const authController = {
     }
   },
 
-  // Check auth - hem public hem admin için
   async checkAuth(req: Request, res: Response<ApiResult<AuthResponseDto>>) {
     try {
       const token = req.cookies.auth_token;
@@ -168,7 +167,6 @@ export const authController = {
         });
       }
 
-      // Token'ı doğrula
       const {
         data: { user },
         error,
@@ -180,17 +178,12 @@ export const authController = {
         });
       }
 
-      console.log(user);
-
-      // Kullanıcının menülerini getir
       const { data: menu } = await supabase
         .from("menus")
         .select("id, restaurant_name, subdomain, is_active")
         .eq("user_id", user.id)
         .eq("is_active", true)
         .single();
-
-      console.log(user.id);
 
       res.json({
         message: "Token geçerli",
@@ -210,7 +203,6 @@ export const authController = {
     }
   },
 
-  // Get user menus - admin için
   async getUserMenus(req: Request, res: Response) {
     try {
       const token = req.cookies.auth_token;
@@ -231,7 +223,6 @@ export const authController = {
         });
       }
 
-      // Kullanıcının tüm menülerini getir
       const { data: menus, error: menusError } = await supabase
         .from("menus")
         .select("id, restaurant_name, subdomain, is_active")

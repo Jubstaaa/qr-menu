@@ -34,10 +34,8 @@ export const formatTime = (
 };
 
 export const formatPhoneNumber = (phone: string): string => {
-  // Remove all non-digit characters
   const cleaned = phone.replace(/\D/g, "");
 
-  // Format Turkish phone number
   if (cleaned.length === 10) {
     return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)} ${cleaned.slice(6, 8)} ${cleaned.slice(8)}`;
   }

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
 
 export const adminSubscriptionController = {
-  // Get user subscription by userId from req
   async getUserSubscription(req: Request, res: Response) {
     try {
       const { data: subscription, error } = await supabase

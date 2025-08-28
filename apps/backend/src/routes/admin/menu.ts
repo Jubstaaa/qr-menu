@@ -1,19 +1,17 @@
 import { Router } from "express";
 import { menuController } from "../../controllers/admin/menu";
 import { authMiddleware } from "../../middleware/auth";
+import multer from "multer";
 
 const router: Router = Router();
+const upload = multer({ storage: multer.memoryStorage() });
 
-// Admin menu routes - require authentication
 router.use(authMiddleware);
 
-// POST /api/admin/menu - Create new menu
 router.post("/", menuController.createMenu);
 
-// GET /api/admin/menu
 router.get("/", menuController.getMenusByUser);
 
-// PUT /api/admin/menu
-router.put("/", menuController.updateMenu);
+router.put("/", upload.single("file"), menuController.updateMenu);
 
 export default router;

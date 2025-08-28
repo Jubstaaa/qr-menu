@@ -6,7 +6,6 @@ export function middleware(request: NextRequest) {
 
   if (pathname.startsWith("/dashboard")) {
     const authToken = request.cookies.get("auth_token")?.value;
-    console.log(request.cookies);
 
     if (!authToken) {
       const loginUrl = new URL("/auth/login", request.url);
@@ -14,7 +13,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // Root path'i dashboard'a yönlendir
   if (pathname === "/") {
     const dashboardUrl = new URL("/dashboard", request.url);
     return NextResponse.redirect(dashboardUrl);

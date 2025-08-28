@@ -5,40 +5,32 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 
-// Routes
 import authRoutes from "./routes/auth";
 import adminCategoryRoutes from "./routes/admin/category";
 import adminItemRoutes from "./routes/admin/item";
 import adminMenuRoutes from "./routes/admin/menu";
 import { adminSubscriptionRoutes } from "./routes/admin/subscription";
 
-// Public routes
 import publicCategoryRoutes from "./routes/public/category";
 import publicItemRoutes from "./routes/public/item";
 import publicMenuRoutes from "./routes/public/menu";
 
-// Load environment variables
 dotenv.config({ path: "../../.env" });
 
 const app = express();
 const PORT = process.env.PORT || 4000;
-console.log(process.env);
-// Middleware
+
 app.use(helmet());
-// CORS configuration
+
 const corsOptions = {
   origin: function (origin: string | undefined, callback: any) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
-    // Get allowed domains from environment
     const allowedDomains = process.env.ALLOWED_DOMAINS
       ? process.env.ALLOWED_DOMAINS.split(",").map((d) => d.trim())
       : ["localhost:3000", "localhost:3024"];
 
-    // Check if origin matches any allowed domain
     const isAllowed = allowedDomains.some((domain) => {
-      // Exact match
       if (origin === `https://${domain}` || origin === `http://${domain}`) {
         return true;
       }
@@ -63,26 +55,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Health check
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-// Auth routes (hem public hem admin için)
 app.use("/api/auth", authRoutes);
 
-// Admin routes
 app.use("/api/admin/categories", adminCategoryRoutes);
 app.use("/api/admin/items", adminItemRoutes);
 app.use("/api/admin/menu", adminMenuRoutes);
 app.use("/api/admin/subscription", adminSubscriptionRoutes);
 
-// Public routes
 app.use("/api/public/categories", publicCategoryRoutes);
 app.use("/api/public/items", publicItemRoutes);
 app.use("/api/public/menu", publicMenuRoutes);
 
-// Error handling middleware
 app.use(
   (
     err: any,
@@ -101,7 +88,6 @@ app.use(
   }
 );
 
-// 404 handler
 app.use("*", (req, res) => {
   res.status(404).json({ error: "Route not found" });
 });

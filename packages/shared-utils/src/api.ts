@@ -1,4 +1,3 @@
-// Global window type for browser environment
 declare global {
   var window: Window & typeof globalThis;
 }
@@ -24,15 +23,13 @@ import {
   ItemDto,
 } from "@qr-menu/shared-types";
 
-// HTTP Methods
 export type HttpMethod = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
-// Request options
 export interface RequestOptions {
   method?: HttpMethod;
   headers?: Record<string, string>;
   body?: any;
-  subdomain?: string; // Server-side için subdomain parametresi
+  subdomain?: string;
   cache?:
     | "default"
     | "no-store"
@@ -43,7 +40,6 @@ export interface RequestOptions {
   credentials?: "omit" | "same-origin" | "include";
 }
 
-// Default request options
 const defaultOptions: RequestOptions = {
   method: "GET",
   headers: {
@@ -53,7 +49,6 @@ const defaultOptions: RequestOptions = {
   credentials: "include",
 };
 
-// Helper function to build full URL
 export const buildApiUrl = (
   endpoint: string,
   params?: Record<string, string>
@@ -76,7 +71,6 @@ export const buildApiUrl = (
   return url;
 };
 
-// Helper function to handle response
 const handleResponse = async <T>(
   response: Response
 ): Promise<ApiResponse<T>> => {
@@ -103,7 +97,6 @@ const handleResponse = async <T>(
   }
 };
 
-// Main API function
 export const apiRequest = async <T = any>(
   endpoint: string,
   options: RequestOptions = {},
@@ -111,31 +104,37 @@ export const apiRequest = async <T = any>(
 ): Promise<ApiResponse<T>> => {
   const finalOptions = { ...defaultOptions, ...options };
 
-  // Build full URL with params
   const url = buildApiUrl(endpoint, params);
 
-  // Cookie tabanlı auth için Authorization header'a gerek yok
   const headers = { ...finalOptions.headers };
 
-  // Subdomain header'ını ekle (server-side veya client-side)
   if (finalOptions.subdomain) {
-    // Server-side'da parametre olarak verilen subdomain
     headers["x-subdomain"] = finalOptions.subdomain;
   } else if (typeof window !== "undefined") {
-    // Client-side'da hostname'den çıkarılan subdomain
     headers["x-subdomain"] = extractSubdomain(window.location.host);
   }
 
-  // Prepare request config
   const requestConfig: RequestInit = {
     method: finalOptions.method,
     headers,
     credentials: finalOptions.credentials,
   };
 
-  // Add body for non-GET requests
   if (finalOptions.method !== "GET" && finalOptions.body) {
-    requestConfig.body = JSON.stringify(finalOptions.body);
+    if (
+      typeof FormData !== "undefined" &&
+      finalOptions.body instanceof FormData
+    ) {
+      if (
+        requestConfig.headers &&
+        (requestConfig.headers as any)["Content-Type"]
+      ) {
+        delete (requestConfig.headers as any)["Content-Type"];
+      }
+      requestConfig.body = finalOptions.body as any;
+    } else {
+      requestConfig.body = JSON.stringify(finalOptions.body);
+    }
   }
 
   try {
@@ -146,7 +145,6 @@ export const apiRequest = async <T = any>(
   }
 };
 
-// Convenience functions for common HTTP methods
 export const apiGet = <T = any>(
   endpoint: string,
   params?: Record<string, string>
@@ -170,14 +168,30 @@ export const apiPatch = <T = any>(endpoint: string, data?: any) => {
   return apiRequest<T>(endpoint, { method: "PATCH", body: data });
 };
 
-// Specific API functions for common operations with proper types
 export const apiClient = {
-  // Menu operations
   getMenuByUser: (): Promise<ApiResponse<Menu>> =>
     apiGet<Menu>(`${config.API_ENDPOINTS.ADMIN.MENU}`),
 
-  updateMenu: (data: Partial<Menu>): Promise<ApiResponse<Menu>> =>
-    apiPut<Menu>(`${config.API_ENDPOINTS.ADMIN.MENU}`, data),
+  updateMenu: (
+    data: Partial<Menu> & { file?: File | null }
+  ): Promise<ApiResponse<Menu>> => {
+    if (typeof window !== "undefined" && data && (data as any).file) {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        if (key === "file" && value instanceof File) {
+          formData.append("file", value);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      return apiRequest(`${config.API_ENDPOINTS.ADMIN.MENU}`, {
+        method: "PUT",
+        body: formData,
+      });
+    }
+    return apiPut<Menu>(`${config.API_ENDPOINTS.ADMIN.MENU}`, data);
+  },
 
   getCategories: (): Promise<ApiResponse<CategoryWithItemsDto>> =>
     apiGet<CategoryWithItemsDto>(`${config.API_ENDPOINTS.ADMIN.CATEGORY}`),
@@ -202,7 +216,6 @@ export const apiClient = {
       options
     ),
 
-  // Auth operations
   login: (data: LoginDto): Promise<ApiResponse<AuthResponseDto>> =>
     apiPost(`${config.API_ENDPOINTS.AUTH.LOGIN}`, data),
 
@@ -218,7 +231,6 @@ export const apiClient = {
   getUserMenus: (): Promise<ApiResponse<AuthResponseDto>> =>
     apiGet(config.API_ENDPOINTS.AUTH.MENUS),
 
-  // Item operations
   getItemsByCategory: (categoryId: string): Promise<ApiResponse<ItemDto>> =>
     apiGet<ItemDto>(
       `${config.API_ENDPOINTS.ADMIN.ITEM}/categories/${categoryId}`
@@ -227,21 +239,56 @@ export const apiClient = {
   getItemsByMenu: (): Promise<ApiResponse<ItemDto>> =>
     apiGet<ItemDto>(`${config.API_ENDPOINTS.ADMIN.ITEM}`),
 
-  // Admin Menu operations
   adminCreateMenu: (
     data: CreateMenuDto
   ): Promise<ApiResponse<CreateMenuResponseDto>> =>
     apiPost(config.API_ENDPOINTS.ADMIN.MENU, data),
 
-  // Category operations
-  createCategory: (data: Partial<Category>): Promise<ApiResponse<Category>> =>
-    apiPost(`${config.API_ENDPOINTS.ADMIN.CATEGORY}`, data),
+  createCategory: (
+    data: Partial<Category> & { file?: File | null }
+  ): Promise<ApiResponse<Category>> => {
+    if (typeof window !== "undefined" && data && (data as any).file) {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        if (key === "file" && value instanceof File) {
+          formData.append("file", value);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      return apiRequest(`${config.API_ENDPOINTS.ADMIN.CATEGORY}`, {
+        method: "POST",
+        body: formData,
+      });
+    }
+    return apiPost(`${config.API_ENDPOINTS.ADMIN.CATEGORY}`, data);
+  },
 
   updateCategory: (
     categoryId: string,
-    data: Partial<Category>
-  ): Promise<ApiResponse<Category>> =>
-    apiPut(`${config.API_ENDPOINTS.ADMIN.CATEGORY}/${categoryId}`, data),
+    data: Partial<Category> & { file?: File | null }
+  ): Promise<ApiResponse<Category>> => {
+    if (typeof window !== "undefined" && data && (data as any).file) {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        if (key === "file" && value instanceof File) {
+          formData.append("file", value);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      return apiRequest(
+        `${config.API_ENDPOINTS.ADMIN.CATEGORY}/${categoryId}`,
+        {
+          method: "PUT",
+          body: formData,
+        }
+      );
+    }
+    return apiPut(`${config.API_ENDPOINTS.ADMIN.CATEGORY}/${categoryId}`, data);
+  },
 
   deleteCategory: (categoryId: string): Promise<ApiResponse<void>> =>
     apiDelete(`${config.API_ENDPOINTS.ADMIN.CATEGORY}/${categoryId}`),
@@ -251,15 +298,48 @@ export const apiClient = {
   ): Promise<ApiResponse<{ updatedCount: number }>> =>
     apiPut(`${config.API_ENDPOINTS.ADMIN.CATEGORY}/reorder`, { changes }),
 
-  // Item operations
-  createItem: (data: Partial<Item>): Promise<ApiResponse<Item>> =>
-    apiPost(`${config.API_ENDPOINTS.ADMIN.ITEM}`, data),
+  createItem: (
+    data: Partial<Item> & { file?: File | null }
+  ): Promise<ApiResponse<Item>> => {
+    if (typeof window !== "undefined" && data && (data as any).file) {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        if (key === "file" && value instanceof File) {
+          formData.append("file", value);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      return apiRequest(`${config.API_ENDPOINTS.ADMIN.ITEM}`, {
+        method: "POST",
+        body: formData,
+      });
+    }
+    return apiPost(`${config.API_ENDPOINTS.ADMIN.ITEM}`, data);
+  },
 
   updateItem: (
     itemId: string,
-    data: Partial<Item>
-  ): Promise<ApiResponse<Item>> =>
-    apiPut(`${config.API_ENDPOINTS.ADMIN.ITEM}/${itemId}`, data),
+    data: Partial<Item> & { file?: File | null }
+  ): Promise<ApiResponse<Item>> => {
+    if (typeof window !== "undefined" && data && (data as any).file) {
+      const formData = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+        if (key === "file" && value instanceof File) {
+          formData.append("file", value);
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+      return apiRequest(`${config.API_ENDPOINTS.ADMIN.ITEM}/${itemId}`, {
+        method: "PUT",
+        body: formData,
+      });
+    }
+    return apiPut(`${config.API_ENDPOINTS.ADMIN.ITEM}/${itemId}`, data);
+  },
 
   deleteItem: (itemId: string): Promise<ApiResponse<void>> =>
     apiDelete(`${config.API_ENDPOINTS.ADMIN.ITEM}/${itemId}`),
@@ -269,7 +349,6 @@ export const apiClient = {
   ): Promise<ApiResponse<{ updatedCount: number }>> =>
     apiPut(`${config.API_ENDPOINTS.ADMIN.ITEM}/reorder`, { changes }),
 
-  // Subscription operations
   getUserSubscription: (): Promise<
     ApiResponse<{ subscription: Subscription | null }>
   > =>

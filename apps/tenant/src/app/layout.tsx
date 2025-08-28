@@ -1,13 +1,22 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "../providers";
 import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
-  title: "QR Menu - Restaurant Menü",
-  description: "Restaurant menü ve sipariş sistemi",
+  title: "QR Menu - Modern Restaurant Menü",
+  description:
+    "Modern restaurant menü sistemi ile lezzetli yemeklerinizi keşfedin",
 };
 
 export default function RootLayout({
@@ -16,22 +25,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="tr">
-      <body className={inter.className}>
+    <html lang="tr" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <Providers>
-          <div className="min-h-screen bg-gray-50">
-            {/* Header */}
-            <header className="bg-white shadow-sm border-b sticky top-0 z-50">
+          <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900">
+            <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/20 dark:border-gray-700/20">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center h-16">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <div className="w-8 h-8 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center">
-                        <span className="text-white font-bold text-sm">QR</span>
+                      <div className="w-10 h-10 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                        <span className="text-white font-bold text-lg">QR</span>
                       </div>
                     </div>
                     <div className="ml-3">
-                      <h1 className="text-xl font-bold text-gray-900">
+                      <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                         QR Menu
                       </h1>
                     </div>
@@ -40,55 +50,57 @@ export default function RootLayout({
                   <nav className="hidden md:flex space-x-8">
                     <a
                       href="#"
-                      className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                      className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200"
                     >
                       Menü
                     </a>
                     <a
                       href="#"
-                      className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                      className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200"
                     >
                       Hakkımızda
                     </a>
                     <a
                       href="#"
-                      className="text-gray-500 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                      className="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white px-3 py-2 text-sm font-medium transition-colors duration-200"
                     >
                       İletişim
                     </a>
                   </nav>
 
                   <div className="flex items-center space-x-4">
-                    <div className="text-sm text-gray-500">QR Menü Sistemi</div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+                      QR Menü Sistemi
+                    </div>
                   </div>
                 </div>
               </div>
             </header>
 
-            {/* Main Content */}
             <main className="flex-1">{children}</main>
 
-            {/* Footer */}
-            <footer className="bg-white border-t mt-12">
+            <footer className="bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm border-t border-gray-200/20 dark:border-gray-700/20 mt-16">
               <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                  {/* Company Info */}
                   <div className="col-span-1 md:col-span-2">
                     <div className="flex items-center mb-4">
-                      <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-500 rounded-lg flex items-center justify-center mr-3">
-                        <span className="text-white font-bold">QR</span>
+                      <div className="w-12 h-12 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 rounded-xl flex items-center justify-center mr-3 shadow-lg">
+                        <span className="text-white font-bold text-lg">QR</span>
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         QR Menu
                       </h3>
                     </div>
-                    <p className="text-gray-600 mb-4 max-w-md">
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 max-w-md leading-relaxed">
                       Modern restaurant menü sistemi ile müşterilerinize en iyi
                       deneyimi sunun. QR kod ile kolay erişim, güzel tasarım ve
                       hızlı sipariş.
                     </p>
                     <div className="flex space-x-4">
-                      <a href="#" className="text-gray-400 hover:text-gray-500">
+                      <a
+                        href="#"
+                        className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                      >
                         <span className="sr-only">Facebook</span>
                         <svg
                           className="h-6 w-6"
@@ -102,7 +114,10 @@ export default function RootLayout({
                           />
                         </svg>
                       </a>
-                      <a href="#" className="text-gray-400 hover:text-gray-500">
+                      <a
+                        href="#"
+                        className="text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition-colors duration-200"
+                      >
                         <span className="sr-only">Instagram</span>
                         <svg
                           className="h-6 w-6"
@@ -116,7 +131,10 @@ export default function RootLayout({
                           />
                         </svg>
                       </a>
-                      <a href="#" className="text-gray-400 hover:text-gray-500">
+                      <a
+                        href="#"
+                        className="text-gray-400 hover:text-blue-500 dark:hover:text-blue-400 transition-colors duration-200"
+                      >
                         <span className="sr-only">Twitter</span>
                         <svg
                           className="h-6 w-6"
@@ -129,16 +147,15 @@ export default function RootLayout({
                     </div>
                   </div>
 
-                  {/* Quick Links */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase mb-4">
+                    <h3 className="text-sm font-semibold text-gray-400 dark:text-gray-500 tracking-wider uppercase mb-4">
                       Hızlı Linkler
                     </h3>
                     <ul className="space-y-3">
                       <li>
                         <a
                           href="#"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm transition-colors duration-200"
                         >
                           Ana Sayfa
                         </a>
@@ -146,7 +163,7 @@ export default function RootLayout({
                       <li>
                         <a
                           href="#"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm transition-colors duration-200"
                         >
                           Menüler
                         </a>
@@ -154,7 +171,7 @@ export default function RootLayout({
                       <li>
                         <a
                           href="#"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm transition-colors duration-200"
                         >
                           Kategoriler
                         </a>
@@ -162,7 +179,7 @@ export default function RootLayout({
                       <li>
                         <a
                           href="#"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm transition-colors duration-200"
                         >
                           Hakkımızda
                         </a>
@@ -170,16 +187,15 @@ export default function RootLayout({
                     </ul>
                   </div>
 
-                  {/* Support */}
                   <div>
-                    <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase mb-4">
+                    <h3 className="text-sm font-semibold text-gray-400 dark:text-gray-500 tracking-wider uppercase mb-4">
                       Destek
                     </h3>
                     <ul className="space-y-3">
                       <li>
                         <a
                           href="#"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm transition-colors duration-200"
                         >
                           Yardım Merkezi
                         </a>
@@ -187,7 +203,7 @@ export default function RootLayout({
                       <li>
                         <a
                           href="#"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm transition-colors duration-200"
                         >
                           İletişim
                         </a>
@@ -195,7 +211,7 @@ export default function RootLayout({
                       <li>
                         <a
                           href="#"
-                          className="text-gray-600 hover:text-gray-900 text-sm"
+                          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white text-sm transition-colors duration-200"
                         >
                           SSS
                         </a>
@@ -204,21 +220,21 @@ export default function RootLayout({
                   </div>
                 </div>
 
-                <div className="mt-8 pt-8 border-t border-gray-200">
+                <div className="mt-8 pt-8 border-t border-gray-200/20 dark:border-gray-700/20">
                   <div className="flex flex-col md:flex-row justify-between items-center">
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-400 dark:text-gray-500 text-sm">
                       © 2025 QR Menu. Tüm hakları saklıdır.
                     </p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
                       <a
                         href="#"
-                        className="text-gray-400 hover:text-gray-500 text-sm"
+                        className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm transition-colors duration-200"
                       >
                         Gizlilik Politikası
                       </a>
                       <a
                         href="#"
-                        className="text-gray-400 hover:text-gray-500 text-sm"
+                        className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 text-sm transition-colors duration-200"
                       >
                         Kullanım Şartları
                       </a>

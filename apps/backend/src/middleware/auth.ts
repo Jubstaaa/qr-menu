@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { supabase } from "../../supabase/supabase";
 
-// Extend Request interface to include user and menu info
 declare global {
   namespace Express {
     interface Request {
@@ -23,7 +22,6 @@ export const authMiddleware = async (
   next: NextFunction
 ) => {
   try {
-    // Get token from cookie
     const token = req.cookies.auth_token;
     if (!token) {
       return res.status(401).json({
@@ -31,14 +29,12 @@ export const authMiddleware = async (
       });
     }
 
-    // Verify token with Supabase
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser(token);
 
     if (authError || !user) {
-      // Clear auth cookie on invalid token
       res.clearCookie("auth_token", {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -51,7 +47,6 @@ export const authMiddleware = async (
       });
     }
 
-    // Get user's menu
     const { data: menu, error: menuError } = await supabase
       .from("menus")
       .select("id, user_id")
@@ -59,7 +54,6 @@ export const authMiddleware = async (
       .eq("is_active", true)
       .single();
 
-    // Add user and menu info to request
     req.user = {
       id: user.id,
       email: user.email || "",
@@ -80,23 +74,20 @@ export const authMiddleware = async (
   }
 };
 
-// Middleware to check if item belongs to user's menu
 export const checkItemOwnership = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params; // item ID
+    const { id } = req.params;
     const userMenuId = req.userMenu?.id;
-    console.log(req.params);
     if (!userMenuId) {
       return res.status(401).json({
         error: "Kimlik doğrulama gerekli",
       });
     }
 
-    // Check if item belongs to user's menu
     const { data: item, error } = await supabase
       .from("menu_items")
       .select(
@@ -127,14 +118,13 @@ export const checkItemOwnership = async (
   }
 };
 
-// Middleware to check if category belongs to user's menu
 export const checkCategoryOwnership = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const { id } = req.params; // category ID
+    const { id } = req.params;
     const userMenuId = req.userMenu?.id;
 
     if (!userMenuId) {
@@ -143,7 +133,6 @@ export const checkCategoryOwnership = async (
       });
     }
 
-    // Check if category belongs to user's menu
     const { data: category, error } = await supabase
       .from("menu_categories")
       .select("id, menu_id")

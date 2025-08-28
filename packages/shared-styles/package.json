@@ -18,6 +18,7 @@
     "tailwindcss": "^4.1.12"
   },
   "dependencies": {
-    "@heroui/theme": "^2.4.20"
+    "@heroui/theme": "^2.4.20",
+    "@qr-menu/shared-components": "workspace:*"
   }
 }

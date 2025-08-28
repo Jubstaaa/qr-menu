@@ -10,31 +10,34 @@ export const TestimonialsSection: React.FC = () => {
       role: "Kebapçı Sahibi",
       company: "Yılmaz Kebap Evi",
       avatar: "AY",
-      content: "QR menü ile müşteri memnuniyetimiz %40 arttı. Artık menü güncellemeleri çok kolay ve müşteriler menüye çok daha kolay erişiyor!",
+      content:
+        "QR menü ile müşteri memnuniyetimiz %40 arttı. Artık menü güncellemeleri çok kolay ve müşteriler menüye çok daha kolay erişiyor!",
       rating: 5,
       bgColor: "from-blue-500 to-blue-600",
-      textColor: "text-blue-600 dark:text-blue-400"
+      textColor: "text-blue-600 dark:text-blue-400",
     },
     {
       name: "Fatma Demir",
       role: "Pizzeria Sahibi",
       company: "Demir Pizza",
       avatar: "FD",
-      content: "5 dakikada kurulum yaptım. Müşteriler artık telefonlarından menüye bakıyor, çok pratik! Artık kağıt menü basmıyoruz.",
+      content:
+        "5 dakikada kurulum yaptım. Müşteriler artık telefonlarından menüye bakıyor, çok pratik! Artık kağıt menü basmıyoruz.",
       rating: 5,
       bgColor: "from-green-500 to-green-600",
-      textColor: "text-green-600 dark:text-green-400"
+      textColor: "text-green-600 dark:text-green-400",
     },
     {
       name: "Mehmet Kaya",
       role: "Cafe Sahibi",
       company: "Kaya Cafe",
       avatar: "MK",
-      content: "Analitik raporları sayesinde hangi ürünlerin popüler olduğunu görebiliyorum. Harika bir sistem! Müşteri davranışlarını anlamak çok kolay.",
+      content:
+        "Analitik raporları sayesinde hangi ürünlerin popüler olduğunu görebiliyorum. Harika bir sistem! Müşteri davranışlarını anlamak çok kolay.",
       rating: 5,
       bgColor: "from-purple-500 to-purple-600",
-      textColor: "text-purple-600 dark:text-purple-400"
-    }
+      textColor: "text-purple-600 dark:text-purple-400",
+    },
   ];
 
   return (
@@ -52,7 +55,8 @@ export const TestimonialsSection: React.FC = () => {
               </span>
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              QR Menu ile başarı hikayeleri. Binlerce restoran sahibi artık dijital menü kullanıyor.
+              QR Menu ile başarı hikayeleri. Binlerce restoran sahibi artık
+              dijital menü kullanıyor.
             </p>
           </div>
 
@@ -63,35 +67,36 @@ export const TestimonialsSection: React.FC = () => {
                 className="group hover:transform hover:-translate-y-2 hover:shadow-2xl transition-all duration-500 dark:bg-gray-800 dark:border-gray-700 border-2 border-transparent hover:border-blue-200 dark:hover:border-blue-700"
               >
                 <CardBody className="p-8 space-y-6">
-                  {/* Quote Icon */}
                   <div className="flex justify-end">
-                    <div className={`w-12 h-12 bg-gradient-to-br ${testimonial.bgColor} rounded-full flex items-center justify-center opacity-20 group-hover:opacity-100 transition-opacity duration-300`}>
+                    <div
+                      className={`w-12 h-12 bg-gradient-to-br ${testimonial.bgColor} rounded-full flex items-center justify-center opacity-20 group-hover:opacity-100 transition-opacity duration-300`}
+                    >
                       <Quote className="w-6 h-6 text-white" />
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-4">
                     <p className="text-gray-700 dark:text-gray-200 text-lg leading-relaxed italic">
                       "{testimonial.content}"
                     </p>
                   </div>
 
-                  {/* Rating */}
                   <div className="flex items-center gap-1">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                      <Star
+                        key={i}
+                        className="w-5 h-5 fill-yellow-400 text-yellow-400"
+                      />
                     ))}
                   </div>
 
-                  {/* Author */}
                   <div className="flex items-center gap-4 pt-4 border-t border-gray-100 dark:border-gray-700">
                     <Avatar
                       name={testimonial.name}
                       className="w-12 h-12 text-lg font-semibold"
                       classNames={{
                         base: "bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800",
-                        name: "text-gray-700 dark:text-gray-200"
+                        name: "text-gray-700 dark:text-gray-200",
                       }}
                     />
                     <div>
@@ -111,22 +116,33 @@ export const TestimonialsSection: React.FC = () => {
             ))}
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pt-8">
             <div className="text-center space-y-2">
-              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">1000+</div>
-              <div className="text-gray-600 dark:text-gray-400">Mutlu Müşteri</div>
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                1000+
+              </div>
+              <div className="text-gray-600 dark:text-gray-400">
+                Mutlu Müşteri
+              </div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400">50K+</div>
-              <div className="text-gray-600 dark:text-gray-400">QR Kod Tarama</div>
+              <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+                50K+
+              </div>
+              <div className="text-gray-600 dark:text-gray-400">
+                QR Kod Tarama
+              </div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">99.9%</div>
+              <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+                99.9%
+              </div>
               <div className="text-gray-600 dark:text-gray-400">Uptime</div>
             </div>
             <div className="text-center space-y-2">
-              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">24/7</div>
+              <div className="text-3xl font-bold text-orange-600 dark:text-orange-400">
+                24/7
+              </div>
               <div className="text-gray-600 dark:text-gray-400">Destek</div>
             </div>
           </div>

@@ -1,4 +1,3 @@
-// Auth DTOs
 export interface LoginDto {
   email: string;
   password: string;

@@ -34,7 +34,6 @@ import {
   AuthResponseDto,
 } from "@qr-menu/shared-types";
 
-// Zod schemas
 const restaurantSchema = z.object({
   name: z.string().min(2, "Restoran adı en az 2 karakter olmalıdır"),
   subdomain: z
@@ -93,7 +92,6 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
     },
   });
 
-  // React Hook Form hooks
   const {
     register: registerRestaurant,
     handleSubmit: handleRestaurantSubmit,
@@ -179,7 +177,6 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
           </ModalHeader>
 
           <ModalBody>
-            {/* Steps */}
             <div className="flex items-center justify-center mb-6">
               {steps.map((step, index) => (
                 <div key={index} className="flex items-center">
@@ -213,7 +210,6 @@ export const CreateMenuModal: React.FC<CreateMenuModalProps> = ({
               ))}
             </div>
 
-            {/* Step Content */}
             <div className="mb-6">{renderStep1()}</div>
           </ModalBody>
 

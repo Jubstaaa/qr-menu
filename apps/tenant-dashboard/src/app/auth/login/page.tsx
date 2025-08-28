@@ -31,13 +31,12 @@ export default function LoginPage() {
 
     try {
       const { message } = await apiClient.login({ email, password });
-      // Başarı mesajını göster
+
       addToast({
         title: message,
         color: "success",
       });
 
-      // Dashboard'a yönlendir
       router.push("/dashboard");
     } catch (err: unknown) {
       const errorMessage =

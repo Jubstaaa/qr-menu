@@ -1,6 +1,5 @@
 export type ApiResult<T> = ApiResponse<T> | ApiErrorResponse;
 
-// Generic API Response wrapper
 export interface ApiResponse<T> {
   data: T;
   message: string;

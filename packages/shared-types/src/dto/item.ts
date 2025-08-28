@@ -1,4 +1,3 @@
-// Item DTOs
 export interface CreateItemDto {
   name: string;
   description?: string;

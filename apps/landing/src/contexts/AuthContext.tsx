@@ -45,7 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const openAuthModal = () => setIsAuthModalOpen(true);
   const closeAuthModal = () => setIsAuthModalOpen(false);
 
-  // Auth check query
   const { data: authData, isLoading } = useQuery<
     AuthResponseDto,
     ApiErrorResponse
@@ -58,7 +57,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     retry: false,
   });
 
-  // Login mutation
   const loginMutation = useMutation<
     ApiResponse<AuthResponseDto>,
     ApiErrorResponse,
@@ -74,7 +72,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     },
   });
 
-  // Register mutation
   const registerMutation = useMutation<
     ApiResponse<AuthResponseDto>,
     ApiErrorResponse,

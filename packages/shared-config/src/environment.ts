@@ -6,7 +6,9 @@ export interface EnvironmentConfig {
   NODE_ENV: "development" | "production" | "test";
   API_URL: string;
   SUPABASE_URL: string;
+  SUPABASE_HOSTNAME: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
+  SUPABASE_STORAGE_BUCKET: string;
   TEST_SUBDOMAIN?: string;
   MICROFRONTENDS_PROXY?: string;
   API_ENDPOINTS: {
@@ -36,7 +38,9 @@ export const config: EnvironmentConfig = {
     (process.env.NODE_ENV as EnvironmentConfig["NODE_ENV"]) || "development",
   API_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000",
   SUPABASE_URL: process.env.SUPABASE_URL || "",
+  SUPABASE_HOSTNAME: process.env.SUPABASE_HOSTNAME || "",
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+  SUPABASE_STORAGE_BUCKET: process.env.SUPABASE_STORAGE_BUCKET || "",
   TEST_SUBDOMAIN: process.env.TEST_SUBDOMAIN,
   MICROFRONTENDS_PROXY: process.env.MICROFRONTENDS_PROXY,
   API_ENDPOINTS: {
@@ -64,3 +68,16 @@ export const config: EnvironmentConfig = {
 export const isDevelopment = () => process.env.NODE_ENV === "development";
 export const isProduction = () => process.env.NODE_ENV === "production";
 export const isTest = () => process.env.NODE_ENV === "test";
+
+export const getNextImagesConfig = () => ({
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https" as const,
+        hostname: config.SUPABASE_HOSTNAME,
+        port: "",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
+});

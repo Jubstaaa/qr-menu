@@ -8,6 +8,8 @@ import {
   MenuWithCategoriesDto,
   CategoryWithItemsDto,
 } from "@qr-menu/shared-types";
+import { uploadImage, deleteImage } from "../../utils/upload";
+import { validateUpdateRestaurant } from "@qr-menu/shared-validation";
 
 export const menuController = {
   async createMenu(
@@ -29,7 +31,6 @@ export const menuController = {
         });
       }
 
-      // Check if subdomain already exists
       const { data: existingMenu, error: checkError } = await supabase
         .from("menus")
         .select("id")
@@ -42,7 +43,6 @@ export const menuController = {
         });
       }
 
-      // Create menu record
       const { data: menu, error: createError } = await supabase
         .from("menus")
         .insert({
@@ -75,7 +75,6 @@ export const menuController = {
     }
   },
 
-  // Get menu by subdomain
   async getMenuBySubdomain(
     req: Request<{ subdomain: string }>,
     res: Response<ApiResult<MenuWithCategoriesDto>>
@@ -94,12 +93,14 @@ export const menuController = {
           restaurant_address,
           restaurant_phone,
           restaurant_email,
-
+          logo_url,
           brand_name,
           menu_categories (
             id,
             name,
             slug,
+            description,
+            image_url,
             sort_order,
             is_active,
             created_at
@@ -131,12 +132,29 @@ export const menuController = {
     }
   },
 
-  // Get menus by user
   async getMenusByUser(req: Request, res: Response) {
     try {
       const { data: menu, error } = await supabase
         .from("menus")
-        .select("*")
+        .select(
+          `
+          id,
+          restaurant_name,
+          restaurant_description,
+          restaurant_address,
+          restaurant_phone,
+          restaurant_email,
+          logo_url,
+          opening_time,
+          closing_time,
+          wifi_ssid,
+          wifi_password,
+          subdomain,
+          is_active,
+          created_at,
+          updated_at
+        `
+        )
         .eq("id", req.userMenu!.id)
         .single();
 
@@ -156,7 +174,6 @@ export const menuController = {
     }
   },
 
-  // Get category with items by subdomain and slug or id (public)
   async getCategoryBySubdomainAndSlug(req: Request, res: Response) {
     try {
       const { subdomain, slug } = req.params as {
@@ -175,7 +192,6 @@ export const menuController = {
         return res.status(404).json({ error: "Menü bulunamadı" });
       }
 
-      // First try by slug
       let { data: category, error: catError } = await supabase
         .from("menu_categories")
         .select(
@@ -184,6 +200,7 @@ export const menuController = {
           name,
           slug,
           description,
+          image_url,
           sort_order,
           is_active,
           created_at,
@@ -198,7 +215,6 @@ export const menuController = {
         .order("sort_order", { ascending: true, foreignTable: "menu_items" })
         .single();
 
-      // If not found by slug, and looks like UUID, try by id
       const isUuid =
         /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
           slug
@@ -212,6 +228,7 @@ export const menuController = {
             name,
             slug,
             description,
+            image_url,
             sort_order,
             is_active,
             created_at,
@@ -246,22 +263,57 @@ export const menuController = {
     }
   },
 
-  // Update menu details
   async updateMenu(req: Request, res: Response) {
     try {
-      const updateData = req.body;
+      let updateData;
+      try {
+        updateData = validateUpdateRestaurant(req.body);
+      } catch (validationError: any) {
+        return res.status(400).json({
+          error: "Geçersiz veri formatı",
+          details: validationError.errors,
+        });
+      }
 
       if (!req.userMenu) {
         return res.status(401).json({ error: "Kullanıcı menüsü bulunamadı" });
       }
 
-      // Update menu with new details
+      let logoUrl = updateData.logo_url;
+      if ((req as any).file) {
+        try {
+          const uploadedLogoUrl = await uploadImage({
+            req,
+            folder: "logos",
+            menuId: req.userMenu.id,
+          });
+
+          if (uploadedLogoUrl) {
+            logoUrl = uploadedLogoUrl;
+
+            if (updateData.logo_url && updateData.logo_url !== logoUrl) {
+              await deleteImage({
+                imageUrl: updateData.logo_url,
+                folder: "logos",
+                menuId: req.userMenu.id,
+              });
+            }
+          }
+        } catch (uploadError) {
+          console.error("Logo upload error:", uploadError);
+          return res.status(500).json({ error: "Logo yüklenemedi" });
+        }
+      }
+
+      const finalUpdateData = {
+        ...updateData,
+        logo_url: logoUrl,
+        updated_at: new Date().toISOString(),
+      };
+
       const { data: updatedMenu, error: updateError } = await supabase
         .from("menus")
-        .update({
-          ...updateData,
-          updated_at: new Date().toISOString(),
-        })
+        .update(finalUpdateData)
         .eq("id", req.userMenu.id)
         .select()
         .single();

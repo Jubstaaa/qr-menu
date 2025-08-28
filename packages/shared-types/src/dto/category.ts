@@ -1,6 +1,5 @@
 import { ItemDto } from "./item";
 
-// Category DTOs
 export interface CreateCategoryDto {
   name: string;
   slug: string;
@@ -26,13 +25,13 @@ export interface CategoryDto {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  image_url?: string;
 }
 
 export interface CategoryWithItemsDto extends CategoryDto {
   menu_items: ItemDto[];
 }
 
-// Category request parameters
 export interface CategoryByIdParams {
   id: string;
 }

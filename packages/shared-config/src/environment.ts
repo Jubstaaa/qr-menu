@@ -71,6 +71,8 @@ export const isTest = () => process.env.NODE_ENV === "test";
 
 export const getNextImagesConfig = () => {
   let hostname = config.SUPABASE_HOSTNAME?.trim();
+  console.log(hostname, config.SUPABASE_HOSTNAME);
+  
   if (!hostname && config.SUPABASE_URL) {
     try {
       const parsed = new URL(config.SUPABASE_URL);

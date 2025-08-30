@@ -6,7 +6,12 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"],
-      "env": ["NODE_ENV", "SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"]
+      "env": [
+        "NODE_ENV",
+        "SUPABASE_URL",
+        "SUPABASE_HOSTNAME",
+        "SUPABASE_SERVICE_ROLE_KEY"
+      ]
     },
     "dev": {
       "dependsOn": ["^build"],

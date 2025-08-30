@@ -80,8 +80,8 @@ export const getNextImagesConfig = () => {
     }
   }
 
-  if (!hostname) {
-    return {} as const;
+  if (!hostname || hostname === "") {
+    return {};
   }
 
   return {
@@ -89,11 +89,11 @@ export const getNextImagesConfig = () => {
       remotePatterns: [
         {
           protocol: "https" as const,
-          hostname,
+          hostname: hostname,
           port: "",
           pathname: "/storage/v1/object/public/**",
         },
       ],
     },
-  } as const;
+  };
 };

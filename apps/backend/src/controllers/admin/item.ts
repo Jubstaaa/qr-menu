@@ -214,7 +214,16 @@ export const adminItemController = {
       const itemIds = changes.map((c) => c.id);
       const { data: existingItems, error: fetchError } = await supabase
         .from("menu_items")
-        .select("id, category_id")
+        .select(
+          `
+          id, 
+          category_id,
+          menu_categories!inner(
+            id,
+            menu_id
+          )
+        `
+        )
         .eq("menu_categories.menu_id", req.userMenu!.id)
         .in("id", itemIds);
 

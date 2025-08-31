@@ -34,6 +34,8 @@ export interface MenuWithCategoriesDto {
   brand_name?: string;
   opening_time?: string;
   closing_time?: string;
+  wifi_ssid?: string;
+  wifi_password?: string;
   theme_color?: string;
   logo_url?: string;
   custom_css?: string;

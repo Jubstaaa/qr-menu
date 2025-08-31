@@ -14,6 +14,7 @@ import { adminSubscriptionRoutes } from "./routes/admin/subscription";
 import publicCategoryRoutes from "./routes/public/category";
 import publicItemRoutes from "./routes/public/item";
 import publicMenuRoutes from "./routes/public/menu";
+import { config } from "@qr-menu/shared-config";
 
 dotenv.config({ path: "../../.env" });
 
@@ -26,9 +27,11 @@ const corsOptions = {
   origin: function (origin: string | undefined, callback: any) {
     if (!origin) return callback(null, true);
 
-    const allowedDomains = process.env.ALLOWED_DOMAINS
-      ? process.env.ALLOWED_DOMAINS.split(",").map((d) => d.trim())
-      : ["localhost:3000", "localhost:3024"];
+    const allowedDomains = [
+      "localhost:3000",
+      "localhost:3024",
+      config.BASE_DOMAIN,
+    ];
 
     const isAllowed = allowedDomains.some((domain) => {
       if (origin === `https://${domain}` || origin === `http://${domain}`) {

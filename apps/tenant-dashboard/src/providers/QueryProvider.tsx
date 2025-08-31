@@ -1,12 +1,14 @@
 "use client";
 
-import { addToast, toast } from "@heroui/react";
+import { addToast } from "@heroui/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const router = useRouter();
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -16,11 +18,15 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
             staleTime: 5 * 60 * 1000,
             gcTime: 10 * 60 * 1000,
           },
+          mutations: {
+            retry: 1,
+          },
         },
       })
   );
 
   useEffect(() => {
+    // Query error handling
     const queryUnsubscribe = queryClient
       .getQueryCache()
       .subscribe((event: any) => {
@@ -28,15 +34,17 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
           const query = event.query;
           const error = query.state.error as any;
 
+          // 401/403 hatalarında logout yap
           if (error?.status === 403) {
-            console.log("Token geçersiz, auth state temizleniyor...");
+            console.log("Token geçersiz, logout yapılıyor...");
 
-            queryClient.setQueryData(["auth"], null);
+            router.replace("/auth/login");
             return;
           }
         }
       });
 
+    // Mutation error handling
     const mutationUnsubscribe = queryClient
       .getMutationCache()
       .subscribe((event: any) => {
@@ -46,17 +54,13 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
           if (mutation.state.status === "error") {
             const error = mutation.state.error as any;
 
+            // 401/403 hatalarında logout yap
             if (error?.status === 403) {
-              console.log("Token geçersiz, auth state temizleniyor...");
+              console.log("Token geçersiz, logout yapılıyor...");
 
-              queryClient.setQueryData(["auth"], null);
+              router.replace("/auth/login");
               return;
             }
-
-            addToast({
-              title: error?.message || "Bir hata oluştu",
-              color: "danger",
-            });
           } else if (mutation.state.status === "success") {
             addToast({
               title: mutation.state.data?.message || "İşlem başarılı!",

@@ -6,13 +6,12 @@ import {
   LoginDto,
   RegisterDto,
 } from "@qr-menu/shared-types";
-
-const isProd = process.env.NODE_ENV === "production";
+import { config, isProduction } from "@qr-menu/shared-config";
 
 const cookieConfig: Pick<CookieOptions, "secure" | "sameSite" | "domain"> = {
-  secure: isProd,
-  sameSite: isProd ? "none" : "lax",
-  domain: isProd ? `.${process.env.COOKIE_DOMAIN}` : undefined,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  domain: isProduction ? `.${config.BASE_DOMAIN}` : undefined,
 };
 
 export const authController = {
@@ -48,11 +47,15 @@ export const authController = {
         });
       }
 
+      const maxAge = authData.session?.expires_in
+        ? authData.session.expires_in * 1000
+        : 30 * 24 * 60 * 60 * 1000;
+
       res.cookie("auth_token", authData.session?.access_token, {
         httpOnly: true,
         ...cookieConfig,
         path: "/",
-        maxAge: 30 * 24 * 60 * 60 * 1000,
+        maxAge: maxAge,
       });
 
       const { data: menu } = await supabase
@@ -111,11 +114,16 @@ export const authController = {
         });
       }
 
+      // Token'ın expires_in değerini kullanarak cookie maxAge'ini ayarla
+      const maxAge = authData.session?.expires_in
+        ? authData.session.expires_in * 1000 // saniyeyi milisaniyeye çevir
+        : 30 * 24 * 60 * 60 * 1000; // fallback: 30 gün
+
       res.cookie("auth_token", authData.session?.access_token, {
         httpOnly: true,
         ...cookieConfig,
-        maxAge: 30 * 24 * 60 * 60 * 1000,
         path: "/",
+        maxAge: maxAge,
       });
 
       res.status(201).json({

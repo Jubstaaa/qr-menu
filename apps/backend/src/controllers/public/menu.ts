@@ -16,16 +16,15 @@ export const publicMenuController = {
         .from("menus")
         .select(
           `
-          id,
           restaurant_name,
           restaurant_description,
           restaurant_phone,
           restaurant_address,
           opening_time,
           closing_time,
-          is_active,
-          subdomain,
           logo_url,
+          wifi_ssid,
+          wifi_password,
           menu_categories (
             id,
             name,
@@ -35,13 +34,7 @@ export const publicMenuController = {
             is_active,
             image_url,
             menu_items (
-              id,
-              name,
-              description,
-              price,
-              image_url,
-              sort_order,
-              is_available
+              id
             )
           )
         `

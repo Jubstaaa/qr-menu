@@ -8,10 +8,9 @@ import {
   Card,
   CardBody,
   CardHeader,
-  useDisclosure,
   addToast,
 } from "@heroui/react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, QrCode } from "lucide-react";
 import { apiClient } from "@qr-menu/shared-utils";
 
 export default function LoginPage() {
@@ -53,13 +52,18 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+        <div className="text-center">
+          <div className="flex justify-center mb-6">
+            <div className="p-3 bg-blue-500 rounded-lg">
+              <QrCode className="text-white text-2xl" />
+            </div>
+          </div>
+          <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">
             Dashboard'a Giriş Yap
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Menünüzü yönetmek için giriş yapın
           </p>
         </div>
@@ -67,7 +71,9 @@ export default function LoginPage() {
         <Card className="w-full">
           <CardHeader className="flex flex-col gap-3">
             <div className="flex flex-col gap-2">
-              <h4 className="text-large font-bold">Giriş Bilgileri</h4>
+              <h4 className="text-center text-large font-bold">
+                Giriş Bilgileri
+              </h4>
               <p className="text-default-500 text-small">
                 Email ve şifrenizi girin
               </p>

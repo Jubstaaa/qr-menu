@@ -45,6 +45,8 @@ export const AuthNavbar: React.FC = () => {
     <Navbar
       onMenuOpenChange={setIsMenuOpen}
       isBordered
+      isBlurred
+      maxWidth="xl"
       className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800"
     >
       <NavbarContent>

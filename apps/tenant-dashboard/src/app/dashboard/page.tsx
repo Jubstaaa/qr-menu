@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   Card,
   CardBody,
@@ -8,8 +8,6 @@ import {
   Button,
   Chip,
   Progress,
-  useDisclosure,
-  addToast,
 } from "@heroui/react";
 import {
   Menu,
@@ -22,58 +20,19 @@ import {
   CreditCard,
   Calendar,
 } from "lucide-react";
-import { apiClient } from "@qr-menu/shared-utils";
-import { Menu as MenuType } from "@qr-menu/shared-types";
 import { useRouter } from "next/navigation";
 import RestaurantForm from "../../components/forms/RestaurantForm";
+import { useDashboard } from "../../hooks/useDashboard";
+import { Loading } from "@qr-menu/shared-components";
 
 export default function DashboardPage() {
-  const [loading, setLoading] = useState(true);
-
-  const [menu, setMenu] = useState<MenuType | null>(null);
-  const [subscription, setSubscription] = useState<any>(null);
   const router = useRouter();
 
-  const {
-    isOpen: isRestaurantModalOpen,
-    onOpen: onRestaurantModalOpen,
-    onClose: onRestaurantModalClose,
-  } = useDisclosure();
+  const { menu, subscription, loadingStates, modals, handlers } =
+    useDashboard();
 
-  useEffect(() => {
-    loadDashboardData();
-  }, []);
-
-  const loadDashboardData = async () => {
-    try {
-      setLoading(true);
-
-      const menuResponse = await apiClient.getMenuByUser();
-      if (menuResponse.data) {
-        setMenu(menuResponse.data);
-      }
-
-      try {
-        const subscriptionResponse = await apiClient.getUserSubscription();
-        if (subscriptionResponse.data) {
-          setSubscription(subscriptionResponse.data);
-        }
-      } catch (error) {
-        console.error("Abonelik bilgileri yüklenirken hata:", error);
-      }
-    } catch (error) {
-      console.error("Dashboard verisi yüklenirken hata:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
+  if (loadingStates.menu || loadingStates.subscription) {
+    return <Loading size="lg" text="Dashboard yükleniyor..." />;
   }
 
   return (
@@ -87,7 +46,7 @@ export default function DashboardPage() {
           <Button
             color="primary"
             startContent={<Settings />}
-            onPress={onRestaurantModalOpen}
+            onPress={modals.restaurant.onOpen}
           >
             Restoran Düzenle
           </Button>
@@ -102,9 +61,11 @@ export default function DashboardPage() {
       </div>
 
       {subscription && (
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader className="pb-3">
-            <h3 className="text-lg font-semibold">Abonelik Bilgileri</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Abonelik Bilgileri
+            </h3>
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -115,7 +76,8 @@ export default function DashboardPage() {
                 <div>
                   <p className="font-medium text-gray-900">Plan</p>
                   <p className="text-sm text-gray-600">
-                    {subscription.plan_type || "Plan bilgisi yok"}
+                    {subscription?.subscription?.plan_type ||
+                      "Plan bilgisi yok"}
                   </p>
                 </div>
               </div>
@@ -127,7 +89,7 @@ export default function DashboardPage() {
                 <div>
                   <p className="font-medium text-gray-900">Durum</p>
                   <p className="text-sm text-gray-600">
-                    {subscription.status || "Durum bilgisi yok"}
+                    {subscription?.subscription?.status || "Durum bilgisi yok"}
                   </p>
                 </div>
               </div>
@@ -139,10 +101,10 @@ export default function DashboardPage() {
                 <div>
                   <p className="font-medium text-gray-900">Bitiş Tarihi</p>
                   <p className="text-sm text-gray-600">
-                    {subscription.end_date
-                      ? new Date(subscription.end_date).toLocaleDateString(
-                          "tr-TR"
-                        )
+                    {subscription?.subscription?.end_date
+                      ? new Date(
+                          subscription.subscription.end_date
+                        ).toLocaleDateString("tr-TR")
                       : "Bitiş tarihi yok"}
                   </p>
                 </div>
@@ -153,9 +115,11 @@ export default function DashboardPage() {
       )}
 
       {menu && (
-        <Card>
+        <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader className="pb-3">
-            <h3 className="text-lg font-semibold">Restoran Bilgileri</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              Restoran Bilgileri
+            </h3>
           </CardHeader>
           <CardBody>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -249,19 +213,9 @@ export default function DashboardPage() {
 
       {menu && (
         <RestaurantForm
-          isOpen={isRestaurantModalOpen}
-          onClose={onRestaurantModalClose}
-          onSubmit={async (data) => {
-            try {
-              const response = await apiClient.updateMenu(data);
-              if (response.data) {
-                setMenu(response.data);
-              }
-              onRestaurantModalClose();
-            } catch (error) {
-              console.error("Error updating restaurant:", error);
-            }
-          }}
+          isOpen={modals.restaurant.isOpen}
+          onClose={modals.restaurant.onClose}
+          onSubmit={handlers.restaurant.submit}
           editingRestaurant={menu}
         />
       )}

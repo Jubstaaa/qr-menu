@@ -9,6 +9,7 @@ export interface EnvironmentConfig {
   SUPABASE_HOSTNAME: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
   SUPABASE_STORAGE_BUCKET: string;
+  BASE_DOMAIN: string;
   TEST_SUBDOMAIN?: string;
   MICROFRONTENDS_PROXY?: string;
   API_ENDPOINTS: {
@@ -41,6 +42,7 @@ export const config: EnvironmentConfig = {
   SUPABASE_HOSTNAME: process.env.SUPABASE_HOSTNAME || "",
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
   SUPABASE_STORAGE_BUCKET: process.env.SUPABASE_STORAGE_BUCKET || "",
+  BASE_DOMAIN: process.env.BASE_DOMAIN || "",
   TEST_SUBDOMAIN: process.env.TEST_SUBDOMAIN,
   MICROFRONTENDS_PROXY: process.env.MICROFRONTENDS_PROXY,
   API_ENDPOINTS: {
@@ -65,14 +67,13 @@ export const config: EnvironmentConfig = {
   },
 };
 
-export const isDevelopment = () => process.env.NODE_ENV === "development";
-export const isProduction = () => process.env.NODE_ENV === "production";
-export const isTest = () => process.env.NODE_ENV === "test";
+export const isDevelopment = process.env.NODE_ENV === "development";
+export const isProduction = process.env.NODE_ENV === "production";
+export const isTest = process.env.NODE_ENV === "test";
 
 export const getNextImagesConfig = () => {
   let hostname = config.SUPABASE_HOSTNAME?.trim();
-  console.log(hostname, config.SUPABASE_HOSTNAME);
-  
+
   if (!hostname && config.SUPABASE_URL) {
     try {
       const parsed = new URL(config.SUPABASE_URL);

@@ -62,16 +62,16 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-app.use("/api/auth", authRoutes);
+app.use("/auth", authRoutes);
 
-app.use("/api/admin/categories", adminCategoryRoutes);
-app.use("/api/admin/items", adminItemRoutes);
-app.use("/api/admin/menu", adminMenuRoutes);
-app.use("/api/admin/subscription", adminSubscriptionRoutes);
+app.use("/admin/categories", adminCategoryRoutes);
+app.use("/admin/items", adminItemRoutes);
+app.use("/admin/menu", adminMenuRoutes);
+app.use("/admin/subscription", adminSubscriptionRoutes);
 
-app.use("/api/public/categories", publicCategoryRoutes);
-app.use("/api/public/items", publicItemRoutes);
-app.use("/api/public/menu", publicMenuRoutes);
+app.use("/public/categories", publicCategoryRoutes);
+app.use("/public/items", publicItemRoutes);
+app.use("/public/menu", publicMenuRoutes);
 
 app.use(
   (

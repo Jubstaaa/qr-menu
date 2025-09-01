@@ -44,3 +44,7 @@ packages/*/dist/
 
 # Misc
 coverage/
+
+# Supabase
+supabase/
+supabase/*

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import {
   Button,
   Navbar,
@@ -18,28 +18,34 @@ import {
   Switch,
 } from "@heroui/react";
 import { QrCode } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
-import { AuthModal } from "./AuthModal";
-import { CreateMenuModal } from "./CreateMenuModal";
+import { useAuthQuery, useLogoutMutation } from "../hooks/api/useAuth";
+import { useModalContext } from "../contexts/ModalContext";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import Link from "next/link";
 
 export const AuthNavbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, menu, logout, openAuthModal, isAuthenticated, isLoading } =
-    useAuth();
+  const { data: authData, isLoading } = useAuthQuery();
+  const logoutMutation = useLogoutMutation();
+  const { openAuthModal, openCreateMenuModal } = useModalContext();
+
+  const user = authData?.user;
+  const menu = authData?.menu;
+  const isAuthenticated = !!user;
 
   const handleLogout = async () => {
-    await logout();
+    await logoutMutation.mutateAsync();
     setIsMenuOpen(false);
   };
 
-  const host = typeof window !== "undefined" ? window.location.host : "";
-
-  const menuUrl = useMemo(() => {
-    if (!menu?.subdomain || !host) return "#";
-    return `https://${menu.subdomain}.${host}`;
-  }, [menu?.subdomain, host]);
+  const handleMenuClick = () => {
+    if (menu?.subdomain) {
+      window.open(
+        `https://${menu.subdomain}.${window.location.host}`,
+        "_blank"
+      );
+    }
+  };
 
   return (
     <Navbar
@@ -120,20 +126,14 @@ export const AuthNavbar: React.FC = () => {
                   <Button
                     color="primary"
                     variant="flat"
-                    as={Link}
-                    href={menuUrl}
-                    target="_blank"
+                    onPress={handleMenuClick}
                   >
                     Menüme Git
                   </Button>
                 ) : (
-                  <CreateMenuModal>
-                    {(onOpen) => (
-                      <Button color="primary" onPress={onOpen}>
-                        Menü Oluştur
-                      </Button>
-                    )}
-                  </CreateMenuModal>
+                  <Button color="primary" onPress={openCreateMenuModal}>
+                    Menü Oluştur
+                  </Button>
                 )}
               </NavbarItem>
             </>
@@ -169,9 +169,7 @@ export const AuthNavbar: React.FC = () => {
                     <DropdownItem
                       key="menu"
                       color="default"
-                      as={Link}
-                      href={menuUrl}
-                      target="_blank"
+                      onClick={handleMenuClick}
                       className="dark:text-gray-100"
                     >
                       Menüme Git
@@ -250,23 +248,19 @@ export const AuthNavbar: React.FC = () => {
                 <Button
                   color="primary"
                   variant="flat"
-                  onPress={() => {
-                    if (menuUrl !== "#" && typeof window !== "undefined") {
-                      window.open(menuUrl, "_blank");
-                    }
-                  }}
+                  onPress={handleMenuClick}
                   className="w-full"
                 >
                   Menüme Git
                 </Button>
               ) : (
-                <CreateMenuModal>
-                  {(onOpen) => (
-                    <Button color="primary" onPress={onOpen} className="w-full">
-                      Menü Oluştur
-                    </Button>
-                  )}
-                </CreateMenuModal>
+                <Button
+                  color="primary"
+                  onPress={openCreateMenuModal}
+                  className="w-full"
+                >
+                  Menü Oluştur
+                </Button>
               )}
             </div>
           )}

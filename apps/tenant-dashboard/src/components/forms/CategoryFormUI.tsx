@@ -8,14 +8,14 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Input,
-  Textarea,
 } from "@heroui/react";
 import { useFormContext } from "react-hook-form";
 import {
   FileInput,
   SwitchField,
   type FileItem,
+  TextInput,
+  TextareaInput,
 } from "@qr-menu/shared-components";
 
 interface CategoryFormUIProps {
@@ -26,7 +26,6 @@ interface CategoryFormUIProps {
   submitButtonIcon: string;
   files: FileItem[];
   setFiles: React.Dispatch<React.SetStateAction<FileItem[]>>;
-  onSubmit: (data: any) => Promise<void>;
 }
 
 export default function CategoryFormUI({
@@ -37,12 +36,9 @@ export default function CategoryFormUI({
   submitButtonIcon,
   files,
   setFiles,
-  onSubmit,
 }: CategoryFormUIProps) {
   const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
     setValue,
     watch,
   } = useFormContext();
@@ -52,22 +48,19 @@ export default function CategoryFormUI({
       <ModalContent>
         <ModalHeader>{title}</ModalHeader>
         <ModalBody>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <Input
+          <div className="space-y-6">
+            <TextInput
+              name="name"
               label="Kategori Adı *"
               placeholder="Örn: Ana Yemekler, Tatlılar, İçecekler"
-              {...register("name")}
-              isInvalid={!!errors.name}
-              errorMessage={errors.name?.message?.toString()}
-              variant="bordered"
+              isRequired
               description="Kategori adı 1-50 karakter arasında olmalıdır"
             />
 
-            <Textarea
+            <TextareaInput
+              name="description"
               label="Açıklama"
               placeholder="Kategori hakkında kısa bir açıklama yazın (opsiyonel)"
-              {...register("description")}
-              variant="bordered"
               description="Müşterilerin kategoriyi daha iyi anlaması için yardımcı olur"
             />
 
@@ -83,15 +76,15 @@ export default function CategoryFormUI({
               isSelected={watch("is_active")}
               onValueChange={(value) => setValue("is_active", value)}
             />
-          </form>
+          </div>
         </ModalBody>
         <ModalFooter>
           <Button color="danger" variant="light" onPress={onClose}>
             İptal
           </Button>
           <Button
+            type="submit"
             color="primary"
-            onPress={() => handleSubmit(onSubmit)()}
             isLoading={isSubmitting}
             endContent={submitButtonIcon}
           >

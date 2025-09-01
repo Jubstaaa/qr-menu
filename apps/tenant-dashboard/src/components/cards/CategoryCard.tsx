@@ -13,13 +13,13 @@ import {
   DropdownItem,
 } from "@heroui/react";
 import { Edit, Trash, MoreVertical, Move } from "lucide-react";
-import { Category } from "@qr-menu/shared-types";
+import { CategoryAPI } from "@qr-menu/shared-types";
 
 interface CategoryCardProps {
-  category: Category;
+  category: CategoryAPI.Admin.GetAllCategoriesResponse[0];
   itemCount: number;
-  onEdit: (category: Category) => void;
-  onDelete: (category: Category) => void;
+  onEdit: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => void;
+  onDelete: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => void;
   dragHandleProps?: any;
 }
 

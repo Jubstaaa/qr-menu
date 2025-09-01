@@ -1,15 +1,18 @@
 import { useDisclosure } from "@heroui/react";
-import { Menu } from "@qr-menu/shared-types";
-import { UpdateRestaurantDto } from "@qr-menu/shared-validation";
-import { useMenu, useSubscription, useUpdateMenu } from "./useApi";
+import { MenuAPI } from "@qr-menu/shared-types";
+import {
+  useMenuQuery,
+  useSubscriptionQuery,
+  useUpdateMenuMutation,
+} from "./api";
 
 export const useDashboard = () => {
   const restaurantModal = useDisclosure();
 
-  const { data: menu, isLoading: menuLoading } = useMenu();
+  const { data: menu, isLoading: menuLoading } = useMenuQuery();
   const { data: subscription, isLoading: subscriptionLoading } =
-    useSubscription();
-  const updateMenuMutation = useUpdateMenu();
+    useSubscriptionQuery();
+  const updateMenuMutation = useUpdateMenuMutation();
 
   const loadingStates = {
     menu: menuLoading,
@@ -19,7 +22,7 @@ export const useDashboard = () => {
 
   const handlers = {
     restaurant: {
-      submit: async (data: UpdateRestaurantDto) => {
+      submit: async (data: MenuAPI.Admin.UpdateMenuRequest) => {
         try {
           await updateMenuMutation.mutateAsync(data);
           restaurantModal.onClose();

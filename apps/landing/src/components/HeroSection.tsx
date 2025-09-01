@@ -2,10 +2,14 @@
 
 import { Button } from "@heroui/react";
 import { QrCode, Smartphone } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+import { useModalContext } from "../contexts/ModalContext";
 
 export const HeroSection: React.FC = () => {
-  const { openAuthModal } = useAuth();
+  const { openAuthModal } = useModalContext();
+
+  const handleDemoClick = () => {
+    window.open(`https://demo.${window.location.host}`, "_blank");
+  };
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 py-20">
@@ -22,7 +26,7 @@ export const HeroSection: React.FC = () => {
             deneyimini artırın ve operasyonel verimliliği maksimize edin.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Button color="primary" size="lg" onClick={openAuthModal}>
+            <Button color="primary" size="lg" onPress={openAuthModal}>
               <QrCode className="mr-2 h-5 w-5" />
               Hemen Başlayın
             </Button>
@@ -30,11 +34,7 @@ export const HeroSection: React.FC = () => {
               variant="bordered"
               size="lg"
               className="dark:border-gray-600 dark:text-gray-200"
-              onClick={() => {
-                const host = window.location.host;
-                const demoUrl = `https://demo.${host}`;
-                window.open(demoUrl, "_blank");
-              }}
+              onPress={handleDemoClick}
             >
               <Smartphone className="mr-2 h-5 w-5" />
               Demo İnceleyin

@@ -1,55 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React from "react";
+import { Button, Card, CardBody, CardHeader } from "@heroui/react";
+import { QrCode } from "lucide-react";
+import { useLoginForm } from "../../../hooks/ui/useLoginForm";
 import {
-  Button,
-  Input,
-  Card,
-  CardBody,
-  CardHeader,
-  addToast,
-} from "@heroui/react";
-import { Eye, EyeOff, QrCode } from "lucide-react";
-import { apiClient } from "@qr-menu/shared-utils";
+  FormProvider,
+  EmailInput,
+  PasswordInput,
+  SubmitButton,
+} from "@qr-menu/shared-components";
 
 export default function LoginPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isVisible, setIsVisible] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const toggleVisibility = () => setIsVisible(!isVisible);
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-
-    try {
-      const { message } = await apiClient.login({ email, password });
-
-      addToast({
-        title: message,
-        color: "success",
-      });
-
-      router.push("/dashboard");
-    } catch (err: unknown) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Giriş yapılırken bir hata oluştu";
-      setError(errorMessage);
-      addToast({
-        title: "Giriş Hatası",
-        description: errorMessage,
-        color: "danger",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const { form, onSubmit } = useLoginForm();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 py-12 px-4 sm:px-6 lg:px-8">
@@ -80,58 +43,15 @@ export default function LoginPage() {
             </div>
           </CardHeader>
           <CardBody className="gap-3">
-            <form onSubmit={handleLogin} className="space-y-4">
-              <Input
-                type="email"
-                label="Email"
-                placeholder="ornek@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                variant="bordered"
-                color={error ? "danger" : "default"}
-              />
+            <FormProvider methods={form} onSubmit={onSubmit}>
+              <EmailInput name="email" label="Email" isRequired />
 
-              <Input
-                label="Şifre"
-                placeholder="Şifrenizi girin"
-                endContent={
-                  <button
-                    className="focus:outline-none"
-                    type="button"
-                    onClick={toggleVisibility}
-                  >
-                    {isVisible ? (
-                      <EyeOff className="text-2xl text-default-400 pointer-events-none" />
-                    ) : (
-                      <Eye className="text-2xl text-default-400 pointer-events-none" />
-                    )}
-                  </button>
-                }
-                type={isVisible ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                variant="bordered"
-                color={error ? "danger" : "default"}
-              />
+              <PasswordInput name="password" label="Şifre" isRequired />
 
-              {error && (
-                <div className="text-danger text-sm bg-danger-50 dark:bg-danger-900/20 p-3 rounded-lg">
-                  {error}
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                color="primary"
-                className="w-full"
-                isLoading={isLoading}
-                disabled={!email || !password}
-              >
-                {isLoading ? "Giriş yapılıyor..." : "Giriş Yap"}
-              </Button>
-            </form>
+              <SubmitButton color="primary" className="w-full">
+                Giriş Yap
+              </SubmitButton>
+            </FormProvider>
           </CardBody>
         </Card>
       </div>

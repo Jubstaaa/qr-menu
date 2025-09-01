@@ -1,32 +1,31 @@
 import { useState } from "react";
 import { useDisclosure } from "@heroui/react";
-import { Category, Item } from "@qr-menu/shared-types";
+import { CategoryAPI, ItemAPI } from "@qr-menu/shared-types";
 import {
-  CreateCategoryDto,
-  UpdateCategoryDto,
-  CreateItemDto,
-} from "@qr-menu/shared-validation";
-import {
-  useCategories,
-  useCreateCategory,
-  useUpdateCategory,
-  useDeleteCategory,
-  useCreateItem,
-  useUpdateItem,
-  useDeleteItem,
-  useReorderCategories,
-  useReorderItemsInCategory,
-} from "./useApi";
+  useCategoriesQuery,
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+  useDeleteCategoryMutation,
+  useCreateItemMutation,
+  useUpdateItemMutation,
+  useDeleteItemMutation,
+  useReorderCategoriesMutation,
+  useReorderItemsInCategoryMutation,
+} from "./api";
 import { useQueryClient } from "@tanstack/react-query";
 
 export const useMenuManagement = () => {
-  const { data: categories = [], isLoading: loading } = useCategories();
+  const { data: categories = [], isLoading: loading } = useCategoriesQuery();
   const categoriesArray = Array.isArray(categories) ? categories : [];
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
-    null
-  );
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [editingItem, setEditingItem] = useState<Item | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<
+    CategoryAPI.Admin.GetAllCategoriesResponse[0] | null
+  >(null);
+  const [editingCategory, setEditingCategory] = useState<
+    CategoryAPI.Admin.GetAllCategoriesResponse[0] | null
+  >(null);
+  const [editingItem, setEditingItem] = useState<
+    CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0] | null
+  >(null);
   const [deleteTarget, setDeleteTarget] = useState<{
     type: "category" | "item";
     id: string;
@@ -41,14 +40,14 @@ export const useMenuManagement = () => {
   const queryClient = useQueryClient();
 
   // Mutations
-  const createCategoryMutation = useCreateCategory();
-  const updateCategoryMutation = useUpdateCategory();
-  const deleteCategoryMutation = useDeleteCategory();
-  const createItemMutation = useCreateItem();
-  const updateItemMutation = useUpdateItem();
-  const deleteItemMutation = useDeleteItem();
-  const reorderCategoriesMutation = useReorderCategories();
-  const reorderItemsMutation = useReorderItemsInCategory();
+  const createCategoryMutation = useCreateCategoryMutation();
+  const updateCategoryMutation = useUpdateCategoryMutation();
+  const deleteCategoryMutation = useDeleteCategoryMutation();
+  const createItemMutation = useCreateItemMutation();
+  const updateItemMutation = useUpdateItemMutation();
+  const deleteItemMutation = useDeleteItemMutation();
+  const reorderCategoriesMutation = useReorderCategoriesMutation();
+  const reorderItemsMutation = useReorderItemsInCategoryMutation();
 
   // Loading states
   const loadingStates = {
@@ -68,21 +67,27 @@ export const useMenuManagement = () => {
     category: {
       submit: async (
         data:
-          | CreateCategoryDto
-          | (UpdateCategoryDto & { file?: File; image_url?: string })
+          | CategoryAPI.Admin.CreateCategoryRequest
+          | (CategoryAPI.Admin.UpdateCategoryRequest & {
+              file?: File;
+              image_url?: string;
+            })
       ) => {
         try {
           if (editingCategory) {
             await updateCategoryMutation.mutateAsync({
               id: editingCategory.id,
-              data: data as UpdateCategoryDto & {
+              data: data as CategoryAPI.Admin.UpdateCategoryRequest & {
                 file?: File;
                 image_url?: string;
               },
             });
           } else {
             await createCategoryMutation.mutateAsync(
-              data as CreateCategoryDto & { file?: File; image_url?: string }
+              data as CategoryAPI.Admin.CreateCategoryRequest & {
+                file?: File;
+                image_url?: string;
+              }
             );
           }
           setEditingCategory(null);
@@ -91,11 +96,11 @@ export const useMenuManagement = () => {
           console.error("Kategori kaydedilirken hata:", err);
         }
       },
-      edit: (category: Category) => {
+      edit: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => {
         setEditingCategory(category);
         categoryModal.onOpen();
       },
-      delete: (category: Category) => {
+      delete: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => {
         setDeleteTarget({
           type: "category",
           id: category.id,
@@ -103,7 +108,9 @@ export const useMenuManagement = () => {
         });
         deleteModal.onOpen();
       },
-      reorder: async (reorderedCategories: Category[]) => {
+      reorder: async (
+        reorderedCategories: CategoryAPI.Admin.GetAllCategoriesResponse
+      ) => {
         try {
           const currentCategories = categoriesArray;
 
@@ -153,7 +160,10 @@ export const useMenuManagement = () => {
     // Item handlers
     item: {
       submit: async (
-        data: CreateItemDto & { file?: File; image_url?: string }
+        data: ItemAPI.Admin.CreateItemRequest & {
+          file?: File;
+          image_url?: string;
+        }
       ) => {
         try {
           if (editingItem) {
@@ -170,15 +180,21 @@ export const useMenuManagement = () => {
           console.error("Ürün kaydedilirken hata:", err);
         }
       },
-      edit: (item: Item) => {
+      edit: (
+        item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+      ) => {
         setEditingItem(item);
         itemModal.onOpen();
       },
-      delete: (item: Item) => {
+      delete: (
+        item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+      ) => {
         setDeleteTarget({ type: "item", id: item.id, name: item.name });
         deleteModal.onOpen();
       },
-      reorder: async (reorderedItems: Item[]) => {
+      reorder: async (
+        reorderedItems: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"]
+      ) => {
         if (!selectedCategory) return;
 
         try {
@@ -253,7 +269,9 @@ export const useMenuManagement = () => {
   };
 
   // Utility functions
-  const getItemsByCategory = (categoryId: string) => {
+  const getItemsByCategory = (
+    categoryId: string
+  ): CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"] => {
     const category = categoriesArray.find((c: any) => c.id === categoryId);
     return (category as any)?.menu_items || [];
   };

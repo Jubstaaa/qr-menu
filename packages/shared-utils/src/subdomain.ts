@@ -1,13 +1,5 @@
 import { config } from "@qr-menu/shared-config";
 
-declare global {
-  interface Window {
-    location: {
-      host: string;
-    };
-  }
-}
-
 export const extractSubdomain = (host: string): string => {
   const cleanHost = host.replace(/^https?:\/\//, "").replace(/^www\./, "");
 

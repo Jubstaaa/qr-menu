@@ -4,7 +4,7 @@ import { Providers } from "../providers";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import WifiPopover from "../components/WifiPopover";
-import { apiClient } from "@qr-menu/shared-utils";
+import { publicMenuApi } from "@qr-menu/shared-utils";
 import "./globals.css";
 import { headers } from "next/headers";
 
@@ -18,13 +18,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata(): Promise<Metadata> {
   const headersList = await headers();
   const subdomain = headersList.get("x-subdomain");
 
-  const { data: menu } = await apiClient.getMenuBySubdomainPublic({
-    subdomain: subdomain || undefined,
-  });
+  const menu = await publicMenuApi.getMenuBySubdomain(subdomain || "");
 
   return {
     title: `${menu.restaurant_name} - Dijital Menü`,
@@ -45,9 +43,7 @@ export default async function RootLayout({
   const headersList = await headers();
   const subdomain = headersList.get("x-subdomain");
 
-  const { data: menu } = await apiClient.getMenuBySubdomainPublic({
-    subdomain: subdomain || undefined,
-  });
+  const menu = await publicMenuApi.getMenuBySubdomain(subdomain || "");
 
   return (
     <html lang="tr" suppressHydrationWarning>
@@ -60,16 +56,13 @@ export default async function RootLayout({
             <main className="flex-1">{children}</main>
             <Footer
               restaurantName={menu.restaurant_name}
-              restaurantDescription={menu.restaurant_description}
-              restaurantPhone={menu.restaurant_phone}
-              restaurantAddress={menu.restaurant_address}
-              openingTime={menu.opening_time}
-              closingTime={menu.closing_time}
+              restaurantDescription={menu.restaurant_description || undefined}
+              restaurantPhone={menu.restaurant_phone || undefined}
+              restaurantAddress={menu.restaurant_address || undefined}
+              openingTime={undefined}
+              closingTime={undefined}
             />
-            <WifiPopover
-              wifiSsid={menu.wifi_ssid}
-              wifiPassword={menu.wifi_password}
-            />
+            <WifiPopover wifiSsid={undefined} wifiPassword={undefined} />
           </div>
         </Providers>
       </body>

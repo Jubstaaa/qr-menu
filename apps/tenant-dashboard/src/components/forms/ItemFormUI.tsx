@@ -8,8 +8,6 @@ import {
   ModalBody,
   ModalFooter,
   Button,
-  Input,
-  Textarea,
   Select,
   SelectItem,
   Switch,
@@ -20,8 +18,11 @@ import {
   FileInput,
   SwitchField,
   type FileItem,
+  TextInput,
+  NumberInput,
+  TextareaInput,
 } from "@qr-menu/shared-components";
-import { Category } from "@qr-menu/shared-types";
+import { CategoryAPI } from "@qr-menu/shared-types";
 
 interface ItemFormUIProps {
   isOpen: boolean;
@@ -31,8 +32,7 @@ interface ItemFormUIProps {
   submitButtonIcon: string;
   files: FileItem[];
   setFiles: React.Dispatch<React.SetStateAction<FileItem[]>>;
-  onSubmit: (data: any) => Promise<void>;
-  categories: Category[];
+  categories: CategoryAPI.Admin.GetAllCategoriesResponse;
 }
 
 export default function ItemFormUI({
@@ -43,13 +43,10 @@ export default function ItemFormUI({
   submitButtonIcon,
   files,
   setFiles,
-  onSubmit,
   categories,
 }: ItemFormUIProps) {
   const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
     setValue,
     watch,
   } = useFormContext();
@@ -59,44 +56,32 @@ export default function ItemFormUI({
       <ModalContent>
         <ModalHeader>{title}</ModalHeader>
         <ModalBody>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input
+              <TextInput
+                name="name"
                 label="Ürün Adı *"
                 placeholder="Örn: Karışık Pizza, Çoban Salata"
-                {...register("name")}
-                isInvalid={!!errors.name}
-                errorMessage={errors.name?.message?.toString()}
-                variant="bordered"
+                isRequired
                 description="Ürün adı 1-100 karakter arasında olmalıdır"
               />
 
-              <Input
+              <NumberInput
+                name="price"
                 label="Fiyat (₺) *"
-                type="number"
                 step="0.01"
                 min="0"
                 placeholder="0.00"
-                startContent={
-                  <div className="pointer-events-none flex items-center">
-                    <span className="text-default-400 text-small">₺</span>
-                  </div>
-                }
-                {...register("price", { valueAsNumber: true })}
-                isInvalid={!!errors.price}
-                errorMessage={errors.price?.message?.toString()}
-                variant="bordered"
+                isRequired
                 description="Ürün fiyatı 0'dan büyük olmalıdır"
               />
             </div>
 
-            <Textarea
+            <TextareaInput
+              name="description"
               label="Ürün Açıklaması"
               placeholder="Ürün hakkında detaylı bilgi, malzemeler, özellikler..."
-              {...register("description")}
-              variant="bordered"
               description="Müşterilerin ürünü daha iyi anlaması için yardımcı olur"
-              rows={3}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -113,10 +98,7 @@ export default function ItemFormUI({
                 <Select
                   label="Kategori *"
                   placeholder="Kategori seçin"
-                  {...register("category_id")}
-                  isInvalid={!!errors.category_id}
-                  errorMessage={errors.category_id?.message?.toString()}
-                  variant="bordered"
+                  isRequired
                   description="Ürünün hangi kategoride yer alacağını seçin"
                 >
                   {categories.map((category) => (
@@ -124,15 +106,11 @@ export default function ItemFormUI({
                   ))}
                 </Select>
 
-                <Input
+                <NumberInput
+                  name="preparation_time"
                   label="Hazırlama Süresi (dk)"
-                  type="number"
                   min="0"
                   placeholder="0"
-                  {...register("preparation_time", { valueAsNumber: true })}
-                  isInvalid={!!errors.preparation_time}
-                  errorMessage={errors.preparation_time?.message?.toString()}
-                  variant="bordered"
                   description="Müşteri bekleme süresini bilmek için önemli"
                 />
               </div>
@@ -200,15 +178,15 @@ export default function ItemFormUI({
                 )}
               </div>
             </div>
-          </form>
+          </div>
         </ModalBody>
         <ModalFooter>
           <Button color="danger" variant="light" onPress={onClose}>
             İptal
           </Button>
           <Button
+            type="submit"
             color="primary"
-            onPress={() => handleSubmit(onSubmit)()}
             isLoading={isSubmitting}
             endContent={submitButtonIcon}
           >

@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { apiClient } from "@qr-menu/shared-utils";
+import { publicMenuApi } from "@qr-menu/shared-utils";
 import Link from "next/link";
 
 export default async function TenantMenuPage() {
@@ -8,9 +8,7 @@ export default async function TenantMenuPage() {
   const subdomain = headersList.get("x-subdomain");
 
   try {
-    const { data: menu } = await apiClient.getMenuBySubdomainPublic({
-      subdomain: subdomain || undefined,
-    });
+    const menu = await publicMenuApi.getMenuBySubdomain(subdomain || "");
 
     if (!menu) {
       notFound();

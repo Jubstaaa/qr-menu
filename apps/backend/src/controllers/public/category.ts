@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
-import { ApiResult, CategoryWithItemsDto } from "@qr-menu/shared-types";
+import { CategoryAPI, ApiResponse, ApiError } from "@qr-menu/shared-types";
 
 export const publicCategoryController = {
   async getCategoryBySubdomainAndSlug(
-    req: Request,
-    res: Response<ApiResult<CategoryWithItemsDto>>
+    req: Request<{ slug: string }>,
+    res: Response<
+      ApiResponse<CategoryAPI.Public.GetCategoryBySlugResponse> | ApiError
+    >
   ) {
     try {
       const { slug } = req.params;
@@ -45,7 +47,16 @@ export const publicCategoryController = {
           description,
           slug,
           image_url,
-          menu_items(*)
+          menu_items (
+            id,
+            name,
+            description,
+            price,
+            image_url,
+            is_popular,
+            is_chef_special,
+            spice_level
+          )
         `
         )
         .eq("menu_id", menu.id)
@@ -63,8 +74,8 @@ export const publicCategoryController = {
       }
 
       res.json({
+        data: category,
         message: "Kategori başarıyla getirildi",
-        data: category as CategoryWithItemsDto,
       });
     } catch (error: any) {
       console.error("Get category by slug error:", error);

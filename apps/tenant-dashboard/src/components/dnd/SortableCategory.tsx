@@ -3,15 +3,15 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Category } from "@qr-menu/shared-types";
+import { CategoryAPI } from "@qr-menu/shared-types";
 import CategoryCard from "../cards/CategoryCard";
 import { cn } from "@heroui/react";
 
 interface SortableCategoryProps {
-  category: Category;
-  onEdit: (category: Category) => void;
-  onDelete: (category: Category) => void;
-  onSelect: (category: Category) => void;
+  category: CategoryAPI.Admin.GetAllCategoriesResponse[0];
+  onEdit: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => void;
+  onDelete: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => void;
+  onSelect: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => void;
   isSelected: boolean;
   itemCount: number;
 }

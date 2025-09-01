@@ -1,10 +1,14 @@
 "use client";
 
-import { MenuWithCategoriesDto } from "@qr-menu/shared-types";
+import { MenuAPI } from "@qr-menu/shared-types";
 import { Utensils } from "lucide-react";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
 
-export default function Header({ menu }: { menu: MenuWithCategoriesDto }) {
+export default function Header({
+  menu,
+}: {
+  menu: MenuAPI.Public.GetMenuBySubdomainResponse;
+}) {
   return (
     <Navbar
       isBordered

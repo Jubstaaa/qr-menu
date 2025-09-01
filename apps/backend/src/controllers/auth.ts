@@ -1,11 +1,6 @@
 import { CookieOptions, Request, Response } from "express";
 import { supabase } from "../../supabase/supabase";
-import {
-  ApiResult,
-  AuthResponseDto,
-  LoginDto,
-  RegisterDto,
-} from "@qr-menu/shared-types";
+import { AuthAPI, ApiResponse, ApiError } from "@qr-menu/shared-types";
 import { config, isProduction } from "@qr-menu/shared-config";
 
 const cookieConfig: Pick<CookieOptions, "secure" | "sameSite" | "domain"> = {
@@ -16,8 +11,8 @@ const cookieConfig: Pick<CookieOptions, "secure" | "sameSite" | "domain"> = {
 
 export const authController = {
   async login(
-    req: Request<{}, {}, LoginDto>,
-    res: Response<ApiResult<AuthResponseDto>>
+    req: Request<{}, {}, AuthAPI.LoginRequest>,
+    res: Response<ApiResponse<AuthAPI.LoginResponse> | ApiError>
   ) {
     try {
       const { email, password } = req.body;
@@ -66,15 +61,20 @@ export const authController = {
         .single();
 
       res.json({
-        message: "Giriş başarılı",
         data: {
           user: {
-            email: authData.user.email,
+            id: authData.user.id,
+            email: authData.user.email || "",
           },
-          menu: {
-            subdomain: menu?.subdomain,
-          },
+          menu: menu
+            ? {
+                id: menu.id,
+                restaurant_name: menu.restaurant_name,
+                subdomain: menu.subdomain,
+              }
+            : undefined,
         },
+        message: "Giriş başarılı",
       });
     } catch (error: any) {
       res.status(500).json({
@@ -84,8 +84,8 @@ export const authController = {
   },
 
   async register(
-    req: Request<{}, {}, RegisterDto>,
-    res: Response<ApiResult<AuthResponseDto>>
+    req: Request<{}, {}, AuthAPI.RegisterRequest>,
+    res: Response<ApiResponse<AuthAPI.RegisterResponse> | ApiError>
   ) {
     try {
       const { email, password } = req.body;
@@ -114,41 +114,27 @@ export const authController = {
         });
       }
 
-      // Token'ın expires_in değerini kullanarak cookie maxAge'ini ayarla
-      const maxAge = authData.session?.expires_in
-        ? authData.session.expires_in * 1000 // saniyeyi milisaniyeye çevir
-        : 30 * 24 * 60 * 60 * 1000; // fallback: 30 gün
-
-      res.cookie("auth_token", authData.session?.access_token, {
-        httpOnly: true,
-        ...cookieConfig,
-        path: "/",
-        maxAge: maxAge,
-      });
-
       res.status(201).json({
-        message: "Kayıt başarılı",
         data: {
           user: {
+            id: authData.user.id,
             email: authData.user.email || "",
           },
         },
+        message: "Kayıt başarılı",
       });
     } catch (error: any) {
-      console.error("Register error:", error);
       res.status(500).json({
         message: "Kayıt oluşturulamadı",
       });
     }
   },
 
-  async logout(req: Request, res: Response<ApiResult<void>>) {
+  async logout(
+    req: Request<{}, {}, AuthAPI.LogoutRequest>,
+    res: Response<ApiResponse<AuthAPI.LogoutResponse> | ApiError>
+  ) {
     try {
-      const token = req.cookies.auth_token;
-      if (token) {
-        await supabase.auth.signOut();
-      }
-
       res.clearCookie("auth_token", {
         httpOnly: true,
         ...cookieConfig,
@@ -156,17 +142,63 @@ export const authController = {
       });
 
       res.json({
-        message: "Çıkış başarılı",
+        data: {
+          message: "Çıkış başarılı",
+        },
+        message: "Çıkış yapıldı",
       });
     } catch (error: any) {
-      console.error("Logout error:", error);
       res.status(500).json({
         message: "Çıkış yapılamadı",
       });
     }
   },
 
-  async checkAuth(req: Request, res: Response<ApiResult<AuthResponseDto>>) {
+  async getCurrentUser(
+    req: Request<{}, {}, AuthAPI.GetCurrentUserRequest>,
+    res: Response<ApiResponse<AuthAPI.GetCurrentUserResponse> | ApiError>
+  ) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({
+          message: "Kullanıcı bulunamadı",
+        });
+      }
+
+      const { data: menu } = await supabase
+        .from("menus")
+        .select("id, restaurant_name, subdomain, is_active")
+        .eq("user_id", req.user.id)
+        .eq("is_active", true)
+        .single();
+
+      res.json({
+        data: {
+          user: {
+            id: req.user.id,
+            email: req.user.email || "",
+          },
+          menu: menu
+            ? {
+                id: menu.id,
+                restaurant_name: menu.restaurant_name,
+                subdomain: menu.subdomain,
+              }
+            : undefined,
+        },
+        message: "Kullanıcı bilgileri getirildi",
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        message: "Kullanıcı bilgileri getirilemedi",
+      });
+    }
+  },
+
+  async checkAuth(
+    req: Request<{}, {}, AuthAPI.CheckAuthRequest>,
+    res: Response<ApiResponse<AuthAPI.CheckAuthResponse> | ApiError>
+  ) {
     try {
       const token = req.cookies.auth_token;
       if (!token) {
@@ -194,15 +226,20 @@ export const authController = {
         .single();
 
       res.json({
-        message: "Token geçerli",
         data: {
           user: {
-            email: user.email,
+            id: user.id,
+            email: user.email || "",
           },
-          menu: {
-            subdomain: menu?.subdomain,
-          },
+          menu: menu
+            ? {
+                id: menu.id,
+                restaurant_name: menu.restaurant_name,
+                subdomain: menu.subdomain,
+              }
+            : undefined,
         },
+        message: "Token geçerli",
       });
     } catch (error: any) {
       res.status(500).json({
@@ -211,12 +248,15 @@ export const authController = {
     }
   },
 
-  async getUserMenus(req: Request, res: Response) {
+  async getUserMenus(
+    req: Request<{}, {}, AuthAPI.GetUserMenusRequest>,
+    res: Response<ApiResponse<AuthAPI.GetUserMenusResponse> | ApiError>
+  ) {
     try {
       const token = req.cookies.auth_token;
       if (!token) {
         return res.status(401).json({
-          error: "Token bulunamadı",
+          message: "Token bulunamadı",
         });
       }
 
@@ -227,7 +267,7 @@ export const authController = {
 
       if (error || !user) {
         return res.status(401).json({
-          error: "Geçersiz token",
+          message: "Geçersiz token",
         });
       }
 
@@ -239,25 +279,24 @@ export const authController = {
 
       if (menusError) {
         return res.status(500).json({
-          error: "Menüler alınırken hata oluştu",
+          message: "Menüler alınırken hata oluştu",
         });
       }
 
       res.json({
-        message: "Kullanıcı menüleri başarıyla alındı",
         data: {
           user: {
             id: user.id,
-            email: user.email,
-            created_at: user.created_at,
+            email: user.email || "",
           },
           menus: menus || [],
         },
+        message: "Kullanıcı menüleri başarıyla alındı",
       });
     } catch (error: any) {
       console.error("Get user menus error:", error);
       res.status(500).json({
-        error: "Kullanıcı menüleri alınırken hata oluştu",
+        message: "Kullanıcı menüleri alınırken hata oluştu",
       });
     }
   },

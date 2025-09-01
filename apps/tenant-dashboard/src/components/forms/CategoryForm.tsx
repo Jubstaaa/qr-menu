@@ -1,17 +1,15 @@
 "use client";
 
 import React from "react";
-import { Category } from "@qr-menu/shared-types";
+import { CategoryAPI } from "@qr-menu/shared-types";
 import CreateCategoryForm from "./CreateCategoryForm";
 import UpdateCategoryForm from "./UpdateCategoryForm";
 
 interface CategoryFormProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (
-    data: any
-  ) => Promise<void>;
-  editingCategory?: Category | null;
+  onSubmit: (data: any) => Promise<void>;
+  editingCategory?: CategoryAPI.Admin.GetAllCategoriesResponse[0] | null;
 }
 
 export default function CategoryForm({
@@ -32,10 +30,6 @@ export default function CategoryForm({
   }
 
   return (
-    <CreateCategoryForm
-      isOpen={isOpen}
-      onClose={onClose}
-      onSubmit={onSubmit}
-    />
+    <CreateCategoryForm isOpen={isOpen} onClose={onClose} onSubmit={onSubmit} />
   );
 }

@@ -1,23 +1,20 @@
 "use client";
 
 import React from "react";
-import {
-  updateRestaurantSchema,
-  type UpdateRestaurantDto,
-} from "@qr-menu/shared-validation";
-import { useForm, FormProvider } from "react-hook-form";
+import { MenuAPI } from "@qr-menu/shared-types";
+import { updateMenuRequestSchema } from "@qr-menu/shared-validation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RestaurantFormUI from "./RestaurantFormUI";
-import { useFileUpload } from "@qr-menu/shared-components";
-import { Menu } from "@qr-menu/shared-types";
+import { useFileUpload, FormProvider } from "@qr-menu/shared-components";
 
 interface UpdateRestaurantFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: UpdateRestaurantDto & { file?: File; image_url?: string }
+    data: MenuAPI.Admin.UpdateMenuRequest & { file?: File; image_url?: string }
   ) => Promise<void>;
-  editingRestaurant: Menu;
+  editingRestaurant: MenuAPI.Admin.GetMenusByUserResponse;
 }
 
 export default function UpdateRestaurantForm({
@@ -26,8 +23,8 @@ export default function UpdateRestaurantForm({
   onSubmit,
   editingRestaurant,
 }: UpdateRestaurantFormProps) {
-  const methods = useForm<UpdateRestaurantDto>({
-    resolver: zodResolver(updateRestaurantSchema),
+  const methods = useForm<MenuAPI.Admin.UpdateMenuRequest>({
+    resolver: zodResolver(updateMenuRequestSchema),
     defaultValues: {
       restaurant_name: editingRestaurant.restaurant_name,
       restaurant_description: editingRestaurant.restaurant_description || "",
@@ -46,7 +43,7 @@ export default function UpdateRestaurantForm({
     editingRestaurant.logo_url
   );
 
-  const handleFormSubmit = async (data: UpdateRestaurantDto) => {
+  const handleFormSubmit = async (data: MenuAPI.Admin.UpdateMenuRequest) => {
     try {
       const payload = preparePayload(data);
       await onSubmit(payload);
@@ -57,7 +54,7 @@ export default function UpdateRestaurantForm({
   };
 
   return (
-    <FormProvider {...methods}>
+    <FormProvider methods={methods} onSubmit={handleFormSubmit}>
       <RestaurantFormUI
         isOpen={isOpen}
         onClose={onClose}
@@ -66,7 +63,6 @@ export default function UpdateRestaurantForm({
         submitButtonIcon="🔄"
         files={files}
         setFiles={setFiles}
-        onSubmit={handleFormSubmit}
       />
     </FormProvider>
   );

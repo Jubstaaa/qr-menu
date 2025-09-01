@@ -1,23 +1,20 @@
 "use client";
 
 import React from "react";
-import {
-  createItemSchema,
-  type CreateItemDto,
-} from "@qr-menu/shared-validation";
-import { useForm, FormProvider } from "react-hook-form";
+import { ItemAPI, CategoryAPI } from "@qr-menu/shared-types";
+import { createItemRequestSchema } from "@qr-menu/shared-validation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ItemFormUI from "./ItemFormUI";
-import { useFileUpload } from "@qr-menu/shared-components";
-import { Category } from "@qr-menu/shared-types";
+import { useFileUpload, FormProvider } from "@qr-menu/shared-components";
 
 interface CreateItemFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: CreateItemDto & { file?: File; image_url?: string }
+    data: ItemAPI.Admin.CreateItemRequest & { file?: File; image_url?: string }
   ) => Promise<void>;
-  categories: Category[];
+  categories: CategoryAPI.Admin.GetAllCategoriesResponse;
   selectedCategoryId?: string;
 }
 
@@ -28,8 +25,8 @@ export default function CreateItemForm({
   categories,
   selectedCategoryId,
 }: CreateItemFormProps) {
-  const methods = useForm<CreateItemDto>({
-    resolver: zodResolver(createItemSchema),
+  const methods = useForm<ItemAPI.Admin.CreateItemRequest>({
+    resolver: zodResolver(createItemRequestSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -44,7 +41,7 @@ export default function CreateItemForm({
 
   const { files, setFiles, preparePayload, resetFiles } = useFileUpload();
 
-  const handleFormSubmit = async (data: CreateItemDto) => {
+  const handleFormSubmit = async (data: ItemAPI.Admin.CreateItemRequest) => {
     try {
       const payload = preparePayload(data);
       await onSubmit(payload);
@@ -57,7 +54,7 @@ export default function CreateItemForm({
   };
 
   return (
-    <FormProvider {...methods}>
+    <FormProvider methods={methods} onSubmit={handleFormSubmit}>
       <ItemFormUI
         isOpen={isOpen}
         onClose={onClose}
@@ -66,7 +63,6 @@ export default function CreateItemForm({
         submitButtonIcon="✨"
         files={files}
         setFiles={setFiles}
-        onSubmit={handleFormSubmit}
         categories={categories}
       />
     </FormProvider>

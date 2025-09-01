@@ -1,20 +1,13 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
-import {
-  ApiResult,
-  CreateMenuDto,
-  UpdateMenuDto,
-  CreateMenuResponseDto,
-  MenuWithCategoriesDto,
-  CategoryWithItemsDto,
-} from "@qr-menu/shared-types";
+import { MenuAPI, ApiResponse, ApiError } from "@qr-menu/shared-types";
 import { uploadImage, deleteImage } from "../../utils/upload";
-import { validateUpdateRestaurant } from "@qr-menu/shared-validation";
+import { menuValidation } from "@qr-menu/shared-utils";
 
 export const menuController = {
   async createMenu(
-    req: Request<{}, {}, CreateMenuDto>,
-    res: Response<ApiResult<CreateMenuResponseDto>>
+    req: Request<{}, {}, MenuAPI.Admin.CreateMenuRequest>,
+    res: Response<ApiResponse<MenuAPI.Admin.CreateMenuResponse> | ApiError>
   ) {
     try {
       const { name, subdomain } = req.body;
@@ -62,10 +55,8 @@ export const menuController = {
       }
 
       res.status(201).json({
+        data: menu,
         message: "Menü başarıyla oluşturuldu!",
-        data: {
-          subdomain: menu.subdomain,
-        },
       });
     } catch (error: any) {
       console.error("Create menu error:", error);
@@ -77,7 +68,9 @@ export const menuController = {
 
   async getMenuBySubdomain(
     req: Request<{ subdomain: string }>,
-    res: Response<ApiResult<MenuWithCategoriesDto>>
+    res: Response<
+      ApiResponse<MenuAPI.Admin.GetMenuBySubdomainResponse> | ApiError
+    >
   ) {
     try {
       const { subdomain } = req.params;
@@ -93,46 +86,140 @@ export const menuController = {
           restaurant_address,
           restaurant_phone,
           restaurant_email,
-          logo_url,
-          brand_name,
-          menu_categories (
-            id,
-            name,
-            slug,
-            description,
-            image_url,
-            sort_order,
-            is_active,
-            created_at
-          )
+          is_active,
+          created_at,
+          updated_at
         `
         )
         .eq("subdomain", subdomain)
         .eq("is_active", true)
-        .order("sort_order", {
-          ascending: true,
-          foreignTable: "menu_categories",
-        })
         .single();
 
-      if (error || !menu) {
+      if (error) {
+        console.error("Get menu error:", error);
+        return res.status(500).json({
+          message: "Menü getirilemedi",
+        });
+      }
+
+      if (!menu) {
         return res.status(404).json({
           message: "Menü bulunamadı",
         });
       }
 
       res.json({
+        data: menu,
         message: "Menü başarıyla getirildi",
-        data: menu as MenuWithCategoriesDto,
       });
     } catch (error: any) {
+      console.error("Get menu error:", error);
       res.status(500).json({
         message: "Menü getirilemedi",
       });
     }
   },
 
-  async getMenusByUser(req: Request, res: Response) {
+  async updateMenu(
+    req: Request<{ id: string }, {}, MenuAPI.Admin.UpdateMenuRequest>,
+    res: Response<ApiResponse<MenuAPI.Admin.UpdateMenuResponse> | ApiError>
+  ) {
+    try {
+      const { id } = req.params;
+      const requestData: MenuAPI.Admin.UpdateMenuRequest = req.body;
+
+      let updateData;
+      try {
+        updateData = menuValidation.validateUpdateMenuRequest(requestData);
+      } catch (validationError: any) {
+        return res.status(400).json({
+          message: "Geçersiz veri formatı",
+        });
+      }
+
+      const { data: existingMenu, error: menuError } = await supabase
+        .from("menus")
+        .select("id, logo_url")
+        .eq("id", id)
+        .single();
+
+      if (menuError || !existingMenu) {
+        return res.status(404).json({
+          message: "Menü bulunamadı",
+        });
+      }
+
+      let finalLogoUrl: string | null = updateData.logo_url as any;
+
+      const hasNewFile = (req as any).file;
+
+      if (hasNewFile) {
+        try {
+          const uploadedUrl = await uploadImage({
+            req,
+            folder: "logos",
+            menuId: id,
+          });
+
+          if (uploadedUrl) {
+            finalLogoUrl = uploadedUrl;
+
+            if (existingMenu.logo_url) {
+              await deleteImage({
+                imageUrl: existingMenu.logo_url,
+                folder: "logos",
+                menuId: id,
+              });
+            }
+          }
+        } catch (uploadError: any) {
+          console.error("Menu logo upload error:", uploadError);
+        }
+      } else if (updateData.logo_url === null) {
+        finalLogoUrl = null;
+
+        if (existingMenu.logo_url) {
+          await deleteImage({
+            imageUrl: existingMenu.logo_url,
+            folder: "logos",
+            menuId: id,
+          });
+        }
+      }
+
+      const { data: updatedMenu, error: updateError } = await supabase
+        .from("menus")
+        .update({
+          ...updateData,
+          logo_url: finalLogoUrl,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (updateError) {
+        return res.status(500).json({
+          message: "Menü güncellenemedi",
+        });
+      }
+
+      res.json({
+        data: updatedMenu,
+        message: "Menü başarıyla güncellendi!",
+      });
+    } catch (error: any) {
+      console.error("Update menu error:", error);
+      res.status(500).json({
+        message: "Menü güncellenemedi",
+      });
+    }
+  },
+
+  async getMenusByUser(
+    req: Request,
+    res: Response<ApiResponse<MenuAPI.Admin.GetMenusByUserResponse> | ApiError>
+  ) {
     try {
       const { data: menu, error } = await supabase
         .from("menus")
@@ -144,11 +231,6 @@ export const menuController = {
           restaurant_address,
           restaurant_phone,
           restaurant_email,
-          logo_url,
-          opening_time,
-          closing_time,
-          wifi_ssid,
-          wifi_password,
           subdomain,
           is_active,
           created_at,
@@ -161,175 +243,19 @@ export const menuController = {
       if (error) {
         console.error("Get user menus error:", error);
         return res.status(500).json({
-          error: "Menüler getirilemedi",
+          message: "Menüler getirilemedi",
         });
       }
 
-      res.json({ data: menu || [] });
+      res.json({
+        data: menu,
+        message: "Menü başarıyla getirildi",
+      });
     } catch (error: any) {
       console.error("Get user menus error:", error);
       res.status(500).json({
-        error: "Menüler getirilemedi",
+        message: "Menüler getirilemedi",
       });
-    }
-  },
-
-  async getCategoryBySubdomainAndSlug(req: Request, res: Response) {
-    try {
-      const { subdomain, slug } = req.params as {
-        subdomain: string;
-        slug: string;
-      };
-
-      const { data: menu, error: menuError } = await supabase
-        .from("menus")
-        .select("id, is_active")
-        .eq("subdomain", subdomain)
-        .eq("is_active", true)
-        .single();
-
-      if (menuError || !menu) {
-        return res.status(404).json({ error: "Menü bulunamadı" });
-      }
-
-      let { data: category, error: catError } = await supabase
-        .from("menu_categories")
-        .select(
-          `
-          id,
-          name,
-          slug,
-          description,
-          image_url,
-          sort_order,
-          is_active,
-          created_at,
-          menu_items (
-           *
-          )
-        `
-        )
-        .eq("menu_id", menu.id)
-        .eq("is_active", true)
-        .eq("slug", slug)
-        .order("sort_order", { ascending: true, foreignTable: "menu_items" })
-        .single();
-
-      const isUuid =
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-          slug
-        );
-      if ((!category || catError) && isUuid) {
-        const resp = await supabase
-          .from("menu_categories")
-          .select(
-            `
-            id,
-            name,
-            slug,
-            description,
-            image_url,
-            sort_order,
-            is_active,
-            created_at,
-            menu_items (
-              id,
-              name,
-              description,
-              price,
-              image_url,
-              sort_order,
-              is_available
-            )
-          `
-          )
-          .eq("menu_id", menu.id)
-          .eq("is_active", true)
-          .eq("id", slug)
-          .order("sort_order", { ascending: true, foreignTable: "menu_items" })
-          .single();
-        category = resp.data as any;
-        catError = resp.error as any;
-      }
-
-      if (catError || !category) {
-        return res.status(404).json({ error: "Kategori bulunamadı" });
-      }
-
-      return res.json({ category });
-    } catch (error: any) {
-      console.error("Get category by subdomain and slug error:", error);
-      return res.status(500).json({ error: "Kategori getirilemedi" });
-    }
-  },
-
-  async updateMenu(req: Request, res: Response) {
-    try {
-      let updateData;
-      try {
-        updateData = validateUpdateRestaurant(req.body);
-      } catch (validationError: any) {
-        return res.status(400).json({
-          error: "Geçersiz veri formatı",
-          details: validationError.errors,
-        });
-      }
-
-      if (!req.userMenu) {
-        return res.status(401).json({ error: "Kullanıcı menüsü bulunamadı" });
-      }
-
-      let logoUrl = updateData.logo_url;
-      if ((req as any).file) {
-        try {
-          const uploadedLogoUrl = await uploadImage({
-            req,
-            folder: "logos",
-            menuId: req.userMenu.id,
-          });
-
-          if (uploadedLogoUrl) {
-            logoUrl = uploadedLogoUrl;
-
-            if (updateData.logo_url && updateData.logo_url !== logoUrl) {
-              await deleteImage({
-                imageUrl: updateData.logo_url,
-                folder: "logos",
-                menuId: req.userMenu.id,
-              });
-            }
-          }
-        } catch (uploadError) {
-          console.error("Logo upload error:", uploadError);
-          return res.status(500).json({ error: "Logo yüklenemedi" });
-        }
-      }
-
-      const finalUpdateData = {
-        ...updateData,
-        logo_url: logoUrl,
-        updated_at: new Date().toISOString(),
-      };
-
-      const { data: updatedMenu, error: updateError } = await supabase
-        .from("menus")
-        .update(finalUpdateData)
-        .eq("id", req.userMenu.id)
-        .select()
-        .single();
-
-      if (updateError) {
-        console.error("Menu update error:", updateError);
-        return res.status(500).json({ error: "Menü güncellenemedi" });
-      }
-
-      return res.json({
-        message: "Restoran başarıyla güncellendi",
-        data: updatedMenu,
-      });
-    } catch (error: any) {
-      console.error("Update menu error:", error);
-      return res.status(500).json({ error: "Menü güncellenemedi" });
     }
   },
 };

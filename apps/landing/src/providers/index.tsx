@@ -2,18 +2,18 @@
 
 import { HeroUIProvider, ToastProvider } from "@heroui/react";
 import { ThemeProvider } from "next-themes";
-import { AuthProvider } from "../contexts/AuthContext";
 import { QueryProvider } from "./QueryProvider";
+import { ModalProvider } from "../contexts/ModalContext";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <HeroUIProvider>
       <QueryProvider>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AuthProvider>
+          <ModalProvider>
             {children}
             <ToastProvider />
-          </AuthProvider>
+          </ModalProvider>
         </ThemeProvider>
       </QueryProvider>
     </HeroUIProvider>

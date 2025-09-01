@@ -12,28 +12,10 @@ import {
   Chip,
 } from "@heroui/react";
 import { X, Clock, Flame, ChefHat, AlertTriangle, Info } from "lucide-react";
-
-type MenuItem = {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  image_url?: string;
-  sort_order: number;
-  is_available: boolean;
-  allergens?: any[];
-  ingredients?: string;
-  spice_level?: string;
-  is_popular?: boolean;
-  is_chef_special?: boolean;
-  preparation_time?: number;
-  nutrition_info?: any;
-  created_at?: string;
-  updated_at?: string;
-};
+import { ItemAPI } from "@qr-menu/shared-types";
 
 interface ProductDetailModalProps {
-  product: MenuItem;
+  product: ItemAPI.Public.GetActiveItemsBySubdomainResponse[0];
   isOpen: boolean;
   onClose: () => void;
 }
@@ -51,14 +33,14 @@ export default function ProductDetailModal({
     isOpen,
     onClose,
   });
-  const getSpiceLevelText = (level: string) => {
+  const getSpiceLevelText = (level: number) => {
     const levels = {
-      mild: "Hafif",
-      medium: "Orta",
-      hot: "Acılı",
-      extra_hot: "Çok Acılı",
+      1: "Hafif",
+      2: "Orta",
+      3: "Acılı",
+      4: "Çok Acılı",
     };
-    return levels[level as keyof typeof levels] || level;
+    return levels[level as keyof typeof levels] || `Seviye ${level}`;
   };
 
   return (
@@ -179,22 +161,24 @@ export default function ProductDetailModal({
           </div>
 
           {/* Allergens */}
-          {product.allergens && product.allergens.length > 0 && (
+          {product.allergens && typeof product.allergens === "string" && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Alerjenler
               </h3>
               <div className="flex flex-wrap gap-2">
-                {product.allergens.map((allergen, index) => (
-                  <Chip
-                    key={index}
-                    color="warning"
-                    variant="bordered"
-                    size="sm"
-                  >
-                    {allergen}
-                  </Chip>
-                ))}
+                {JSON.parse(product.allergens).map(
+                  (allergen: string, index: number) => (
+                    <Chip
+                      key={index}
+                      color="warning"
+                      variant="bordered"
+                      size="sm"
+                    >
+                      {allergen}
+                    </Chip>
+                  )
+                )}
               </div>
             </div>
           )}

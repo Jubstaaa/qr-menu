@@ -3,7 +3,7 @@
 import React from "react";
 import { Button, Card, CardBody, CardHeader } from "@heroui/react";
 import { Plus } from "lucide-react";
-import { Item } from "@qr-menu/shared-types";
+import { ItemAPI } from "@qr-menu/shared-types";
 
 import CategoryForm from "../../../components/forms/CategoryForm";
 import ItemForm from "../../../components/forms/ItemForm";
@@ -110,7 +110,7 @@ export default function MenuManagementPage() {
                 <div>
                   {getItemsByCategory(selectedCategory.id).length > 0 ? (
                     <SortableItems
-                      items={getItemsByCategory(selectedCategory.id) as Item[]}
+                      items={getItemsByCategory(selectedCategory.id)}
                       onReorder={handlers.item.reorder}
                       onEdit={handlers.item.edit}
                       onDelete={handlers.item.delete}

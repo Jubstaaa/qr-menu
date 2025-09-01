@@ -1,24 +1,21 @@
 "use client";
 
 import React from "react";
-import {
-  createItemSchema,
-  type CreateItemDto,
-} from "@qr-menu/shared-validation";
-import { useForm, FormProvider } from "react-hook-form";
+import { ItemAPI, CategoryAPI } from "@qr-menu/shared-types";
+import { updateItemRequestSchema } from "@qr-menu/shared-validation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ItemFormUI from "./ItemFormUI";
-import { useFileUpload } from "@qr-menu/shared-components";
-import { Item, Category } from "@qr-menu/shared-types";
+import { useFileUpload, FormProvider } from "@qr-menu/shared-components";
 
 interface UpdateItemFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: CreateItemDto & { file?: File; image_url?: string }
+    data: ItemAPI.Admin.UpdateItemRequest & { file?: File; image_url?: string }
   ) => Promise<void>;
-  editingItem: Item;
-  categories: Category[];
+  editingItem: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0];
+  categories: CategoryAPI.Admin.GetAllCategoriesResponse;
 }
 
 export default function UpdateItemForm({
@@ -28,8 +25,8 @@ export default function UpdateItemForm({
   editingItem,
   categories,
 }: UpdateItemFormProps) {
-  const methods = useForm<CreateItemDto>({
-    resolver: zodResolver(createItemSchema),
+  const methods = useForm<ItemAPI.Admin.UpdateItemRequest>({
+    resolver: zodResolver(updateItemRequestSchema),
     defaultValues: {
       name: editingItem.name,
       description: editingItem.description || "",
@@ -46,7 +43,7 @@ export default function UpdateItemForm({
     editingItem.image_url
   );
 
-  const handleFormSubmit = async (data: CreateItemDto) => {
+  const handleFormSubmit = async (data: ItemAPI.Admin.UpdateItemRequest) => {
     try {
       const payload = preparePayload(data);
       await onSubmit(payload);
@@ -57,7 +54,7 @@ export default function UpdateItemForm({
   };
 
   return (
-    <FormProvider {...methods}>
+    <FormProvider methods={methods} onSubmit={handleFormSubmit}>
       <ItemFormUI
         isOpen={isOpen}
         onClose={onClose}
@@ -66,7 +63,6 @@ export default function UpdateItemForm({
         submitButtonIcon="🔄"
         files={files}
         setFiles={setFiles}
-        onSubmit={handleFormSubmit}
         categories={categories}
       />
     </FormProvider>

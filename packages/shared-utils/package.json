@@ -14,7 +14,9 @@
   },
   "dependencies": {
     "@qr-menu/shared-config": "workspace:*",
-    "@qr-menu/shared-types": "workspace:*"
+    "@qr-menu/shared-types": "workspace:*",
+    "@qr-menu/shared-validation": "workspace:*",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

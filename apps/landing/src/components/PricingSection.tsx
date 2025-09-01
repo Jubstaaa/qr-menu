@@ -2,10 +2,11 @@
 
 import { Button, Card, CardBody, Chip } from "@heroui/react";
 import { Check, Crown, Star, Zap } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+import { useModalContext } from "../contexts/ModalContext";
+import Link from "next/link";
 
 export const PricingSection: React.FC = () => {
-  const { openAuthModal } = useAuth();
+  const { openAuthModal } = useModalContext();
 
   const pricingPlans = [
     {
@@ -156,21 +157,28 @@ export const PricingSection: React.FC = () => {
                       ))}
                     </div>
 
-                    <Button
-                      color={plan.buttonColor as any}
-                      variant={plan.popular ? "solid" : "bordered"}
-                      size="lg"
-                      className="w-full h-12 text-base font-semibold"
-                      onClick={() => {
-                        if (plan.name === "Enterprise") {
-                          window.location.href = "/contact";
-                        } else {
-                          openAuthModal();
-                        }
-                      }}
-                    >
-                      {plan.buttonText}
-                    </Button>
+                    {plan.name === "Enterprise" ? (
+                      <Button
+                        color={plan.buttonColor as any}
+                        variant={plan.popular ? "solid" : "bordered"}
+                        size="lg"
+                        className="w-full h-12 text-base font-semibold"
+                        as={Link}
+                        href="/contact"
+                      >
+                        {plan.buttonText}
+                      </Button>
+                    ) : (
+                      <Button
+                        color={plan.buttonColor as any}
+                        variant={plan.popular ? "solid" : "bordered"}
+                        size="lg"
+                        className="w-full h-12 text-base font-semibold"
+                        onClick={openAuthModal}
+                      >
+                        {plan.buttonText}
+                      </Button>
+                    )}
                   </div>
                 </CardBody>
               </Card>

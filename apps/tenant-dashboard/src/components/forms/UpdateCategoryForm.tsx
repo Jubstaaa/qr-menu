@@ -1,23 +1,23 @@
 "use client";
 
 import React from "react";
-import {
-  updateCategorySchema,
-  type UpdateCategoryDto,
-} from "@qr-menu/shared-validation";
-import { Category } from "@qr-menu/shared-types";
-import { useForm, FormProvider } from "react-hook-form";
+import { CategoryAPI } from "@qr-menu/shared-types";
+import { updateCategoryRequestSchema } from "@qr-menu/shared-validation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CategoryFormUI from "./CategoryFormUI";
-import { useFileUpload } from "@qr-menu/shared-components";
+import { useFileUpload, FormProvider } from "@qr-menu/shared-components";
 
 interface UpdateCategoryFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: UpdateCategoryDto & { file?: File; image_url?: string }
+    data: CategoryAPI.Admin.UpdateCategoryRequest & {
+      file?: File;
+      image_url?: string;
+    }
   ) => Promise<void>;
-  editingCategory: Category;
+  editingCategory: CategoryAPI.Admin.GetAllCategoriesResponse[0];
 }
 
 export default function UpdateCategoryForm({
@@ -26,8 +26,8 @@ export default function UpdateCategoryForm({
   onSubmit,
   editingCategory,
 }: UpdateCategoryFormProps) {
-  const methods = useForm<UpdateCategoryDto>({
-    resolver: zodResolver(updateCategorySchema),
+  const methods = useForm<CategoryAPI.Admin.UpdateCategoryRequest>({
+    resolver: zodResolver(updateCategoryRequestSchema),
     defaultValues: {
       name: editingCategory.name,
       description: editingCategory.description || "",
@@ -49,7 +49,9 @@ export default function UpdateCategoryForm({
     }
   }, [editingCategory, methods]);
 
-  const handleFormSubmit = async (data: UpdateCategoryDto) => {
+  const handleFormSubmit = async (
+    data: CategoryAPI.Admin.UpdateCategoryRequest
+  ) => {
     try {
       const payload = preparePayload(data);
       await onSubmit(payload);
@@ -62,7 +64,7 @@ export default function UpdateCategoryForm({
   };
 
   return (
-    <FormProvider {...methods}>
+    <FormProvider methods={methods} onSubmit={handleFormSubmit}>
       <CategoryFormUI
         isOpen={isOpen}
         onClose={onClose}
@@ -71,7 +73,6 @@ export default function UpdateCategoryForm({
         submitButtonIcon="🔄"
         files={files}
         setFiles={setFiles}
-        onSubmit={handleFormSubmit}
       />
     </FormProvider>
   );

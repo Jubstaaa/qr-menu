@@ -1,9 +1,11 @@
-export * from "./api";
+// Common Types
 export * from "./common";
-export * from "./database-types";
 
-export * from "./dto";
-
-export * from "./ui";
-
+// Utility Types
 export * from "./utils";
+
+// API Types
+export * from "./api";
+
+// Supabase Types
+export * from "./supabase-types";

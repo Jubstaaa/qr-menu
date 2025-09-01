@@ -1,20 +1,21 @@
 "use client";
 
 import React from "react";
-import {
-  createCategorySchema,
-  type CreateCategoryDto,
-} from "@qr-menu/shared-validation";
-import { useForm, FormProvider } from "react-hook-form";
+import { CategoryAPI } from "@qr-menu/shared-types";
+import { createCategoryRequestSchema } from "@qr-menu/shared-validation";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import CategoryFormUI from "./CategoryFormUI";
-import { useFileUpload } from "@qr-menu/shared-components";
+import { useFileUpload, FormProvider } from "@qr-menu/shared-components";
 
 interface CreateCategoryFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: CreateCategoryDto & { file?: File; image_url?: string }
+    data: CategoryAPI.Admin.CreateCategoryRequest & {
+      file?: File;
+      image_url?: string;
+    }
   ) => Promise<void>;
 }
 
@@ -23,8 +24,8 @@ export default function CreateCategoryForm({
   onClose,
   onSubmit,
 }: CreateCategoryFormProps) {
-  const methods = useForm<CreateCategoryDto>({
-    resolver: zodResolver(createCategorySchema),
+  const methods = useForm<CategoryAPI.Admin.CreateCategoryRequest>({
+    resolver: zodResolver(createCategoryRequestSchema),
     defaultValues: {
       name: "",
       description: "",
@@ -34,7 +35,9 @@ export default function CreateCategoryForm({
 
   const { files, setFiles, preparePayload, resetFiles } = useFileUpload();
 
-  const handleFormSubmit = async (data: CreateCategoryDto) => {
+  const handleFormSubmit = async (
+    data: CategoryAPI.Admin.CreateCategoryRequest
+  ) => {
     try {
       const payload = preparePayload(data);
       await onSubmit(payload);
@@ -47,7 +50,7 @@ export default function CreateCategoryForm({
   };
 
   return (
-    <FormProvider {...methods}>
+    <FormProvider methods={methods} onSubmit={handleFormSubmit}>
       <CategoryFormUI
         isOpen={isOpen}
         onClose={onClose}
@@ -56,7 +59,6 @@ export default function CreateCategoryForm({
         submitButtonIcon="✨"
         files={files}
         setFiles={setFiles}
-        onSubmit={handleFormSubmit}
       />
     </FormProvider>
   );

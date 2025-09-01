@@ -1,50 +1,65 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../supabase/supabase";
-import { Category } from "@qr-menu/shared-types";
+import { CategoryAPI, ApiResponse, ApiError } from "@qr-menu/shared-types";
 import { uploadImage, deleteImage } from "../../utils/upload";
-import { validateUpdateCategory } from "@qr-menu/shared-validation";
+import { categoryValidation } from "@qr-menu/shared-utils";
 
 export const adminCategoryController = {
-  async getCategories(req: Request, res: Response) {
+  async getCategories(
+    req: Request<{}, {}, CategoryAPI.Admin.GetAllCategoriesRequest>,
+    res: Response<
+      ApiResponse<CategoryAPI.Admin.GetAllCategoriesResponse> | ApiError
+    >
+  ) {
     try {
       const { data: categories, error } = await supabase
         .from("menu_categories")
         .select(
           `
-        *,
-        menu_items(*)
-      `
+          id,
+          name,
+          description,
+          image_url,
+          menu_id,
+          created_at,
+          updated_at,
+          menu_items(*)
+        `
         )
         .eq("menu_id", req.userMenu!.id)
-        .order("sort_order", { ascending: true })
-        .order("sort_order", { foreignTable: "menu_items", ascending: true });
+        .order("sort_order", { ascending: true });
 
       if (error) {
         console.error("Get categories error:", error);
         return res.status(500).json({
-          error: "Kategoriler getirilemedi",
+          message: "Kategoriler getirilemedi",
         });
       }
 
       res.json({
+        data: categories,
         message: "Kategoriler başarıyla getirildi",
-        data: categories || [],
       });
     } catch (error: any) {
       console.error("Get categories error:", error);
       res.status(500).json({
-        error: "Kategoriler getirilemedi",
+        message: "Kategoriler getirilemedi",
       });
     }
   },
 
-  async createCategory(req: Request, res: Response) {
+  async createCategory(
+    req: Request<{}, {}, CategoryAPI.Admin.CreateCategoryRequest>,
+    res: Response<
+      ApiResponse<CategoryAPI.Admin.CreateCategoryResponse> | ApiError
+    >
+  ) {
     try {
-      const data: Partial<Category> = req.body;
+      const requestData: CategoryAPI.Admin.CreateCategoryRequest = req.body;
 
-      if (!data.name) {
+      if (!requestData.name) {
         return res.status(400).json({
-          error: "Kategori adı gerekli",
+          message: "Kategori adı gerekli",
         });
       }
 
@@ -62,10 +77,10 @@ export const adminCategoryController = {
       const { data: category, error: createError } = await supabase
         .from("menu_categories")
         .insert({
-          ...data,
+          ...requestData,
           menu_id: req.userMenu!.id,
-          sort_order: data.sort_order || 0,
-          image_url: uploadedUrl ?? data.image_url ?? null,
+          sort_order: 0,
+          image_url: uploadedUrl ?? requestData.image_url ?? null,
         })
         .select()
         .single();
@@ -73,33 +88,39 @@ export const adminCategoryController = {
       if (createError) {
         console.error("Category creation error:", createError);
         return res.status(500).json({
-          error: "Kategori oluşturulamadı",
+          message: "Kategori oluşturulamadı",
         });
       }
 
       res.status(201).json({
-        message: "Kategori başarıyla oluşturuldu!",
         data: category,
+        message: "Kategori başarıyla oluşturuldu!",
       });
     } catch (error: any) {
       console.error("Create category error:", error);
       res.status(500).json({
-        error: "Kategori oluşturulamadı",
+        message: "Kategori oluşturulamadı",
       });
     }
   },
 
-  async updateCategory(req: Request, res: Response) {
+  async updateCategory(
+    req: Request<{ id: string }, {}, CategoryAPI.Admin.UpdateCategoryRequest>,
+    res: Response<
+      ApiResponse<CategoryAPI.Admin.UpdateCategoryResponse> | ApiError
+    >
+  ) {
     try {
       const { id } = req.params;
+      const requestData: CategoryAPI.Admin.UpdateCategoryRequest = req.body;
 
       let updateData;
       try {
-        updateData = validateUpdateCategory(req.body);
+        updateData =
+          categoryValidation.validateUpdateCategoryRequest(requestData);
       } catch (validationError: any) {
         return res.status(400).json({
-          error: "Geçersiz veri formatı",
-          details: validationError.errors,
+          message: "Geçersiz veri formatı",
         });
       }
 
@@ -111,7 +132,7 @@ export const adminCategoryController = {
 
       if (categoryError || !existingCategory) {
         return res.status(404).json({
-          error: "Kategori bulunamadı",
+          message: "Kategori bulunamadı",
         });
       }
 
@@ -166,81 +187,93 @@ export const adminCategoryController = {
 
       if (updateError) {
         return res.status(500).json({
-          error: "Kategori güncellenemedi",
+          message: "Kategori güncellenemedi",
         });
       }
 
       res.json({
-        message: "Kategori başarıyla güncellendi!",
         data: updatedCategory,
+        message: "Kategori başarıyla güncellendi!",
       });
     } catch (error: any) {
       console.error("Update category error:", error);
       res.status(500).json({
-        error: "Kategori güncellenemedi",
+        message: "Kategori güncellenemedi",
       });
     }
   },
 
-  async reorderCategories(req: Request, res: Response) {
+  async reorderCategories(
+    req: Request<{}, {}, { category_ids: string[] }>,
+    res: Response<ApiResponse<{ success: boolean }> | ApiError>
+  ) {
     try {
-      const { changes } = req.body as {
-        changes: Array<{ id: string; newSortOrder: number }>;
-      };
+      const requestData: { category_ids: string[] } = req.body;
 
-      if (!Array.isArray(changes) || changes.length === 0) {
+      if (
+        !Array.isArray(requestData.category_ids) ||
+        requestData.category_ids.length === 0
+      ) {
         return res.status(400).json({
-          error: "Değişiklik listesi gerekli",
+          message: "Kategori ID listesi gerekli",
         });
       }
 
-      const categoryIds = changes.map((c) => c.id);
       const { data: existingCategories, error: fetchError } = await supabase
         .from("menu_categories")
         .select("id")
         .eq("menu_id", req.userMenu!.id)
-        .in("id", categoryIds);
+        .in("id", requestData.category_ids);
 
       if (fetchError) {
         console.error("Fetch categories error:", fetchError);
         return res.status(500).json({
-          error: "Kategoriler getirilemedi",
+          message: "Kategoriler getirilemedi",
         });
       }
 
-      if (existingCategories.length !== changes.length) {
+      if (existingCategories.length !== requestData.category_ids.length) {
         return res.status(403).json({
-          error: "Bazı kategoriler size ait değil",
+          message: "Bazı kategoriler size ait değil",
         });
       }
 
       const updates = [];
-      for (const change of changes) {
+      for (let i = 0; i < requestData.category_ids.length; i++) {
         const { error: updateError } = await supabase
           .from("menu_categories")
-          .update({ sort_order: change.newSortOrder })
-          .eq("id", change.id);
+          .update({ sort_order: i })
+          .eq("id", requestData.category_ids[i]);
 
         if (updateError) {
           console.error("Category reorder error:", updateError);
           return res.status(500).json({
-            error: "Kategori sıralaması güncellenemedi",
+            message: "Kategori sıralaması güncellenemedi",
           });
         }
-        updates.push(change.id);
+        updates.push(requestData.category_ids[i]);
       }
 
       return res.json({
+        data: {
+          success: true,
+        },
         message: "Sıralama başarıyla güncellendi",
-        data: { updatedCount: updates.length },
       });
     } catch (error: any) {
       console.error("Reorder categories error:", error);
-      return res.status(500).json({ error: "Sıralama güncellenemedi" });
+      return res.status(500).json({
+        message: "Sıralama güncellenemedi",
+      });
     }
   },
 
-  async deleteCategory(req: Request, res: Response) {
+  async deleteCategory(
+    req: Request<{ id: string }, {}, {}>,
+    res: Response<
+      ApiResponse<CategoryAPI.Admin.DeleteCategoryResponse> | ApiError
+    >
+  ) {
     try {
       const { id } = req.params;
 
@@ -252,7 +285,7 @@ export const adminCategoryController = {
 
       if (categoryError || !category) {
         return res.status(404).json({
-          error: "Kategori bulunamadı",
+          message: "Kategori bulunamadı",
         });
       }
 
@@ -264,17 +297,20 @@ export const adminCategoryController = {
       if (deleteError) {
         console.error("Category deletion error:", deleteError);
         return res.status(500).json({
-          error: "Kategori silinemedi",
+          message: "Kategori silinemedi",
         });
       }
 
       res.json({
+        data: {
+          success: true,
+        },
         message: "Kategori başarıyla silindi!",
       });
     } catch (error: any) {
       console.error("Delete category error:", error);
       res.status(500).json({
-        error: "Kategori silinemedi",
+        message: "Kategori silinemedi",
       });
     }
   },

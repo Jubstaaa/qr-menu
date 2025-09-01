@@ -7,6 +7,4 @@ router.get("/", publicItemController.getActiveItemsBySubdomain);
 
 router.get("/:itemId", publicItemController.getItemBySubdomainAndId);
 
-router.get("/popular", publicItemController.getPopularItemsBySubdomain);
-
 export default router;

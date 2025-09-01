@@ -76,8 +76,7 @@ export default function DashboardPage() {
                 <div>
                   <p className="font-medium text-gray-900">Plan</p>
                   <p className="text-sm text-gray-600">
-                    {subscription?.subscription?.plan_type ||
-                      "Plan bilgisi yok"}
+                    {subscription?.plan_type || "Plan bilgisi yok"}
                   </p>
                 </div>
               </div>
@@ -89,7 +88,7 @@ export default function DashboardPage() {
                 <div>
                   <p className="font-medium text-gray-900">Durum</p>
                   <p className="text-sm text-gray-600">
-                    {subscription?.subscription?.status || "Durum bilgisi yok"}
+                    {subscription?.status || "Durum bilgisi yok"}
                   </p>
                 </div>
               </div>
@@ -101,10 +100,10 @@ export default function DashboardPage() {
                 <div>
                   <p className="font-medium text-gray-900">Bitiş Tarihi</p>
                   <p className="text-sm text-gray-600">
-                    {subscription?.subscription?.end_date
-                      ? new Date(
-                          subscription.subscription.end_date
-                        ).toLocaleDateString("tr-TR")
+                    {subscription?.end_date
+                      ? new Date(subscription.end_date).toLocaleDateString(
+                          "tr-TR"
+                        )
                       : "Bitiş tarihi yok"}
                   </p>
                 </div>

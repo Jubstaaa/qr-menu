@@ -3,29 +3,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import ProductDetailModal from "./ProductDetailModal";
+import { ItemAPI } from "@qr-menu/shared-types";
 
-type MenuItem = {
-  id: string;
-  name: string;
-  description?: string;
-  price: number;
-  image_url?: string;
-  sort_order: number;
-  is_available: boolean;
-  allergens?: any[];
-  ingredients?: string;
-  spice_level?: string;
-  is_popular?: boolean;
-  is_chef_special?: boolean;
-  preparation_time?: number;
-  nutrition_info?: any;
-};
+type MenuItem = ItemAPI.Public.GetActiveItemsBySubdomainResponse[0];
 
-interface ProductGridProps {
-  products: MenuItem[];
-}
-
-export default function ProductGrid({ products }: ProductGridProps) {
+export default function ProductGrid({
+  products,
+}: {
+  products: ItemAPI.Public.GetActiveItemsBySubdomainResponse;
+}) {
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -121,15 +107,15 @@ export default function ProductGrid({ products }: ProductGridProps) {
                   {item.spice_level && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                       🌶️{" "}
-                      {item.spice_level === "mild"
+                      {item.spice_level === 1
                         ? "Hafif"
-                        : item.spice_level === "medium"
+                        : item.spice_level === 2
                           ? "Orta"
-                          : item.spice_level === "hot"
+                          : item.spice_level === 3
                             ? "Acılı"
-                            : item.spice_level === "extra_hot"
+                            : item.spice_level === 4
                               ? "Çok Acılı"
-                              : item.spice_level}
+                              : `Seviye ${item.spice_level}`}
                     </span>
                   )}
                   {item.preparation_time && (

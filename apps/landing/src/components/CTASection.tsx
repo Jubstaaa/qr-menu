@@ -2,10 +2,14 @@
 
 import { Button } from "@heroui/react";
 import { QrCode, ArrowRight, Sparkles } from "lucide-react";
-import { useAuth } from "../contexts/AuthContext";
+import { useModalContext } from "../contexts/ModalContext";
 
 export const CTASection: React.FC = () => {
-  const { openAuthModal } = useAuth();
+  const { openAuthModal } = useModalContext();
+
+  const handleDemoClick = () => {
+    window.open(`https://demo.${window.location.host}`, "_blank");
+  };
 
   return (
     <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 dark:from-blue-700 dark:via-purple-700 dark:to-indigo-800 py-20 relative overflow-hidden">
@@ -41,7 +45,7 @@ export const CTASection: React.FC = () => {
               color="primary"
               size="lg"
               className="h-14 px-8 text-lg font-semibold bg-white text-blue-600 hover:bg-blue-50 shadow-xl hover:shadow-2xl transition-all duration-300"
-              onClick={openAuthModal}
+              onPress={openAuthModal}
               endContent={<ArrowRight className="w-6 h-6" />}
             >
               Ücretsiz Deneyin
@@ -50,11 +54,7 @@ export const CTASection: React.FC = () => {
               variant="bordered"
               size="lg"
               className="h-14 px-8 text-lg font-semibold border-2 border-white/30 text-white hover:bg-white/10 backdrop-blur-sm transition-all duration-300"
-              onClick={() => {
-                const host = window.location.host;
-                const demoUrl = `https://demo.${host}`;
-                window.open(demoUrl, "_blank");
-              }}
+              onPress={handleDemoClick}
             >
               Demo İnceleyin
             </Button>

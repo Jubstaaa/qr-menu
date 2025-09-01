@@ -10,7 +10,7 @@ import {
   NavbarItem,
 } from "@heroui/react";
 import { LogOut, QrCode } from "lucide-react";
-import { apiClient } from "@qr-menu/shared-utils";
+import { authApi } from "@qr-menu/shared-utils";
 
 export default function DashboardNav() {
   const pathname = usePathname();
@@ -18,7 +18,7 @@ export default function DashboardNav() {
 
   const handleLogout = async () => {
     try {
-      await apiClient.logout();
+      await authApi.logout();
       router.replace("/auth/login");
     } catch (error) {
       console.error("Logout error:", error);

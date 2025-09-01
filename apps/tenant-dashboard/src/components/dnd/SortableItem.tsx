@@ -3,13 +3,17 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Item } from "@qr-menu/shared-types";
+import { CategoryAPI } from "@qr-menu/shared-types";
 import ItemCard from "../cards/ItemCard";
 
 interface SortableItemProps {
-  item: Item;
-  onEdit: (item: Item) => void;
-  onDelete: (item: Item) => void;
+  item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0];
+  onEdit: (
+    item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+  ) => void;
+  onDelete: (
+    item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+  ) => void;
 }
 
 export default function SortableItem({

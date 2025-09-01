@@ -1,3 +1,3 @@
-export * from "./schemas";
+export * from "./api";
 
 export { z } from "zod";

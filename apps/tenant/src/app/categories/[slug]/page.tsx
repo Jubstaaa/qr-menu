@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { apiClient } from "@qr-menu/shared-utils";
+import { publicCategoryApi } from "@qr-menu/shared-utils";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import ProductGrid from "../../../components/ProductGrid";
@@ -16,16 +16,13 @@ export default async function CategoryDetailPage({
   const subdomain = headersList.get("x-subdomain");
 
   const { slug } = await params;
-  const { data: categoryData } = await apiClient.getCategoryBySlugPublic(
-    { slug },
-    {
-      subdomain: subdomain || undefined,
-    }
-  );
+  const categoryData = await publicCategoryApi.getCategoryBySlug(slug);
 
   if (!categoryData) {
     notFound();
   }
+
+  // Transform API data to match ProductGrid's expected format
 
   return (
     <div className="bg-gray-50">

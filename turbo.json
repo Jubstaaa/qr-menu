@@ -10,7 +10,8 @@
         "NODE_ENV",
         "SUPABASE_URL",
         "SUPABASE_HOSTNAME",
-        "SUPABASE_SERVICE_ROLE_KEY"
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "BASE_DOMAIN"
       ]
     },
     "dev": {

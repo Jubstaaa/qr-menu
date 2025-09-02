@@ -34,7 +34,6 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
           const query = event.query;
           const error = query.state.error as any;
 
-          // 401/403 hatalarında logout yap
           if (error?.status === 403) {
             console.log("Token geçersiz, logout yapılıyor...");
 
@@ -44,7 +43,6 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
         }
       });
 
-    // Mutation error handling
     const mutationUnsubscribe = queryClient
       .getMutationCache()
       .subscribe((event: any) => {
@@ -54,7 +52,11 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
           if (mutation.state.status === "error") {
             const error = mutation.state.error as any;
 
-            // 401/403 hatalarında logout yap
+            addToast({
+              title: error?.message || "İşlem başarısız!",
+              color: "danger",
+            });
+
             if (error?.status === 403) {
               console.log("Token geçersiz, logout yapılıyor...");
 

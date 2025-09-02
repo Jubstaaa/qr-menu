@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminCategoryApi } from "@qr-menu/shared-utils";
+import { ApiUtils } from "@qr-menu/shared-utils";
 import { CategoryAPI } from "@qr-menu/shared-types";
 
 export const useCategoriesQuery = () => {
@@ -19,7 +19,7 @@ export const useCreateCategoryMutation = () => {
     mutationFn: async (
       data: CategoryAPI.Admin.CreateCategoryRequest & { file?: File | null }
     ): Promise<CategoryAPI.Admin.CreateCategoryResponse> => {
-      const response = await adminCategoryApi.createCategory(data);
+      const response = await ApiUtils.Admin.Category.Category.create(data);
       return response;
     },
     onSuccess: (newCategory: CategoryAPI.Admin.CreateCategoryResponse) => {

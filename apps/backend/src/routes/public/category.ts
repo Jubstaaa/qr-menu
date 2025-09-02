@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { publicCategoryController } from "../../controllers/public/category.js";
+import { getCategoryBySubdomainAndSlug } from "../../controllers/public/category";
 
 const router: Router = Router();
 
-router.get("/:slug", publicCategoryController.getCategoryBySubdomainAndSlug);
+router.get("/:slug", getCategoryBySubdomainAndSlug);
 
 export default router;

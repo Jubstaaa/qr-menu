@@ -1,0 +1,1 @@
+export { getCategoryBySubdomainAndSlug } from "./get";

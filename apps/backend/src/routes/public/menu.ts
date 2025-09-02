@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { publicMenuController } from "../../controllers/public/menu.js";
+import { getMenuBySubdomain } from "../../controllers/public/menu";
 
 const router: Router = Router();
 
-router.get("/", publicMenuController.getMenuBySubdomain);
+router.get("/", getMenuBySubdomain);
 
 export default router;

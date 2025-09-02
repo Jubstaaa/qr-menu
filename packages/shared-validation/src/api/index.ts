@@ -1,7 +1,11 @@
-// API Request Schemas and Types
-export * from "./base";
-export * from "./auth";
-export * from "./menu";
-export * from "./category";
-export * from "./item";
-export * from "./subscription";
+import { Admin } from "./admin";
+import { Public } from "./public";
+import { Common } from "./common";
+// Export all schemas
+
+// Create apiValidation object
+export const ApiValidation = {
+  Admin,
+  Public,
+  Common,
+};

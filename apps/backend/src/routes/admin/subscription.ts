@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { adminSubscriptionController } from "../../controllers/admin/subscription.js";
-import { authMiddleware } from "../../middleware/auth.js";
+import { getSubscription } from "../../controllers/admin/subscription";
+import { authMiddleware } from "../../middleware/auth";
 
 const router: Router = Router();
 
 router.use(authMiddleware);
 
-router.get("/", adminSubscriptionController.getUserSubscription);
+router.get("/", getSubscription);
 
-export { router as adminSubscriptionRoutes };
+export default router;

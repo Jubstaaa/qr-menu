@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { publicItemController } from "../../controllers/public/item.js";
+import {
+  getActiveItemsBySubdomain,
+  getItemBySubdomainAndId,
+} from "../../controllers/public/item";
 
 const router: Router = Router();
 
-router.get("/", publicItemController.getActiveItemsBySubdomain);
+router.get("/", getActiveItemsBySubdomain);
 
-router.get("/:itemId", publicItemController.getItemBySubdomainAndId);
+router.get("/:itemId", getItemBySubdomainAndId);
 
 export default router;

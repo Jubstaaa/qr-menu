@@ -1,17 +1,19 @@
-// Base API Types
-export * from "./base";
+import { Admin as AdminNamespace } from "./admin";
+import { Public as PublicNamespace } from "./public";
+import { Common as CommonNamespace } from "./common";
 
-// Auth API Types
-export * from "./auth";
+export namespace ApiType {
+  export import Admin = AdminNamespace;
+  export import Public = PublicNamespace;
+  export import Common = CommonNamespace;
+}
 
-// Menu API Types
-export * from "./menu";
+export type ApiResponse<T = any> = {
+  data: T;
+  message?: string;
+};
 
-// Category API Types
-export * from "./category";
-
-// Item API Types
-export * from "./item";
-
-// Subscription API Types
-export * from "./subscription";
+export type ApiErrorResponse = {
+  message: string;
+  error?: string;
+};

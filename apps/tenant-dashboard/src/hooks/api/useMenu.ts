@@ -1,12 +1,12 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { adminMenuApi } from "@qr-menu/shared-utils";
+import { adminMenuApi, ApiUtils} from "@qr-menu/shared-utils";
 import { MenuAPI } from "@qr-menu/shared-types";
 
 export const useMenuQuery = () => {
   return useQuery({
     queryKey: ["menu"],
     queryFn: async (): Promise<MenuAPI.Admin.GetMenusByUserResponse> => {
-      const response = await adminMenuApi.getMenusByUser();
+      const response = await ApiUtils.Admin.Menu.getMenusByUser();
       return response;
     },
   });

@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { menuController } from "../../controllers/admin/menu";
+import {
+  createMenu,
+  getCurrentUserMenu,
+  updateMenu,
+} from "../../controllers/admin/menu";
 import { authMiddleware } from "../../middleware/auth";
 import multer from "multer";
 
@@ -8,10 +12,10 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 router.use(authMiddleware);
 
-router.post("/", menuController.createMenu);
+router.post("/", createMenu);
 
-router.get("/", menuController.getMenusByUser);
+router.get("/", getCurrentUserMenu);
 
-router.put("/", upload.single("file"), menuController.updateMenu);
+router.put("/:id", updateMenu);
 
 export default router;

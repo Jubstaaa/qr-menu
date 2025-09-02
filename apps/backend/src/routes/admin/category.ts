@@ -8,7 +8,7 @@ import {
   reorderCategories,
 } from "../../controllers/admin/category";
 import { authMiddleware, checkCategoryOwnership } from "../../middleware/auth";
-import { validate } from "../../middleware/validate";
+import { validate } from "../../middleware/validation";
 import { validationUtils } from "@qr-menu/shared-utils";
 
 const router: Router = Router();

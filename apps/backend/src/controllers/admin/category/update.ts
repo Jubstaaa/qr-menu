@@ -1,11 +1,17 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
-import { ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
+import { ApiResponse, ApiErrorResponse, ApiType } from "@qr-menu/shared-types";
 import { uploadImage, deleteImage } from "../../../utils/upload";
 
 export const updateCategory = async (
-  req: Request,
-  res: Response<ApiResponse<any> | ApiErrorResponse>
+  req: Request<
+    ApiType.Admin.Category.Update.Request.Params,
+    {},
+    ApiType.Admin.Category.Update.Request.Data
+  >,
+  res: Response<
+    ApiResponse<ApiType.Admin.Category.Update.Response> | ApiErrorResponse
+  >
 ) => {
   if (!req.userMenu?.id) {
     return res.status(401).json({
@@ -13,13 +19,13 @@ export const updateCategory = async (
     });
   }
 
-  const params = req.params;
+  const { id } = req.params;
   const data = req.body;
 
   const { data: existingCategory, error: categoryError } = await supabase
     .from("menu_categories")
     .select("id, menu_id, image_url")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (categoryError || !existingCategory) {
@@ -71,7 +77,7 @@ export const updateCategory = async (
       image_url: finalImageUrl,
       updated_at: new Date().toISOString(),
     })
-    .eq("id", params.id)
+    .eq("id", id)
     .select()
     .single();
 

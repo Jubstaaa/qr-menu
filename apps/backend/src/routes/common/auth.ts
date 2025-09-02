@@ -6,7 +6,7 @@ import {
   checkAuth,
   getUserMenus,
 } from "../../controllers/common/auth";
-import { validate } from "../../middleware/validate";
+import { validate } from "../../middleware/validation";
 import { validationUtils } from "@qr-menu/shared-utils";
 
 const router: Router = express.Router();

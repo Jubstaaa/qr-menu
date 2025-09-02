@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
-import { ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
+import { ApiResponse, ApiErrorResponse, ApiType } from "@qr-menu/shared-types";
 
 export const reorderCategories = async (
-  req: Request,
-  res: Response<ApiResponse<any> | ApiErrorResponse>
+  req: Request<{}, {}, ApiType.Admin.Category.Reorder.Request.Data>,
+  res: Response<
+    ApiResponse<ApiType.Admin.Category.Reorder.Response> | ApiErrorResponse
+  >
 ) => {
   if (!req.userMenu?.id) {
     return res.status(401).json({
@@ -12,7 +14,7 @@ export const reorderCategories = async (
     });
   }
 
-  const data = req.body;
+  const { changes } = req.body;
 
   const { data: existingCategories, error: fetchError } = await supabase
     .from("menu_categories")
@@ -20,33 +22,34 @@ export const reorderCategories = async (
     .eq("menu_id", req.userMenu!.id)
     .in(
       "id",
-      data.changes.map((change: any) => change.id)
+      changes.map((change: any) => change.id)
     );
 
   if (fetchError) {
     throw new Error(`Kategoriler getirilemedi: ${fetchError.message}`);
   }
 
-  if (existingCategories.length !== data.changes.length) {
+  if (existingCategories.length !== changes.length) {
     throw new Error("Bazı kategoriler size ait değil");
   }
 
   const updates = [];
-  for (let i = 0; i < data.changes.length; i++) {
+  for (let i = 0; i < changes.length; i++) {
     const { error: updateError } = await supabase
       .from("menu_categories")
       .update({ sort_order: i })
-      .eq("id", data.changes[i].id);
+      .eq("id", changes[i].id);
 
     if (updateError) {
       throw new Error(
         `Kategori sıralaması güncellenemedi: ${updateError.message}`
       );
     }
-    updates.push(data.changes[i]);
+    updates.push(changes[i]);
   }
 
   res.json({
+    data: updates,
     message: "Sıralama başarıyla güncellendi",
   });
 };

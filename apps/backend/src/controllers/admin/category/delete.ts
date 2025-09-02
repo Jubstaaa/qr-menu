@@ -1,10 +1,12 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
-import { ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
+import { ApiResponse, ApiErrorResponse, ApiType } from "@qr-menu/shared-types";
 
 export const deleteCategory = async (
-  req: Request,
-  res: Response<ApiResponse<any> | ApiErrorResponse>
+  req: Request<ApiType.Admin.Category.Delete.Request.Params>,
+  res: Response<
+    ApiResponse<ApiType.Admin.Category.Delete.Response> | ApiErrorResponse
+  >
 ) => {
   if (!req.userMenu?.id) {
     return res.status(401).json({
@@ -12,13 +14,12 @@ export const deleteCategory = async (
     });
   }
 
-  const params = req.params;
-  const data = req.body;
+  const { id } = req.params;
 
   const { data: category, error: categoryError } = await supabase
     .from("menu_categories")
     .select("id, menu_id")
-    .eq("id", params.id)
+    .eq("id", id)
     .eq("menu_id", req.userMenu.id)
     .single();
 
@@ -29,13 +30,14 @@ export const deleteCategory = async (
   const { error: deleteError } = await supabase
     .from("menu_categories")
     .delete()
-    .eq("id", params.id);
+    .eq("id", id);
 
   if (deleteError) {
     throw new Error(`Kategori silinemedi: ${deleteError.message}`);
   }
 
   res.json({
+    data: { id },
     message: "Kategori başarıyla silindi!",
   });
 };

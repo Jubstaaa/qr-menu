@@ -3,11 +3,17 @@ import { supabase } from "../../../../supabase/supabase";
 import { ApiType, ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
 
 export const deleteItem = async (
-  req: Request<{ id: string }, {}, {}>,
+  req: Request<ApiType.Admin.Item.Delete.Request.Params>,
   res: Response<
     ApiResponse<ApiType.Admin.Item.Delete.Response> | ApiErrorResponse
   >
 ) => {
+  if (!req.userMenu?.id) {
+    return res.status(401).json({
+      message: "Aktif menü bulunamadı. Lütfen önce bir menü oluşturun.",
+    });
+  }
+
   const { id } = req.params;
 
   const { data: item, error: itemError } = await supabase
@@ -30,9 +36,7 @@ export const deleteItem = async (
   }
 
   res.json({
-    data: {
-      success: true,
-    },
+    data: { id },
     message: "Ürün başarıyla silindi!",
   });
 };

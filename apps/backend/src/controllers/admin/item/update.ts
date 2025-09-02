@@ -2,31 +2,25 @@ import { Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
 import { ApiType, ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
 import { uploadImage, deleteImage } from "../../../utils/upload";
-import { validationUtils } from "@qr-menu/shared-utils";
 
 export const updateItem = async (
-  req: Request<{ id: string }, {}, ApiType.Admin.Item.Update.Request.Data>,
+  req: Request<
+    ApiType.Admin.Item.Update.Request.Params,
+    {},
+    ApiType.Admin.Item.Update.Request.Data
+  >,
   res: Response<
     ApiResponse<ApiType.Admin.Item.Update.Response> | ApiErrorResponse
   >
 ) => {
-  // userMenu kontrolü
   if (!req.userMenu?.id) {
     return res.status(401).json({
       message: "Aktif menü bulunamadı. Lütfen önce bir menü oluşturun.",
-      error: "Aktif menü bulunamadı. Lütfen önce bir menü oluşturun.",
     });
   }
 
   const { id } = req.params;
   const requestData = req.body;
-
-  let updateData;
-  try {
-    updateData = validationUtils.admin.item.update(requestData);
-  } catch (validationError: any) {
-    throw new Error(`Geçersiz veri formatı: ${validationError.message}`);
-  }
 
   const { data: existingItem, error: itemError } = await supabase
     .from("menu_items")
@@ -38,7 +32,7 @@ export const updateItem = async (
     throw new Error("Ürün bulunamadı");
   }
 
-  let finalImageUrl: string | null = updateData.image_url as any;
+  let finalImageUrl: string | null = requestData.image_url as any;
 
   const hasNewFile = (req as any).file;
 
@@ -64,7 +58,7 @@ export const updateItem = async (
     } catch (uploadError: any) {
       console.error("Item image upload error:", uploadError);
     }
-  } else if (updateData.image_url === null) {
+  } else if (requestData.image_url === null) {
     finalImageUrl = null;
 
     if (existingItem.image_url) {
@@ -79,7 +73,7 @@ export const updateItem = async (
   const { data: updatedItem, error: updateError } = await supabase
     .from("menu_items")
     .update({
-      ...updateData,
+      ...requestData,
       image_url: finalImageUrl,
       updated_at: new Date().toISOString(),
     })

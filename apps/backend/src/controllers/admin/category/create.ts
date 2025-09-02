@@ -1,15 +1,10 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
-import { ApiType, ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
+import { ApiResponse, ApiErrorResponse, ApiType } from "@qr-menu/shared-types";
 import { uploadImage } from "../../../utils/upload";
-import { validationUtils } from "@qr-menu/shared-utils";
 
 export const createCategory = async (
-  req: Request<
-    ApiType.Admin.Category.Create.Request.Params,
-    {},
-    ApiType.Admin.Category.Create.Request.Data
-  >,
+  req: Request<{}, {}, ApiType.Admin.Category.Create.Request.Data>,
   res: Response<
     ApiResponse<ApiType.Admin.Category.Create.Response> | ApiErrorResponse
   >
@@ -19,9 +14,6 @@ export const createCategory = async (
       message: "Aktif menü bulunamadı. Lütfen önce bir menü oluşturun.",
     });
   }
-
-  const params = validationUtils.admin.category.create.request.params(req.params);
-  const data = validationUtils.admin.category.create.request.data(req.body);
 
   let uploadedUrl: string | null = null;
   try {
@@ -37,10 +29,10 @@ export const createCategory = async (
   const { data: category, error: createError } = await supabase
     .from("menu_categories")
     .insert({
-      ...data,
+      ...req.body,
       menu_id: req.userMenu.id,
       sort_order: 0,
-      image_url: uploadedUrl ?? data.image_url ?? null,
+      image_url: uploadedUrl ?? req.body.image_url ?? null,
     })
     .select()
     .single();
@@ -50,7 +42,7 @@ export const createCategory = async (
   }
 
   res.status(201).json({
-    data: validationUtils.admin.category.create.response(category),
+    data: category,
     message: "Kategori başarıyla oluşturuldu!",
   });
 };

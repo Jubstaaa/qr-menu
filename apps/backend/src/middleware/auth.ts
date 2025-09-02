@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { supabase } from "../../supabase/supabase";
+import { isProduction } from "@qr-menu/shared-config";
 
 declare global {
   namespace Express {
@@ -37,7 +38,7 @@ export const authMiddleware = async (
     if (authError || !user) {
       res.clearCookie("auth_token", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction,
         sameSite: "lax",
         path: "/",
       });

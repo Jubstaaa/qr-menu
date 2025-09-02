@@ -1,17 +1,10 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
-import { ApiType, ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
-import { validationUtils } from "@qr-menu/shared-utils";
+import { ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
 
 export const deleteCategory = async (
-  req: Request<
-    ApiType.Admin.Category.Delete.Request.Params,
-    {},
-    ApiType.Admin.Category.Delete.Request.Data
-  >,
-  res: Response<
-    ApiResponse<ApiType.Admin.Category.Delete.Response> | ApiErrorResponse
-  >
+  req: Request,
+  res: Response<ApiResponse<any> | ApiErrorResponse>
 ) => {
   if (!req.userMenu?.id) {
     return res.status(401).json({
@@ -19,10 +12,8 @@ export const deleteCategory = async (
     });
   }
 
-  const params = validationUtils.admin.category.remove.request.params(
-    req.params
-  );
-  const data = validationUtils.admin.category.remove.request.data(req.body);
+  const params = req.params;
+  const data = req.body;
 
   const { data: category, error: categoryError } = await supabase
     .from("menu_categories")

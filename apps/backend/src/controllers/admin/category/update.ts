@@ -1,18 +1,11 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
-import { ApiType, ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
+import { ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
 import { uploadImage, deleteImage } from "../../../utils/upload";
-import { validationUtils } from "@qr-menu/shared-utils";
 
 export const updateCategory = async (
-  req: Request<
-    ApiType.Admin.Category.Update.Request.Params,
-    {},
-    ApiType.Admin.Category.Update.Request.Data
-  >,
-  res: Response<
-    ApiResponse<ApiType.Admin.Category.Update.Response> | ApiErrorResponse
-  >
+  req: Request,
+  res: Response<ApiResponse<any> | ApiErrorResponse>
 ) => {
   if (!req.userMenu?.id) {
     return res.status(401).json({
@@ -20,10 +13,8 @@ export const updateCategory = async (
     });
   }
 
-  const params = validationUtils.admin.category.update.request.params(
-    req.params
-  );
-  const data = validationUtils.admin.category.update.request.data(req.body);
+  const params = req.params;
+  const data = req.body;
 
   const { data: existingCategory, error: categoryError } = await supabase
     .from("menu_categories")

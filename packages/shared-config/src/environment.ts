@@ -12,6 +12,7 @@ export interface EnvironmentConfig {
   BASE_DOMAIN: string;
   TEST_SUBDOMAIN?: string;
   MICROFRONTENDS_PROXY?: string;
+  PORT: number;
 }
 
 export const config: EnvironmentConfig = {
@@ -25,6 +26,7 @@ export const config: EnvironmentConfig = {
   BASE_DOMAIN: process.env.BASE_DOMAIN || "",
   TEST_SUBDOMAIN: process.env.TEST_SUBDOMAIN,
   MICROFRONTENDS_PROXY: process.env.MICROFRONTENDS_PROXY,
+  PORT: parseInt(process.env.PORT || "4000"),
 };
 
 export const isDevelopment = process.env.NODE_ENV === "development";

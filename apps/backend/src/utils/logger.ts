@@ -1,3 +1,4 @@
+import { isProduction } from "@qr-menu/shared-config";
 import fs from "fs";
 import path from "path";
 
@@ -53,7 +54,7 @@ class Logger {
     await this.logToConsole(errorLog);
 
     // Dosyaya logla (production'da)
-    if (process.env.NODE_ENV === "production") {
+    if (isProduction) {
       await this.logToFile(errorLog);
     }
   }

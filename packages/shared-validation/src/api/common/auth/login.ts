@@ -14,7 +14,13 @@ export const Login = {
     user: z.object({
       id: z.string(),
       email: z.string(),
-      name: z.string(),
     }),
+    menu: z
+      .object({
+        id: z.string(),
+        restaurant_name: z.string(),
+        subdomain: z.string(),
+      })
+      .optional(),
   }),
 };

@@ -6,13 +6,22 @@ import {
   checkAuth,
   getUserMenus,
 } from "../../controllers/common/auth";
+import { validate } from "../../middleware/validate";
+import { validationUtils } from "@qr-menu/shared-utils";
 
 const router: Router = express.Router();
 
-router.post("/login", login);
-router.post("/register", register);
-router.post("/logout", logout);
-router.get("/check", checkAuth);
-router.get("/menus", getUserMenus);
+router.post("/login", validate(validationUtils.common.auth.login), login);
+router.post(
+  "/register",
+  validate(validationUtils.common.auth.register),
+  register
+);
+router.post("/logout", validate(validationUtils.common.auth.logout), logout);
+router.get(
+  "/check",
+  validate(validationUtils.common.auth.checkAuth),
+  checkAuth
+);
 
 export default router;

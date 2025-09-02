@@ -1,7 +1,7 @@
 import { CookieOptions, Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
-import { AuthAPI, ApiResponse, ApiError } from "@qr-menu/shared-types";
 import { config, isProduction } from "@qr-menu/shared-config";
+import { ApiType, ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
 
 const cookieConfig: Pick<CookieOptions, "secure" | "sameSite" | "domain"> = {
   secure: isProduction,
@@ -10,17 +10,13 @@ const cookieConfig: Pick<CookieOptions, "secure" | "sameSite" | "domain"> = {
 };
 
 export const login = async (
-  req: Request<{}, {}, AuthAPI.LoginRequest>,
-  res: Response<ApiResponse<AuthAPI.LoginResponse> | ApiError>
+  req: Request<{}, {}, ApiType.Common.Auth.Login.Request.Data>,
+  res: Response<
+    ApiResponse<ApiType.Common.Auth.Login.Response> | ApiErrorResponse
+  >
 ) => {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        message: "Email ve şifre gerekli",
-      });
-    }
 
     const { data: authData, error: authError } =
       await supabase.auth.signInWithPassword({
@@ -61,17 +57,12 @@ export const login = async (
 
     res.json({
       data: {
+        token: authData.session?.access_token || "",
         user: {
           id: authData.user.id,
           email: authData.user.email || "",
         },
-        menu: menu
-          ? {
-              id: menu.id,
-              restaurant_name: menu.restaurant_name,
-              subdomain: menu.subdomain,
-            }
-          : undefined,
+        menu: menu || undefined,
       },
       message: "Giriş başarılı",
     });

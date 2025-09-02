@@ -1,14 +1,9 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
-import { ApiType, ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
-import { validationUtils } from "@qr-menu/shared-utils";
+import { ApiResponse, ApiErrorResponse, ApiType } from "@qr-menu/shared-types";
 
 export const getCategories = async (
-  req: Request<
-    ApiType.Admin.Category.GetAll.Request.Params,
-    {},
-    ApiType.Admin.Category.GetAll.Request.Data
-  >,
+  req: Request<{}, {}, ApiType.Admin.Category.GetAll.Request.Data>,
   res: Response<
     ApiResponse<ApiType.Admin.Category.GetAll.Response> | ApiErrorResponse
   >
@@ -18,11 +13,6 @@ export const getCategories = async (
       message: "Aktif menü bulunamadı. Lütfen önce bir menü oluşturun.",
     });
   }
-
-  const params = validationUtils.admin.category.getAll.request.params(
-    req.params
-  );
-  const data = validationUtils.admin.category.getAll.request.data(req.body);
 
   const { data: categories, error } = await supabase
     .from("menu_categories")
@@ -46,7 +36,7 @@ export const getCategories = async (
   }
 
   res.json({
-    data: validationUtils.admin.category.getAll.response(categories),
+    data: categories,
     message: "Kategoriler başarıyla getirildi",
   });
 };

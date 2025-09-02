@@ -3,16 +3,13 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 
 import routes from "./routes";
 import { config } from "@qr-menu/shared-config";
 import { globalErrorHandler, requestTimer } from "./middleware/errorLogger";
 
-dotenv.config({ path: "../../.env" });
-
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = config.PORT;
 
 app.use(helmet());
 
@@ -58,7 +55,7 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-app.use("/api", routes);
+app.use(routes);
 
 // Error logging middleware (tüm route'lardan sonra)
 app.use(globalErrorHandler);

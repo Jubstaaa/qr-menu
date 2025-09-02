@@ -1,17 +1,10 @@
 import { Request, Response } from "express";
 import { supabase } from "../../../../supabase/supabase";
-import { ApiType, ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
-import { validationUtils } from "@qr-menu/shared-utils";
+import { ApiResponse, ApiErrorResponse } from "@qr-menu/shared-types";
 
 export const reorderCategories = async (
-  req: Request<
-    ApiType.Admin.Category.Reorder.Request.Params,
-    {},
-    ApiType.Admin.Category.Reorder.Request.Data
-  >,
-  res: Response<
-    ApiResponse<ApiType.Admin.Category.Reorder.Response> | ApiErrorResponse
-  >
+  req: Request,
+  res: Response<ApiResponse<any> | ApiErrorResponse>
 ) => {
   if (!req.userMenu?.id) {
     return res.status(401).json({
@@ -19,10 +12,7 @@ export const reorderCategories = async (
     });
   }
 
-  const params = validationUtils.admin.category.reorder.request.params(
-    req.params
-  );
-  const data = validationUtils.admin.category.reorder.request.data(req.body);
+  const data = req.body;
 
   const { data: existingCategories, error: fetchError } = await supabase
     .from("menu_categories")
@@ -30,7 +20,7 @@ export const reorderCategories = async (
     .eq("menu_id", req.userMenu!.id)
     .in(
       "id",
-      data.changes.map((change) => change.id)
+      data.changes.map((change: any) => change.id)
     );
 
   if (fetchError) {

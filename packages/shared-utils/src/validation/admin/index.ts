@@ -1,7 +1,7 @@
 // Export all schemas
-import * as category from "./category";
-import * as item from "./item";
-import * as menu from "./menu";
+import { category } from "./category";
+import { item } from "./item";
+import { menu } from "./menu";
 
 // Create apiValidation object
 export const admin = {

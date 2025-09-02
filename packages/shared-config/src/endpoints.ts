@@ -3,7 +3,7 @@ export const ENDPOINTS = {
   ADMIN: {
     MENU: {
       CREATE: "/admin/menus",
-      GET_CURRENT_USER: "/admin/menus",
+      GET_BY_USER: "/admin/menus",
       UPDATE: "/admin/menus/:id",
     },
     CATEGORY: {

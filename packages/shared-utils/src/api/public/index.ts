@@ -1,9 +1,9 @@
 // Export all schemas
-import * as Category from "./category";
-import * as Menu from "./menu";
+import * as category from "./category";
+import * as menu from "./menu";
 
 // Create apiValidation object
-export const Public = {
-  Category: Category,
-  Menu: Menu,
+export const publicModule = {
+  category,
+  menu,
 };

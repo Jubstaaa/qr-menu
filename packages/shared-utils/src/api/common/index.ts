@@ -1,6 +1,6 @@
 // Export all schemas
-import * as Auth from "./auth";
+import * as auth from "./auth";
 // Create apiValidation object
-export const Common = {
-  Auth: Auth,
+export const common = {
+  auth,
 };

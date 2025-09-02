@@ -1,9 +1,9 @@
-import { Admin } from "./admin";
-import { Public } from "./public";
-import { Common } from "./common";
+import { admin } from "./admin";
+import { publicModule } from "./public";
+import { common } from "./common";
 
-export const ApiUtils = {
-  Admin: Admin,
-  Public: Public,
-  Common: Common,
+export const apiUtils = {
+  admin,
+  publicModule,
+  common,
 };

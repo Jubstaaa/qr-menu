@@ -1,13 +1,11 @@
 // Export all schemas
-import * as Category from "./category";
-import * as Item from "./item";
-import * as Menu from "./menu";
-import * as Subscription from "./subscription";
+import * as category from "./category";
+import * as item from "./item";
+import * as menu from "./menu";
 
 // Create apiValidation object
-export const Admin = {
-  Category: Category,
-  Item: Item,
-  Menu: Menu,
-  Subscription: Subscription,
+export const admin = {
+  category,
+  item,
+  menu,
 };

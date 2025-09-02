@@ -1,232 +1,143 @@
-import { ENDPOINTS, config } from "@qr-menu/shared-config";
+import { config } from "@qr-menu/shared-config";
 import { ApiResponse } from "@qr-menu/shared-types";
 
-// Request Options Interface
 export interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: Record<string, string>;
   body?: any;
   credentials?: "omit" | "same-origin" | "include";
   subdomain?: string;
+  query?: Record<string, any>;
+  pathParams?: Record<string, string>;
 }
 
-// Default Options
-const defaultOptions: RequestOptions = {
-  method: "GET",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  credentials: "include",
-};
-
-// Base API Client Interface
-export interface ApiClient {
-  get<T>(url: string, params?: Record<string, any>): Promise<ApiResponse<T>>;
-  post<T>(url: string, data?: any): Promise<ApiResponse<T>>;
-  put<T>(url: string, data?: any): Promise<ApiResponse<T>>;
-  patch<T>(url: string, data?: any): Promise<ApiResponse<T>>;
-  delete<T>(url: string): Promise<ApiResponse<T>>;
-}
-
-// API Client Implementation
-export class QrMenuApiClient implements ApiClient {
+export class ApiClient {
   private baseUrl: string;
 
-  constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || config.API_URL;
+  constructor(baseUrl: string = config.API_URL) {
+    this.baseUrl = baseUrl;
   }
 
-  private async request<T>(
-    method: string,
-    url: string,
-    data?: any,
-    params?: Record<string, any>,
-    options: RequestOptions = {}
-  ): Promise<ApiResponse<T>> {
-    const finalOptions = { ...defaultOptions, ...options, method };
-
-    const headers = { ...finalOptions.headers };
-
-    // Subdomain handling
-    if (finalOptions.subdomain) {
-      headers["x-subdomain"] = finalOptions.subdomain;
-    }
-
-    let requestUrl = url;
-    if (params) {
-      const searchParams = new URLSearchParams();
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          searchParams.append(key, String(value));
-        }
-      });
-      const queryString = searchParams.toString();
-      if (queryString) {
-        requestUrl += `?${queryString}`;
-      }
-    }
-
-    const config: RequestInit = {
-      method,
-      headers,
-      credentials: finalOptions.credentials,
-    };
-
-    // Body handling
-    if (method !== "GET" && data) {
-      if (typeof FormData !== "undefined" && data instanceof FormData) {
-        if (config.headers && (config.headers as any)["Content-Type"]) {
-          delete (config.headers as any)["Content-Type"];
-        }
-        config.body = data as any;
-      } else {
-        config.body = JSON.stringify(data);
-      }
-    }
-
-    try {
-      const response = await fetch(requestUrl, config);
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        return {
-          data: undefined as T,
-          message: (responseData as any)?.message || `HTTP ${response.status}`,
-        };
-      }
-
-      return {
-        data: (responseData as any)?.data || (responseData as T),
-        message: (responseData as any)?.message,
-      };
-    } catch (error) {
-      return {
-        data: undefined as T,
-        message: error instanceof Error ? error.message : "Network error",
-      };
-    }
-  }
-
-  async get<T>(
-    url: string,
-    params?: Record<string, any>,
-    options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
-    return this.request<T>("GET", url, undefined, params, options);
-  }
-
-  async post<T>(
-    url: string,
-    data?: any,
-    options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
-    return this.request<T>("POST", url, data, undefined, options);
-  }
-
-  async put<T>(
-    url: string,
-    data?: any,
-    options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
-    return this.request<T>("PUT", url, data, undefined, options);
-  }
-
-  async patch<T>(
-    url: string,
-    data?: any,
-    options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
-    return this.request<T>("PATCH", url, data, undefined, options);
-  }
-
-  async delete<T>(
-    url: string,
-    options?: RequestOptions
-  ): Promise<ApiResponse<T>> {
-    return this.request<T>("DELETE", url, undefined, undefined, options);
-  }
-
-  // Helper method to build URL with endpoint path
-  buildUrl<TParams extends Record<string, string> = Record<string, string>>(
-    endpointPath: string,
-    params?: TParams
+  private buildUrl(
+    endpoint: string,
+    pathParams?: Record<string, string>,
+    query?: Record<string, any>
   ): string {
-    let url = `${this.baseUrl}${endpointPath}`;
+    let url = `${this.baseUrl}${endpoint}`;
 
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        url = url.replace(`:${key}`, value);
+    if (pathParams) {
+      Object.entries(pathParams).forEach(([k, v]) => {
+        url = url.replace(`:${k}`, v);
       });
+    }
+
+    if (query) {
+      const search = new URLSearchParams();
+      Object.entries(query).forEach(([k, v]) => {
+        if (v !== undefined && v !== null) search.append(k, String(v));
+      });
+      if (Array.from(search).length > 0) {
+        url += `?${search.toString()}`;
+      }
     }
 
     return url;
   }
 
-  // Helper methods that return data directly
-  async getData<TResponse>(
-    url: string,
-    params?: Record<string, any>,
-    options?: RequestOptions
-  ): Promise<TResponse> {
-    const response = await this.get<TResponse>(url, params, options);
-    if (!response.data) {
-      throw new Error(response.message || "Request failed");
+  private async request<T>(
+    endpoint: string,
+    options: RequestOptions
+  ): Promise<ApiResponse<T>> {
+    const {
+      method = "GET",
+      headers = {},
+      body,
+      credentials,
+      subdomain,
+      pathParams,
+      query,
+    } = options;
+
+    const finalHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+      ...headers,
+    };
+
+    if (subdomain) {
+      finalHeaders["x-subdomain"] = subdomain;
     }
-    return response.data;
+
+    const url = this.buildUrl(endpoint, pathParams, query);
+
+    const config: RequestInit = {
+      method,
+      headers: finalHeaders,
+      credentials,
+    };
+
+    if (method !== "GET" && body) {
+      if (typeof FormData !== "undefined" && body instanceof FormData) {
+        delete (config.headers as any)["Content-Type"];
+        config.body = body;
+      } else {
+        config.body = JSON.stringify(body);
+      }
+    }
+
+    try {
+      const res = await fetch(url, config);
+      const json = (await res.json()) as ApiResponse<T>;
+
+      if (!res.ok) {
+        return {
+          data: undefined as unknown as T,
+          message: json.message || `HTTP ${res.status}`,
+        };
+      }
+
+      return {
+        data: json.data,
+        message: json.message,
+      };
+    } catch (err) {
+      return {
+        data: undefined as unknown as T,
+        message: err instanceof Error ? err.message : "Network error",
+      };
+    }
   }
 
-  async postData<TRequest = any, TResponse = any>(
-    url: string,
-    data?: TRequest,
-    options?: RequestOptions
-  ): Promise<TResponse> {
-    const response = await this.post<TResponse>(url, data, options);
-    if (!response.data) {
-      throw new Error(response.message || "Request failed");
-    }
-    return response.data;
+  get<T>(endpoint: string, args?: Omit<RequestOptions, "method" | "body">) {
+    return this.request<T>(endpoint, { ...args, method: "GET" });
   }
 
-  async putData<TRequest = any, TResponse = any>(
-    url: string,
-    data?: TRequest,
-    options?: RequestOptions
-  ): Promise<TResponse> {
-    const response = await this.put<TResponse>(url, data, options);
-    if (!response.data) {
-      throw new Error(response.message || "Request failed");
-    }
-    return response.data;
+  post<T, B = any>(
+    endpoint: string,
+    body?: B,
+    args?: Omit<RequestOptions, "method" | "body">
+  ) {
+    return this.request<T>(endpoint, { ...args, method: "POST", body });
   }
 
-  async patchData<TRequest = any, TResponse = any>(
-    url: string,
-    data?: TRequest,
-    options?: RequestOptions
-  ): Promise<TResponse> {
-    const response = await this.patch<TResponse>(url, data, options);
-    if (!response.data) {
-      throw new Error(response.message || "Request failed");
-    }
-    return response.data;
+  put<T, B = any>(
+    endpoint: string,
+    body?: B,
+    args?: Omit<RequestOptions, "method" | "body">
+  ) {
+    return this.request<T>(endpoint, { ...args, method: "PUT", body });
   }
 
-  async deleteData<TResponse>(
-    url: string,
-    options?: RequestOptions
-  ): Promise<TResponse> {
-    const response = await this.delete<TResponse>(url, options);
-    if (!response.data) {
-      throw new Error(response.message || "Request failed");
-    }
-    return response.data;
+  patch<T, B = any>(
+    endpoint: string,
+    body?: B,
+    args?: Omit<RequestOptions, "method" | "body">
+  ) {
+    return this.request<T>(endpoint, { ...args, method: "PATCH", body });
+  }
+
+  delete<T>(endpoint: string, args?: Omit<RequestOptions, "method" | "body">) {
+    return this.request<T>(endpoint, { ...args, method: "DELETE" });
   }
 }
 
-// Default API Client Instance - config.API_URL kullanır
-export const apiClient = new QrMenuApiClient();
-
-// Legacy function for backward compatibility
-export const createApiClient = (baseUrl?: string) => {
-  return new QrMenuApiClient(baseUrl);
-};
+export const apiClient = new ApiClient();

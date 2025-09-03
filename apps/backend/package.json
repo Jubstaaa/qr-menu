@@ -11,7 +11,7 @@
     "dev:tsx": "tsx watch src/main.ts",
     "dev:turbo": "turbo run dev --filter=@qrmenu/backend --watch",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    "start": "node dist/main",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",

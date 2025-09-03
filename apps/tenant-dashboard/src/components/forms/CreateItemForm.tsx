@@ -1,20 +1,20 @@
 "use client";
 
 import React from "react";
-import { ItemAPI, CategoryAPI } from "@qr-menu/shared-types";
-import { createItemRequestSchema } from "@qr-menu/shared-validation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ItemFormUI from "./ItemFormUI";
 import { useFileUpload, FormProvider } from "@qr-menu/shared-components";
+import { ApiType } from "@qr-menu/shared-types";
+import { ApiValidation } from "@qr-menu/shared-validation";
 
 interface CreateItemFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: ItemAPI.Admin.CreateItemRequest & { file?: File; image_url?: string }
+    data: ApiType.Admin.Item.Create.Request.Data & { file?: File; image_url?: string }
   ) => Promise<void>;
-  categories: CategoryAPI.Admin.GetAllCategoriesResponse;
+  categories: ApiType.Admin.Category.GetAll.Response;
   selectedCategoryId?: string;
 }
 
@@ -25,8 +25,8 @@ export default function CreateItemForm({
   categories,
   selectedCategoryId,
 }: CreateItemFormProps) {
-  const methods = useForm<ItemAPI.Admin.CreateItemRequest>({
-    resolver: zodResolver(createItemRequestSchema),
+  const methods = useForm<ApiType.Admin.Item.Create.Request.Data>({
+    resolver: zodResolver(ApiValidation.Admin.Item.Create.Request.Data),
     defaultValues: {
       name: "",
       description: "",
@@ -41,7 +41,7 @@ export default function CreateItemForm({
 
   const { files, setFiles, preparePayload, resetFiles } = useFileUpload();
 
-  const handleFormSubmit = async (data: ItemAPI.Admin.CreateItemRequest) => {
+  const handleFormSubmit = async (data: ApiType.Admin.Item.Create.Request.Data) => {
     try {
       const payload = preparePayload(data);
       await onSubmit(payload);

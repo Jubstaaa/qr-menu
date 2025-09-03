@@ -1,13 +1,13 @@
 "use client";
 
-import { MenuAPI } from "@qr-menu/shared-types";
 import { Utensils } from "lucide-react";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/react";
+import { ApiType } from "@qr-menu/shared-types";
 
 export default function Header({
   menu,
 }: {
-  menu: MenuAPI.Public.GetMenuBySubdomainResponse;
+  menu: ApiType.Public.Menu.Get.Response;
 }) {
   return (
     <Navbar

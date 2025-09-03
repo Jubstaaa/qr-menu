@@ -4,7 +4,7 @@ import { z } from "zod";
 export const Update = {
   Request: {
     Data: z.object({
-      restaurant_name: z.string().min(1, "Restoran adı zorunludur").optional(),
+      restaurant_name: z.string().min(1, "Restoran adı zorunludur"),
       restaurant_description: z.string().optional(),
       restaurant_address: z.string().optional(),
       restaurant_phone: z.string().optional(),

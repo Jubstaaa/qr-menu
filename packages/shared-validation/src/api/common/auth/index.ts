@@ -1,13 +1,3 @@
-import { Login } from "./login";
-import { Register } from "./register";
-import { Logout } from "./logout";
-import { CheckAuth } from "./checkAuth";
-// Export all schemas
-
-// Create apiValidation object
-export const Auth = {
-  Login,
-  Register,
-  Logout,
-  CheckAuth,
-};
+export { CheckAuth } from "./checkAuth";
+export { Login } from "./login";
+export { Register } from "./register";

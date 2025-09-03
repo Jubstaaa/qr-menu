@@ -6,4 +6,4 @@ export const register = (data: ApiType.Common.Auth.Register.Request.Data) =>
   apiClient.post<
     ApiType.Common.Auth.Register.Response,
     ApiType.Common.Auth.Register.Request.Data
-  >(ENDPOINTS.COMMON.AUTH.REGISTER, data);
+  >(ENDPOINTS.AUTH.REGISTER, data);

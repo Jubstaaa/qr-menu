@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useDisclosure } from "@heroui/react";
-import { CategoryAPI, ItemAPI } from "@qr-menu/shared-types";
 import {
   useCategoriesQuery,
   useCreateCategoryMutation,
@@ -13,18 +12,19 @@ import {
   useReorderItemsInCategoryMutation,
 } from "./api";
 import { useQueryClient } from "@tanstack/react-query";
+import { ApiType } from "@qr-menu/shared-types";
 
 export const useMenuManagement = () => {
   const { data: categories = [], isLoading: loading } = useCategoriesQuery();
   const categoriesArray = Array.isArray(categories) ? categories : [];
   const [selectedCategory, setSelectedCategory] = useState<
-    CategoryAPI.Admin.GetAllCategoriesResponse[0] | null
+    ApiType.Admin.Category.GetAll.Response[0] | null
   >(null);
   const [editingCategory, setEditingCategory] = useState<
-    CategoryAPI.Admin.GetAllCategoriesResponse[0] | null
+    ApiType.Admin.Category.GetAll.Response[0] | null
   >(null);
   const [editingItem, setEditingItem] = useState<
-    CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0] | null
+    ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0] | null
   >(null);
   const [deleteTarget, setDeleteTarget] = useState<{
     type: "category" | "item";
@@ -67,8 +67,8 @@ export const useMenuManagement = () => {
     category: {
       submit: async (
         data:
-          | CategoryAPI.Admin.CreateCategoryRequest
-          | (CategoryAPI.Admin.UpdateCategoryRequest & {
+          | ApiType.Admin.Category.Create.Request.Data
+          | (ApiType.Admin.Category.Update.Request.Data & {
               file?: File;
               image_url?: string;
             })
@@ -77,14 +77,14 @@ export const useMenuManagement = () => {
           if (editingCategory) {
             await updateCategoryMutation.mutateAsync({
               id: editingCategory.id,
-              data: data as CategoryAPI.Admin.UpdateCategoryRequest & {
+              data: data as ApiType.Admin.Category.Update.Request.Data & {
                 file?: File;
                 image_url?: string;
               },
             });
           } else {
             await createCategoryMutation.mutateAsync(
-              data as CategoryAPI.Admin.CreateCategoryRequest & {
+              data as ApiType.Admin.Category.Create.Request.Data & {
                 file?: File;
                 image_url?: string;
               }
@@ -96,11 +96,11 @@ export const useMenuManagement = () => {
           console.error("Kategori kaydedilirken hata:", err);
         }
       },
-      edit: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => {
+      edit: (category: ApiType.Admin.Category.GetAll.Response[0]) => {
         setEditingCategory(category);
         categoryModal.onOpen();
       },
-      delete: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => {
+      delete: (category: ApiType.Admin.Category.GetAll.Response[0]) => {
         setDeleteTarget({
           type: "category",
           id: category.id,
@@ -109,7 +109,7 @@ export const useMenuManagement = () => {
         deleteModal.onOpen();
       },
       reorder: async (
-        reorderedCategories: CategoryAPI.Admin.GetAllCategoriesResponse
+        reorderedCategories: ApiType.Admin.Category.GetAll.Response
       ) => {
         try {
           const currentCategories = categoriesArray;
@@ -160,7 +160,7 @@ export const useMenuManagement = () => {
     // Item handlers
     item: {
       submit: async (
-        data: ItemAPI.Admin.CreateItemRequest & {
+        data: ApiType.Admin.Item.Create.Request.Data & {
           file?: File;
           image_url?: string;
         }
@@ -181,19 +181,19 @@ export const useMenuManagement = () => {
         }
       },
       edit: (
-        item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+        item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
       ) => {
         setEditingItem(item);
         itemModal.onOpen();
       },
       delete: (
-        item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+        item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
       ) => {
         setDeleteTarget({ type: "item", id: item.id, name: item.name });
         deleteModal.onOpen();
       },
       reorder: async (
-        reorderedItems: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"]
+        reorderedItems: ApiType.Admin.Category.GetAll.Response[0]["menu_items"]
       ) => {
         if (!selectedCategory) return;
 
@@ -271,7 +271,7 @@ export const useMenuManagement = () => {
   // Utility functions
   const getItemsByCategory = (
     categoryId: string
-  ): CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"] => {
+  ): ApiType.Admin.Category.GetAll.Response[0]["menu_items"] => {
     const category = categoriesArray.find((c: any) => c.id === categoryId);
     return (category as any)?.menu_items || [];
   };

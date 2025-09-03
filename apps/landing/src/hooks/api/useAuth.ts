@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { authApi } from "@qr-menu/shared-utils";
-import { AuthAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
+import { apiUtils } from "@qr-menu/shared-utils";
 
 // Auth Query Hook
 export const useAuthQuery = () => {
-  return useQuery<AuthAPI.CheckAuthResponse, any>({
+  return useQuery<ApiType.Common.Auth.CheckAuth.Response>({
     queryKey: ["auth"],
     queryFn: async () => {
-      const response = await authApi.getCurrentUser();
-      return response;
+      const response = await apiUtils.common.auth.checkAuth();
+      return response.data;
     },
     retry: false,
   });
@@ -18,13 +18,20 @@ export const useAuthQuery = () => {
 export const useLoginMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<AuthAPI.LoginResponse, any, AuthAPI.LoginRequest>({
-    mutationFn: async (data: AuthAPI.LoginRequest) => {
-      const response = await authApi.login(data);
-      return response;
+  return useMutation<
+    ApiType.Common.Auth.Login.Response,
+    any,
+    ApiType.Common.Auth.Login.Request.Data
+  >({
+    mutationFn: async (data: ApiType.Common.Auth.Login.Request.Data) => {
+      const response = await apiUtils.common.auth.login(data);
+      return response.data;
     },
-    onSuccess: (response: AuthAPI.LoginResponse) => {
-      queryClient.setQueryData<AuthAPI.LoginResponse>(["auth"], response);
+    onSuccess: (data: ApiType.Common.Auth.Login.Response) => {
+      queryClient.setQueryData<ApiType.Common.Auth.Login.Response>(
+        ["auth"],
+        data
+      );
     },
   });
 };
@@ -33,13 +40,20 @@ export const useLoginMutation = () => {
 export const useRegisterMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<AuthAPI.RegisterResponse, any, AuthAPI.RegisterRequest>({
-    mutationFn: async (data: AuthAPI.RegisterRequest) => {
-      const response = await authApi.register(data);
-      return response;
+  return useMutation<
+    ApiType.Common.Auth.Register.Response,
+    any,
+    ApiType.Common.Auth.Register.Request.Data
+  >({
+    mutationFn: async (data: ApiType.Common.Auth.Register.Request.Data) => {
+      const response = await apiUtils.common.auth.register(data);
+      return response.data;
     },
-    onSuccess: (response: AuthAPI.RegisterResponse) => {
-      queryClient.setQueryData<AuthAPI.RegisterResponse>(["auth"], response);
+    onSuccess: (data: ApiType.Common.Auth.Register.Response) => {
+      queryClient.setQueryData<ApiType.Common.Auth.Register.Response>(
+        ["auth"],
+        data
+      );
     },
   });
 };
@@ -48,13 +62,16 @@ export const useRegisterMutation = () => {
 export const useLogoutMutation = () => {
   const queryClient = useQueryClient();
 
-  return useMutation<AuthAPI.LogoutResponse, any, void>({
+  return useMutation({
     mutationFn: async () => {
-      const response = await authApi.logout();
+      const response = await apiUtils.common.auth.logout();
       return response;
     },
     onSuccess: () => {
-      queryClient.setQueryData<AuthAPI.LoginResponse | null>(["auth"], null);
+      queryClient.setQueryData<ApiType.Common.Auth.Login.Response | null>(
+        ["auth"],
+        null
+      );
     },
   });
 };

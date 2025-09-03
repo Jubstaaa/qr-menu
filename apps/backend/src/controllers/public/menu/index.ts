@@ -1,2 +1,0 @@
-export { getMenuBySubdomain } from "./get";
-

@@ -1,7 +1,3 @@
-import { GetBySlug } from "./getBySlug";
-// Export all schemas
-
-// Create apiValidation object
-export const Category = {
-  GetBySlug,
-};
+export { GetBySlug } from "./getBySlug";
+export { Get } from "./get";
+export { GetItemsByCategory } from "./getItemsByCategory";

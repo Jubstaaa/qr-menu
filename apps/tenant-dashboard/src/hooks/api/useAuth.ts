@@ -1,11 +1,20 @@
 import { useMutation } from "@tanstack/react-query";
-import { AuthAPI } from "@qr-menu/shared-types";
-import { authApi } from "@qr-menu/shared-utils";
+import { ApiType } from "@qr-menu/shared-types";
+import { apiUtils } from "@qr-menu/shared-utils";
 
 export const useLoginMutation = () => {
   return useMutation({
-    mutationFn: async (credentials: AuthAPI.LoginRequest) => {
-      const response = await authApi.login(credentials);
+    mutationFn: async (credentials: ApiType.Common.Auth.Login.Request.Data) => {
+      const response = await apiUtils.common.auth.login(credentials);
+      return response;
+    },
+  });
+};
+
+export const useLogoutMutation = () => {
+  return useMutation({
+    mutationFn: async () => {
+      const response = await apiUtils.common.auth.logout();
       return response;
     },
   });

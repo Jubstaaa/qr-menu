@@ -1,13 +1,6 @@
-import { create } from "./create";
-import { update } from "./update";
-import { remove } from "./delete";
-import { getAll } from "./getAll";
-import { getById } from "./getById";
-
-export const item = {
-  getAll,
-  create,
-  update,
-  remove,
-  getById,
-};
+export { update } from "./update";
+export { create } from "./create";
+export { getAll } from "./getAll";
+export { getById } from "./getById";
+export { remove as delete } from "./delete";
+export { reorder } from "./reorder";

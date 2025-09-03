@@ -15,7 +15,7 @@ This project follows a **monorepo** structure using **Turborepo** and **pnpm wor
 ```
 qr-menu/
 ├── apps/                          # Application packages
-│   ├── backend/                   # Express.js API server
+│   ├── backend/                   # NestJS API server
 │   ├── landing/                   # Marketing landing page
 │   ├── tenant/                    # Customer-facing menu app (microfrontend)
 │   └── tenant-dashboard/          # Restaurant management dashboard (microfrontend)
@@ -32,7 +32,7 @@ qr-menu/
 
 ### Backend API (`apps/backend`)
 
-- **Framework**: Express.js with TypeScript
+- **Framework**: NestJS with TypeScript
 - **Database**: Supabase (PostgreSQL)
 - **Features**: RESTful API, authentication, file uploads, menu management
 - **Port**: Configurable (default: 3000)
@@ -164,7 +164,7 @@ qr-menu/
 
 ### Backend
 
-- **Express.js**: ^4.18.2
+- **NestJS**: ^10.x
 - **Supabase**: ^2.56.0
 - **PostgreSQL**: Database
 - **Multer**: File uploads
@@ -226,7 +226,7 @@ pnpm dev
 #### Start specific applications
 
 ```bash
-# Backend only
+# Backend (NestJS) only
 pnpm --filter @qrmenu/backend dev
 
 # Landing page only

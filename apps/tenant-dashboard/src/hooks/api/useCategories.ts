@@ -1,13 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiUtils } from "@qr-menu/shared-utils";
-import { CategoryAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
+import { apiUtils } from "@qr-menu/shared-utils";
 
 export const useCategoriesQuery = () => {
   return useQuery({
     queryKey: ["categories"],
-    queryFn: async (): Promise<CategoryAPI.Admin.GetAllCategoriesResponse> => {
-      const response = await adminCategoryApi.getCategories();
-      return response;
+    queryFn: async (): Promise<ApiType.Admin.Category.GetAll.Response> => {
+      const response = await apiUtils.admin.category.getAll();
+      return response.data;
     },
   });
 };
@@ -17,15 +17,15 @@ export const useCreateCategoryMutation = () => {
 
   return useMutation({
     mutationFn: async (
-      data: CategoryAPI.Admin.CreateCategoryRequest & { file?: File | null }
-    ): Promise<CategoryAPI.Admin.CreateCategoryResponse> => {
-      const response = await ApiUtils.Admin.Category.Category.create(data);
-      return response;
+      data: ApiType.Admin.Category.Create.Request.Data & { file?: File | null }
+    ): Promise<ApiType.Admin.Category.Create.Response> => {
+      const response = await apiUtils.admin.category.create(data);
+      return response.data;
     },
-    onSuccess: (newCategory: CategoryAPI.Admin.CreateCategoryResponse) => {
+    onSuccess: (newCategory: ApiType.Admin.Category.Create.Response) => {
       queryClient.setQueryData(
         ["categories"],
-        (prev: CategoryAPI.Admin.GetAllCategoriesResponse | undefined) => [
+        (prev: ApiType.Admin.Category.GetAll.Response | undefined) => [
           ...(prev || []),
           newCategory,
         ]
@@ -43,18 +43,18 @@ export const useUpdateCategoryMutation = () => {
       data,
     }: {
       id: string;
-      data: CategoryAPI.Admin.UpdateCategoryRequest & { file?: File | null };
-    }): Promise<CategoryAPI.Admin.UpdateCategoryResponse> => {
-      const response = await adminCategoryApi.updateCategory(id, data);
-      return response;
+      data: ApiType.Admin.Category.Update.Request.Data & { file?: File | null };
+    }): Promise<ApiType.Admin.Category.Update.Response> => {
+      const response = await apiUtils.admin.category.update({ id }, data);
+      return response.data;
     },
     onSuccess: (
-      updatedCategory: CategoryAPI.Admin.UpdateCategoryResponse,
+      updatedCategory: ApiType.Admin.Category.Update.Response,
       variables
     ) => {
       queryClient.setQueryData(
         ["categories"],
-        (prev: CategoryAPI.Admin.GetAllCategoriesResponse | undefined) =>
+        (prev: ApiType.Admin.Category.GetAll.Response | undefined) =>
           (prev || []).map((category) =>
             category.id === variables.id ? updatedCategory : category
           )
@@ -68,13 +68,13 @@ export const useDeleteCategoryMutation = () => {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      const response = await adminCategoryApi.deleteCategory(id);
+      const response = await apiUtils.admin.category.delete({ id });
       return response;
     },
     onSuccess: (_, variables) => {
       queryClient.setQueryData(
         ["categories"],
-        (prev: CategoryAPI.Admin.GetAllCategoriesResponse | undefined) =>
+        (prev: ApiType.Admin.Category.GetAll.Response | undefined) =>
           (prev || []).filter((category) => category.id !== variables)
       );
     },
@@ -85,7 +85,7 @@ export const useReorderCategoriesMutation = () => {
     mutationFn: async (
       changes: Array<{ id: string; newSortOrder: number }>
     ) => {
-      const response = await adminCategoryApi.reorderCategories(changes);
+      const response = await apiUtils.admin.category.reorder({ changes });
       return response;
     },
   });

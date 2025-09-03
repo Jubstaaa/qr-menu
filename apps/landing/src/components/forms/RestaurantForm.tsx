@@ -7,14 +7,14 @@ import {
 import { useRestaurantForm } from "../../hooks/ui/useRestaurantForm";
 import { useCreateMenuMutation } from "../../hooks/api/useCreateMenu";
 import { useModalContext } from "../../contexts/ModalContext";
-import { MenuAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
 
 export const RestaurantForm: React.FC = () => {
   const form = useRestaurantForm();
   const createMenuMutation = useCreateMenuMutation();
   const { closeCreateMenuModal } = useModalContext();
 
-  const onSubmit = async (data: MenuAPI.Admin.CreateMenuRequest) => {
+  const onSubmit = async (data: ApiType.Admin.Menu.Create.Request.Data) => {
     try {
       await createMenuMutation.mutateAsync(data);
       form.reset();

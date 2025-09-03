@@ -3,6 +3,6 @@ import { ApiType } from "@qr-menu/shared-types";
 import { apiClient } from "../../api-client";
 
 export const getAll = () =>
-  apiClient.get<ApiType.Admin.Category.GetAll.Response[]>(
+  apiClient.get<ApiType.Admin.Category.GetAll.Response>(
     ENDPOINTS.ADMIN.CATEGORY.GET_ALL
   );

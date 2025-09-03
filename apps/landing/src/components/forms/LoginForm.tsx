@@ -6,9 +6,10 @@ import {
   PasswordInput,
   SubmitButton,
 } from "@qr-menu/shared-components";
-import { useLoginForm, LoginFormData } from "../../hooks/ui/useLoginForm";
+import { useLoginForm } from "../../hooks/ui/useLoginForm";
 import { useLoginMutation } from "../../hooks/api/useAuth";
 import { useModalContext } from "../../contexts/ModalContext";
+import { ApiType } from "@qr-menu/shared-types";
 
 interface LoginFormProps {}
 
@@ -17,7 +18,7 @@ export const LoginForm: React.FC<LoginFormProps> = () => {
   const loginMutation = useLoginMutation();
   const { closeAuthModal } = useModalContext();
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: ApiType.Common.Auth.Login.Request.Data) => {
     try {
       await loginMutation.mutateAsync(data);
       form.reset();

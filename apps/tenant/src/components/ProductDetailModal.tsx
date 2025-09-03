@@ -12,10 +12,10 @@ import {
   Chip,
 } from "@heroui/react";
 import { X, Clock, Flame, ChefHat, AlertTriangle, Info } from "lucide-react";
-import { ItemAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
 
 interface ProductDetailModalProps {
-  product: ItemAPI.Public.GetActiveItemsBySubdomainResponse[0];
+  product: ApiType.Public.Category.GetItemsByCategory.Response[0];
   isOpen: boolean;
   onClose: () => void;
 }
@@ -121,7 +121,7 @@ export default function ProductDetailModal({
               )}
 
               {/* Ingredients */}
-              {product.ingredients && (
+              {/* {product.ingredients && (
                 <div className="mb-4">
                   <h3 className="text-sm font-semibold text-gray-900 mb-2">
                     Malzemeler
@@ -130,7 +130,7 @@ export default function ProductDetailModal({
                     {product.ingredients}
                   </p>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
 
@@ -161,7 +161,7 @@ export default function ProductDetailModal({
           </div>
 
           {/* Allergens */}
-          {product.allergens && typeof product.allergens === "string" && (
+          {/* {product.allergens && typeof product.allergens === "string" && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Alerjenler
@@ -181,10 +181,10 @@ export default function ProductDetailModal({
                 )}
               </div>
             </div>
-          )}
+          )} */}
 
           {/* Nutrition Info */}
-          {product.nutrition_info &&
+          {/* {product.nutrition_info &&
             Object.keys(product.nutrition_info).length > 0 && (
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">
@@ -208,7 +208,7 @@ export default function ProductDetailModal({
                   )}
                 </div>
               </div>
-            )}
+            )} */}
         </ModalBody>
 
         <ModalFooter>

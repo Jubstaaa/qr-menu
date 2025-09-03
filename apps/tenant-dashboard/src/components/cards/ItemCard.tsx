@@ -13,15 +13,15 @@ import {
   DropdownItem,
 } from "@heroui/react";
 import { Edit, Trash, MoreVertical, Star, Clock, Move } from "lucide-react";
-import { CategoryAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
 
 interface ItemCardProps {
-  item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0];
+  item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0];
   onEdit: (
-    item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
   ) => void;
   onDelete: (
-    item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
   ) => void;
   dragHandleProps?: any;
 }
@@ -121,7 +121,7 @@ export default function ItemCard({
           </div>
           <div className="text-right">
             <div className="text-lg font-bold text-primary">
-              ₺{item.price.toFixed(2)}
+              ₺{item.price?.toFixed(2) || 0}
             </div>
           </div>
         </div>

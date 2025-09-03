@@ -6,4 +6,4 @@ export const login = (data: ApiType.Common.Auth.Login.Request.Data) =>
   apiClient.post<
     ApiType.Common.Auth.Login.Response,
     ApiType.Common.Auth.Login.Request.Data
-  >(ENDPOINTS.COMMON.AUTH.LOGIN, data);
+  >(ENDPOINTS.AUTH.LOGIN, data);

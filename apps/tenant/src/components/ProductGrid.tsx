@@ -3,19 +3,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import ProductDetailModal from "./ProductDetailModal";
-import { ItemAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
 
-type MenuItem = ItemAPI.Public.GetActiveItemsBySubdomainResponse[0];
+type Item = ApiType.Public.Category.GetItemsByCategory.Response[0];
 
-export default function ProductGrid({
-  products,
-}: {
-  products: ItemAPI.Public.GetActiveItemsBySubdomainResponse;
-}) {
-  const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
+export default function ProductGrid({ items }: { items: Item[] }) {
+  const [selectedProduct, setSelectedProduct] = useState<Item | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const openProductModal = (product: MenuItem) => {
+  const openProductModal = (product: Item) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
@@ -25,7 +21,7 @@ export default function ProductGrid({
     setSelectedProduct(null);
   };
 
-  if (!products || products.length === 0) {
+  if (!items || items.length === 0) {
     return (
       <div className="text-center py-12">
         <div className="text-6xl mb-4">🍽️</div>
@@ -42,7 +38,7 @@ export default function ProductGrid({
   return (
     <>
       <div className="grid grid-cols-1 gap-6">
-        {products.map((item) => (
+        {items.map((item) => (
           <div
             key={item.id}
             className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden hover:shadow-lg active:scale-98 transition-all duration-200 cursor-pointer group"

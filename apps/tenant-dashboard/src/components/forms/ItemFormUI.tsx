@@ -22,7 +22,7 @@ import {
   NumberInput,
   TextareaInput,
 } from "@qr-menu/shared-components";
-import { CategoryAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
 
 interface ItemFormUIProps {
   isOpen: boolean;
@@ -32,7 +32,7 @@ interface ItemFormUIProps {
   submitButtonIcon: string;
   files: FileItem[];
   setFiles: React.Dispatch<React.SetStateAction<FileItem[]>>;
-  categories: CategoryAPI.Admin.GetAllCategoriesResponse;
+  categories: ApiType.Admin.Category.GetAll.Response;
 }
 
 export default function ItemFormUI({

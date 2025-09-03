@@ -1,23 +1,23 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminMenuApi } from "@qr-menu/shared-utils";
-import { MenuAPI, AuthAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
+import { apiUtils } from "@qr-menu/shared-utils";
 
 export const useCreateMenuMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
-    MenuAPI.Admin.CreateMenuResponse,
+    ApiType.Admin.Menu.Create.Response,
     any,
-    MenuAPI.Admin.CreateMenuRequest
+    ApiType.Admin.Menu.Create.Request.Data
   >({
-    mutationFn: async (data: MenuAPI.Admin.CreateMenuRequest) => {
-      const response = await adminMenuApi.createMenu(data);
-      return response;
+    mutationFn: async (data: ApiType.Admin.Menu.Create.Request.Data) => {
+      const response = await apiUtils.admin.menu.create(data);
+      return response.data;
     },
     onSuccess: (response) => {
-      queryClient.setQueryData<AuthAPI.LoginResponse>(
+      queryClient.setQueryData<ApiType.Admin.Menu.Create.Response>(
         ["auth"],
-        (oldData: AuthAPI.LoginResponse | null) => {
+        (oldData: ApiType.Admin.Menu.Create.Response | null) => {
           if (!oldData) return null;
           return {
             ...oldData,

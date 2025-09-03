@@ -9,7 +9,7 @@ import {
 import { useRegisterForm } from "../../hooks/ui/useRegisterForm";
 import { useRegisterMutation } from "../../hooks/api/useAuth";
 import { useModalContext } from "../../contexts/ModalContext";
-import { AuthAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
 
 interface RegisterFormProps {}
 
@@ -18,7 +18,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = () => {
   const registerMutation = useRegisterMutation();
   const { closeAuthModal } = useModalContext();
 
-  const onSubmit = async (data: AuthAPI.RegisterRequest) => {
+  const onSubmit = async (data: ApiType.Common.Auth.Register.Request.Data) => {
     try {
       await registerMutation.mutateAsync(data);
       form.reset();

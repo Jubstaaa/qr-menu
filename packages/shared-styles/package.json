@@ -13,7 +13,7 @@
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "@heroui/react": "^2.8.2",
+    "@heroui/react": "^2.8.3",
     "@tailwindcss/cli": "^4.1.12",
     "tailwindcss": "^4.1.12"
   },

@@ -1,13 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminItemApi } from "@qr-menu/shared-utils";
-import { ItemAPI } from "@qr-menu/shared-types";
+import { ApiType } from "@qr-menu/shared-types";
+import { apiUtils } from "@qr-menu/shared-utils";
 
 export const useItemsQuery = () => {
   return useQuery({
     queryKey: ["items"],
-    queryFn: async (): Promise<ItemAPI.Admin.GetAllItemsResponse> => {
-      const response = await adminItemApi.getAllItems();
-      return response;
+    queryFn: async (): Promise<ApiType.Admin.Item.GetAll.Response> => {
+      const response = await apiUtils.admin.item.getAll();
+      return response.data as unknown as ApiType.Admin.Item.GetAll.Response;
     },
   });
 };
@@ -15,9 +15,11 @@ export const useItemsQuery = () => {
 export const useItemsByCategoryQuery = (categoryId: string) => {
   return useQuery({
     queryKey: ["items", categoryId],
-    queryFn: async (): Promise<ItemAPI.Admin.GetAllItemsResponse> => {
-      const response = await adminItemApi.getAllItems();
-      return response.filter((item) => item.category_id === categoryId);
+    queryFn: async (): Promise<ApiType.Admin.Item.GetAll.Response> => {
+      const response = await apiUtils.admin.item.getAll();
+      return response.data.filter(
+        (item: any) => item.category_id === categoryId
+      ) as unknown as ApiType.Admin.Item.GetAll.Response;
     },
     enabled: !!categoryId,
   });
@@ -28,12 +30,12 @@ export const useCreateItemMutation = () => {
 
   return useMutation({
     mutationFn: async (
-      data: ItemAPI.Admin.CreateItemRequest & { file?: File | null }
-    ): Promise<ItemAPI.Admin.CreateItemResponse> => {
-      const response = await adminItemApi.createItem(data);
-      return response;
+      data: ApiType.Admin.Item.Create.Request.Data & { file?: File | null }
+    ): Promise<ApiType.Admin.Item.Create.Response> => {
+      const response = await apiUtils.admin.item.create(data);
+      return response.data;
     },
-    onSuccess: (newItem: ItemAPI.Admin.CreateItemResponse, variables) => {
+    onSuccess: (newItem: ApiType.Admin.Item.Create.Response, variables) => {
       queryClient.setQueryData(["categories"], (prev: any) =>
         prev.map((category: any) => {
           if (category.id === variables.category_id) {
@@ -58,12 +60,12 @@ export const useUpdateItemMutation = () => {
       data,
     }: {
       id: string;
-      data: ItemAPI.Admin.UpdateItemRequest & { file?: File | null };
-    }): Promise<ItemAPI.Admin.UpdateItemResponse> => {
-      const response = await adminItemApi.updateItem(id, data);
-      return response;
+      data: ApiType.Admin.Item.Update.Request.Data & { file?: File | null };
+    }): Promise<ApiType.Admin.Item.Update.Response> => {
+      const response = await apiUtils.admin.item.update({ id }, data);
+      return response.data;
     },
-    onSuccess: (updatedItem: ItemAPI.Admin.UpdateItemResponse, variables) => {
+    onSuccess: (updatedItem: ApiType.Admin.Item.Update.Response, variables) => {
       queryClient.setQueryData(["categories"], (prev: any) =>
         prev.map((category: any) => ({
           ...category,
@@ -83,9 +85,9 @@ export const useDeleteItemMutation = () => {
   return useMutation({
     mutationFn: async (
       id: string
-    ): Promise<ItemAPI.Admin.DeleteItemResponse> => {
-      const response = await adminItemApi.deleteItem(id);
-      return response;
+    ): Promise<ApiType.Admin.Item.Delete.Response> => {
+      const response = await apiUtils.admin.item.delete({ id });
+      return response.data as ApiType.Admin.Item.Delete.Response;
     },
     onSuccess: (_, variables) => {
       queryClient.setQueryData(["categories"], (prev: any) =>
@@ -104,9 +106,11 @@ export const useReorderItemsInCategoryMutation = () => {
   return useMutation({
     mutationFn: async (
       changes: Array<{ id: string; newSortOrder: number }>
-    ): Promise<ItemAPI.Admin.ReorderItemsResponse> => {
-      const response = await adminItemApi.reorderItemsInCategory(changes);
-      return response;
+    ): Promise<ApiType.Admin.Item.Reorder.Response> => {
+      const response = await apiUtils.admin.item.reorder({
+        itemIds: changes.map((item) => item.id),
+      });
+      return response.data as ApiType.Admin.Item.Reorder.Response;
     },
   });
 };

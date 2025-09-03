@@ -10,7 +10,10 @@ export const Login = {
     Params: z.object({}),
   },
   Response: z.object({
-    token: z.string(),
+    session: z.object({
+      access_token: z.string(),
+      expires_in: z.number(),
+    }),
     user: z.object({
       id: z.string(),
       email: z.string(),

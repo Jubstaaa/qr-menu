@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { ItemAPI, CategoryAPI } from "@qr-menu/shared-types";
 import CreateItemForm from "./CreateItemForm";
+import { ApiType } from "@qr-menu/shared-types";
 import UpdateItemForm from "./UpdateItemForm";
 
 interface ItemFormProps {
@@ -10,9 +10,9 @@ interface ItemFormProps {
   onClose: () => void;
   onSubmit: (data: any) => Promise<void>;
   editingItem?:
-    | CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+    | ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
     | null;
-  categories: CategoryAPI.Admin.GetAllCategoriesResponse;
+  categories: ApiType.Admin.Category.GetAll.Response;
   selectedCategoryId?: string;
 }
 

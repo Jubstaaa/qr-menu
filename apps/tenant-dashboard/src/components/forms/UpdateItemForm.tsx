@@ -1,21 +1,24 @@
 "use client";
 
 import React from "react";
-import { ItemAPI, CategoryAPI } from "@qr-menu/shared-types";
-import { updateItemRequestSchema } from "@qr-menu/shared-validation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ItemFormUI from "./ItemFormUI";
 import { useFileUpload, FormProvider } from "@qr-menu/shared-components";
+import { ApiType } from "@qr-menu/shared-types";
+import { ApiValidation } from "@qr-menu/shared-validation";
 
 interface UpdateItemFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: ItemAPI.Admin.UpdateItemRequest & { file?: File; image_url?: string }
+    data: ApiType.Admin.Item.Update.Request.Data & {
+      file?: File;
+      image_url?: string;
+    }
   ) => Promise<void>;
-  editingItem: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0];
-  categories: CategoryAPI.Admin.GetAllCategoriesResponse;
+  editingItem: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0];
+  categories: ApiType.Admin.Category.GetAll.Response;
 }
 
 export default function UpdateItemForm({
@@ -25,12 +28,12 @@ export default function UpdateItemForm({
   editingItem,
   categories,
 }: UpdateItemFormProps) {
-  const methods = useForm<ItemAPI.Admin.UpdateItemRequest>({
-    resolver: zodResolver(updateItemRequestSchema),
+  const methods = useForm<ApiType.Admin.Item.Update.Request.Data>({
+    resolver: zodResolver(ApiValidation.Admin.Item.Update.Request.Data),
     defaultValues: {
       name: editingItem.name,
       description: editingItem.description || "",
-      price: editingItem.price,
+      price: editingItem.price || 0,
       is_available: editingItem.is_available ?? true,
       is_popular: editingItem.is_popular ?? false,
       is_chef_special: editingItem.is_chef_special ?? false,
@@ -43,7 +46,9 @@ export default function UpdateItemForm({
     editingItem.image_url
   );
 
-  const handleFormSubmit = async (data: ItemAPI.Admin.UpdateItemRequest) => {
+  const handleFormSubmit = async (
+    data: ApiType.Admin.Item.Update.Request.Data
+  ) => {
     try {
       const payload = preparePayload(data);
       await onSubmit(payload);

@@ -1,40 +1,29 @@
-# Backend API
+# Backend (NestJS)
 
-Express.js backend API for the QR Menu Management System.
+NestJS-based API server. Provides authentication, admin endpoints for menu/category/item management, and public endpoints. Uses Supabase (PostgreSQL + Auth + Storage).
 
 ## Features
 
-- **Authentication**: Supabase auth integration
-- **Admin APIs**: Category, item, and menu management
-- **Public APIs**: Public menu access
-- **File Upload**: Image upload support
-- **Database**: Supabase PostgreSQL integration
+- Auth: Supabase Auth
+- Admin API: Menu, category, and item CRUD + reorder
+- Public API: Read-only menu, category, and item endpoints
+- Validation: Zod (shared-validation)
+- Types: End-to-end type safety via shared-types
 
-## Tech Stack
-
-- **Runtime**: Node.js with Express.js
-- **Language**: TypeScript
-- **Database**: Supabase (PostgreSQL)
-- **Auth**: Supabase Auth
-- **File Storage**: Supabase Storage
-- **Validation**: Zod schemas
-
-## Getting Started
-
-### Prerequisites
+## Requirements
 
 - Node.js 18+
-- pnpm
+- pnpm 8+
 - Supabase project
 
-### Installation
+## Setup
 
 ```bash
 cd apps/backend
 pnpm install
 ```
 
-### Environment Variables
+## Environment Variables
 
 Create a `.env` file:
 
@@ -42,124 +31,82 @@ Create a `.env` file:
 SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-PORT=3001
 NODE_ENV=development
 ```
 
-### Development
+Additional envs may exist at the repository root (e.g., for shared packages).
+
+## Run
+
+Development:
 
 ```bash
-# Start development server
 pnpm dev
+```
 
-# Build for production
+Production build and start:
+
+```bash
 pnpm build
-
-# Start production server
 pnpm start
 ```
 
-## API Structure
+## Scripts
 
-### Admin Routes
+- `pnpm dev`: Start dev server (watch)
+- `pnpm build`: Build for production
+- `pnpm start`: Run production build
+- `pnpm lint`: Lint code
+- `pnpm type-check`: Type check
 
-- `POST /api/admin/category` - Create category
-- `GET /api/admin/category` - Get all categories
-- `PUT /api/admin/category/:id` - Update category
-- `DELETE /api/admin/category/:id` - Delete category
-
-- `POST /api/admin/item` - Create item
-- `GET /api/admin/item` - Get all items
-- `PUT /api/admin/item/:id` - Update item
-- `DELETE /api/admin/item/:id` - Delete item
-
-- `POST /api/admin/menu` - Create menu
-- `GET /api/admin/menu` - Get current user's menu
-
-### Public Routes
-
-- `GET /api/public/menu/:subdomain` - Get menu by subdomain
-- `GET /api/public/category` - Get public categories
-- `GET /api/public/item` - Get public items
-
-### Auth Routes
-
-- `GET /api/auth/check` - Check authentication
-- `GET /api/auth/current-user` - Get current user
-- `GET /api/auth/user-menus` - Get user's menus
-
-## Database Schema
-
-The backend uses Supabase with the following main tables:
-
-- `menus` - Restaurant menus
-- `categories` - Menu categories
-- `items` - Menu items
-- `subscriptions` - User subscriptions
-
-## Middleware
-
-- **Auth Middleware**: JWT token validation
-- **Upload Middleware**: File upload handling
-- **Validation**: Request body validation with Zod
-
-## Development
-
-### Project Structure
+## Project Structure (overview)
 
 ```
 src/
-├── controllers/     # Route controllers
-├── middleware/      # Express middleware
-├── routes/          # API route definitions
-├── utils/           # Utility functions
-└── supabase/        # Database configuration
+├── common/               # Guards, interceptors, pipes, services
+├── modules/
+│   ├── admin/
+│   │   ├── menu/
+│   │   ├── category/
+│   │   └── item/
+│   ├── auth/
+│   └── public/
+├── app.module.ts
+└── main.ts
 ```
 
-### Adding New Routes
+## API Overview
 
-1. Create controller in `src/controllers/`
-2. Define route in `src/routes/`
-3. Add validation schema in `packages/shared-validation`
-4. Update types in `packages/shared-types`
+- Base URL: `/`
+- Admin endpoints require authentication.
 
-### Testing
+Example endpoints:
 
-```bash
-# Run tests
-pnpm test
+- Admin
+  - `POST /admin/category`
+  - `GET /admin/item`
+  - `POST /admin/item/reorder`
+  - `GET /admin/menu`
+- Public
+  - `GET /public/menu/:subdomain`
+  - `GET /public/category`
+- Auth
+  - `GET /auth/check`
 
-# Run tests in watch mode
-pnpm test:watch
-```
+See `packages/shared-types` and `packages/shared-validation` for exact request/response contracts and schemas.
+
+## Development Notes
+
+- When adding new endpoints, update `shared-validation` (Zod) and `shared-types` first.
+- Use `SupabaseService` to access the Supabase client in services.
+- Map database rows to shared-types consistently in service returns.
 
 ## Deployment
 
-### Production Build
-
-```bash
-pnpm build
-pnpm start
-```
-
-### Environment Variables
-
-Ensure all required environment variables are set in production:
-
-- `SUPABASE_URL`
-- `SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `NODE_ENV=production`
-- `PORT` (optional, defaults to 3001)
-
-## Contributing
-
-1. Follow the existing code structure
-2. Use TypeScript for all new code
-3. Add proper error handling
-4. Include input validation
-5. Update documentation
+- Build with `pnpm build`
+- Set required env variables in production
+- Keep Supabase credentials secure
 
 ## License
 
-MIT License - see main project README for details.
+MIT (see root README)

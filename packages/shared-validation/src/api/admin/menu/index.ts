@@ -1,11 +1,3 @@
-import { Create } from "./create";
-import { Update } from "./update";
-import { GetByUser } from "./getByUser";
-// Export all schemas
-
-// Create apiValidation object
-export const Menu = {
-  Create,
-  Update,
-  GetByUser,
-};
+export { Create } from "./create";
+export { Update } from "./update";
+export { Get } from "./get";

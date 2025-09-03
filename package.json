@@ -4,7 +4,7 @@
   "description": "Modern QR Menu Management System - Monorepo",
   "private": true,
   "scripts": {
-    "dev": "turbo run dev --concurrency 11",
+    "dev": "turbo run dev --parallel --concurrency 11",
     "dev:proxy": "microfrontends proxy --local-apps tenant tenant-dashboard",
     "build": "turbo run build",
     "test": "turbo run test",
@@ -12,6 +12,8 @@
     "clean": "turbo run clean",
     "type-check": "turbo run type-check",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "types:gen": "cd apps/backend && supabase gen types typescript --linked > ../../packages/shared-types/src/supabase-types.ts",
+    "migrate": "cd apps/backend && supabase db push",
     "prepare": "husky install"
   },
   "devDependencies": {

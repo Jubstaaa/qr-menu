@@ -1,20 +1,23 @@
 "use client";
 
 import React from "react";
-import { MenuAPI } from "@qr-menu/shared-types";
-import { updateMenuRequestSchema } from "@qr-menu/shared-validation";
+import { ApiType } from "@qr-menu/shared-types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import RestaurantFormUI from "./RestaurantFormUI";
 import { useFileUpload, FormProvider } from "@qr-menu/shared-components";
+import { ApiValidation } from "@qr-menu/shared-validation";
 
 interface UpdateRestaurantFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: MenuAPI.Admin.UpdateMenuRequest & { file?: File; image_url?: string }
+    data: ApiType.Admin.Menu.Update.Request.Data & {
+      file?: File;
+      image_url?: string;
+    }
   ) => Promise<void>;
-  editingRestaurant: MenuAPI.Admin.GetMenusByUserResponse;
+  editingRestaurant: ApiType.Admin.Menu.Get.Response;
 }
 
 export default function UpdateRestaurantForm({
@@ -23,8 +26,8 @@ export default function UpdateRestaurantForm({
   onSubmit,
   editingRestaurant,
 }: UpdateRestaurantFormProps) {
-  const methods = useForm<MenuAPI.Admin.UpdateMenuRequest>({
-    resolver: zodResolver(updateMenuRequestSchema),
+  const methods = useForm<ApiType.Admin.Menu.Update.Request.Data>({
+    resolver: zodResolver(ApiValidation.Admin.Menu.Update.Request.Data),
     defaultValues: {
       restaurant_name: editingRestaurant.restaurant_name,
       restaurant_description: editingRestaurant.restaurant_description || "",
@@ -43,7 +46,9 @@ export default function UpdateRestaurantForm({
     editingRestaurant.logo_url
   );
 
-  const handleFormSubmit = async (data: MenuAPI.Admin.UpdateMenuRequest) => {
+  const handleFormSubmit = async (
+    data: ApiType.Admin.Menu.Update.Request.Data
+  ) => {
     try {
       const payload = preparePayload(data);
       await onSubmit(payload);
@@ -54,16 +59,16 @@ export default function UpdateRestaurantForm({
   };
 
   return (
-    <FormProvider methods={methods} onSubmit={handleFormSubmit}>
-      <RestaurantFormUI
-        isOpen={isOpen}
-        onClose={onClose}
-        title="Restoran Düzenle"
-        submitButtonText="Güncelle"
-        submitButtonIcon="🔄"
-        files={files}
-        setFiles={setFiles}
-      />
-    </FormProvider>
+    <RestaurantFormUI
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Restoran Düzenle"
+      submitButtonText="Güncelle"
+      submitButtonIcon="🔄"
+      files={files}
+      setFiles={setFiles}
+      handleSubmit={handleFormSubmit}
+      methods={methods}
+    />
   );
 }

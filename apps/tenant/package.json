@@ -9,7 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@heroui/react": "^2.8.2",
+    "@heroui/react": "^2.8.3",
     "@qr-menu/shared-components": "workspace:*",
     "@qr-menu/shared-config": "workspace:*",
     "@qr-menu/shared-styles": "workspace:*",

@@ -10,15 +10,16 @@ import {
   NavbarItem,
 } from "@heroui/react";
 import { LogOut, QrCode } from "lucide-react";
-import { authApi } from "@qr-menu/shared-utils";
+import { useLogoutMutation } from "../hooks/api/useAuth";
 
 export default function DashboardNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const logoutMutation = useLogoutMutation();
 
   const handleLogout = async () => {
     try {
-      await authApi.logout();
+      await logoutMutation.mutateAsync();
       router.replace("/auth/login");
     } catch (error) {
       console.error("Logout error:", error);

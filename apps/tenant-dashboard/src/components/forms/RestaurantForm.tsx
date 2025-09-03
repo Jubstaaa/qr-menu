@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { MenuAPI } from "@qr-menu/shared-types";
 import UpdateRestaurantForm from "./UpdateRestaurantForm";
+import { ApiType } from "@qr-menu/shared-types";
 
 interface RestaurantFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => Promise<void>;
-  editingRestaurant: MenuAPI.Admin.GetMenusByUserResponse;
+  editingRestaurant: ApiType.Admin.Menu.Get.Response;
 }
 
 export default function RestaurantForm({

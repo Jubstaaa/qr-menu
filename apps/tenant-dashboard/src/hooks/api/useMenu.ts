@@ -1,23 +1,21 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { adminMenuApi, ApiUtils} from "@qr-menu/shared-utils";
-import { MenuAPI } from "@qr-menu/shared-types";
+import { apiUtils } from "@qr-menu/shared-utils";
+import { ApiType } from "@qr-menu/shared-types";
 
 export const useMenuQuery = () => {
   return useQuery({
     queryKey: ["menu"],
-    queryFn: async (): Promise<MenuAPI.Admin.GetMenusByUserResponse> => {
-      const response = await ApiUtils.Admin.Menu.getMenusByUser();
-      return response;
+    queryFn: async (): Promise<ApiType.Admin.Menu.Get.Response> => {
+      const response = await apiUtils.admin.menu.get();
+      return response.data;
     },
   });
 };
 
 export const useUpdateMenuMutation = () => {
   return useMutation({
-    mutationFn: async (
-      data: MenuAPI.Admin.UpdateMenuRequest & { file?: File | null }
-    ) => {
-      const response = await adminMenuApi.updateMenu(data);
+    mutationFn: async (data: ApiType.Admin.Menu.Update.Request.Data) => {
+      const response = await apiUtils.admin.menu.update(data);
       return response;
     },
   });

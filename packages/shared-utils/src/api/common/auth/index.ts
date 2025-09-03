@@ -1,11 +1,4 @@
-import { login } from "./login";
-import { register } from "./register";
-import { logout } from "./logout";
-import { checkAuth } from "./checkAuth";
-
-export const auth = {
-  login,
-  register,
-  logout,
-  checkAuth,
-};
+export { login } from "./login";
+export { register } from "./register";
+export { logout } from "./logout";
+export { checkAuth } from "./checkAuth";

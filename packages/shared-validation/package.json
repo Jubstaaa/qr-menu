@@ -10,12 +10,9 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "^4.1.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0"
-  },
-  "peerDependencies": {
-    "zod": "^3.22.4"
   }
 }

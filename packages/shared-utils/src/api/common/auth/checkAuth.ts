@@ -4,5 +4,5 @@ import { ENDPOINTS } from "@qr-menu/shared-config";
 
 export const checkAuth = () =>
   apiClient.get<ApiType.Common.Auth.CheckAuth.Response>(
-    ENDPOINTS.COMMON.AUTH.CHECK_AUTH
+    ENDPOINTS.AUTH.CHECK_AUTH
   );

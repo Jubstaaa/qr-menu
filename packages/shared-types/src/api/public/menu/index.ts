@@ -1,5 +1,5 @@
-import { GetBySubdomain as GetBySubdomainNamespace } from "./getBySubdomain";
+import { Get as GetNamespace } from "./get";
 
 export namespace Menu {
-  export import GetBySubdomain = GetBySubdomainNamespace;
+  export import Get = GetNamespace;
 }

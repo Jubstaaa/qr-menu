@@ -1,1 +1,0 @@
-export { getSubscription } from "./get";

@@ -4,14 +4,17 @@
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist/**/*"],
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "clean": "rm -rf dist"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "dotenv": "^16.3.1"
+    "@types/express": "^4.17.21",
+    "dotenv": "^16.3.1",
+    "typescript": "^5.0.0"
   }
 }

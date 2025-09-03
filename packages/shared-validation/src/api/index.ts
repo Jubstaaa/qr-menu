@@ -1,9 +1,9 @@
-import { Admin } from "./admin";
-import { Public } from "./public";
-import { Common } from "./common";
-// Export all schemas
+import * as Admin from "./admin";
+import * as Public from "./public";
+import * as Common from "./common";
 
-// Create apiValidation object
+export { Admin, Public, Common };
+
 export const ApiValidation = {
   Admin,
   Public,

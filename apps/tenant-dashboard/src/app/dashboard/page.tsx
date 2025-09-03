@@ -28,10 +28,9 @@ import { Loading } from "@qr-menu/shared-components";
 export default function DashboardPage() {
   const router = useRouter();
 
-  const { menu, subscription, loadingStates, modals, handlers } =
-    useDashboard();
+  const { menu, loadingStates, modals, handlers } = useDashboard();
 
-  if (loadingStates.menu || loadingStates.subscription) {
+  if (loadingStates.menu || loadingStates) {
     return <Loading size="lg" text="Dashboard yükleniyor..." />;
   }
 
@@ -60,7 +59,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {subscription && (
+      {/* {subscription && (
         <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
           <CardHeader className="pb-3">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
@@ -111,7 +110,7 @@ export default function DashboardPage() {
             </div>
           </CardBody>
         </Card>
-      )}
+      )} */}
 
       {menu && (
         <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">

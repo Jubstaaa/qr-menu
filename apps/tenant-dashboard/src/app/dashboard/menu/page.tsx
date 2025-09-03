@@ -3,7 +3,6 @@
 import React from "react";
 import { Button, Card, CardBody, CardHeader } from "@heroui/react";
 import { Plus } from "lucide-react";
-import { ItemAPI } from "@qr-menu/shared-types";
 
 import CategoryForm from "../../../components/forms/CategoryForm";
 import ItemForm from "../../../components/forms/ItemForm";

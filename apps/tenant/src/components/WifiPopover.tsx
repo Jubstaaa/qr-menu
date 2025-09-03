@@ -11,19 +11,14 @@ import {
   useDisclosure,
   Snippet,
 } from "@heroui/react";
-
-interface WifiPopoverProps {
-  wifiSsid?: string;
-  wifiPassword?: string;
-}
+import { ApiType } from "@qr-menu/shared-types";
 
 export default function WifiPopover({
-  wifiSsid,
-  wifiPassword,
-}: WifiPopoverProps) {
+  menu,
+}: {
+  menu: ApiType.Public.Menu.Get.Response;
+}) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  if (!wifiSsid) return null;
 
   return (
     <>
@@ -52,23 +47,23 @@ export default function WifiPopover({
 
           <ModalBody>
             <div className="space-y-4">
-              {/* SSID */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Ağ Adı (SSID)
-                </label>
-                <Snippet className="w-full h-10" hideCopyButton>
-                  {wifiSsid}
-                </Snippet>
-              </div>
-
+              {menu.wifi_ssid && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Ağ Adı (SSID)
+                  </label>
+                  <Snippet className="w-full h-10" hideCopyButton>
+                    {menu.wifi_ssid}
+                  </Snippet>
+                </div>
+              )}
               {/* Password */}
-              {wifiPassword && (
+              {menu.wifi_password && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Şifre
                   </label>
-                  <Snippet className="w-full">{wifiPassword}</Snippet>
+                  <Snippet className="w-full">{menu.wifi_password}</Snippet>
                 </div>
               )}
             </div>

@@ -17,15 +17,15 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CategoryAPI } from "@qr-menu/shared-types";
 import SortableCategory from "./SortableCategory";
+import { ApiType } from "@qr-menu/shared-types";
 
 interface SortableCategoriesProps {
-  categories: CategoryAPI.Admin.GetAllCategoriesResponse;
-  onReorder: (categories: CategoryAPI.Admin.GetAllCategoriesResponse) => void;
-  onEdit: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => void;
-  onDelete: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => void;
-  onSelect: (category: CategoryAPI.Admin.GetAllCategoriesResponse[0]) => void;
+  categories: ApiType.Admin.Category.GetAll.Response;
+  onReorder: (categories: ApiType.Admin.Category.GetAll.Response) => void;
+  onEdit: (category: ApiType.Admin.Category.GetAll.Response[0]) => void;
+  onDelete: (category: ApiType.Admin.Category.GetAll.Response[0]) => void;
+  onSelect: (category: ApiType.Admin.Category.GetAll.Response[0]) => void;
   selectedCategoryId?: string;
   getItemCount?: (categoryId: string) => number;
 }

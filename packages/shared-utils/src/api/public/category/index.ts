@@ -1,5 +1,3 @@
-import { getBySlug } from "./slug";
-
-export const category = {
-  getBySlug,
-};
+export { getBySlug } from "./getBySlug";
+export { getAll } from "./getAll";
+export { getItemsByCategory } from "./getItemsByCategory";

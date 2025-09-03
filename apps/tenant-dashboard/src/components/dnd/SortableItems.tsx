@@ -17,19 +17,19 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { CategoryAPI } from "@qr-menu/shared-types";
 import SortableItem from "./SortableItem";
+import { ApiType } from "@qr-menu/shared-types";
 
 interface SortableItemsProps {
-  items: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"];
+  items: ApiType.Admin.Category.GetAll.Response[0]["menu_items"];
   onReorder: (
-    items: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"]
+    items: ApiType.Admin.Category.GetAll.Response[0]["menu_items"]
   ) => void;
   onEdit: (
-    item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
   ) => void;
   onDelete: (
-    item: CategoryAPI.Admin.GetAllCategoriesResponse[0]["menu_items"][0]
+    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
   ) => void;
 }
 

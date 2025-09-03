@@ -1,21 +1,33 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "target": "ES2020",
-    "lib": ["ES2020"],
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "strict": true,
-    "allowJs": true,
-    "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "module": "commonjs",
     "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2020",
+    "sourceMap": true,
     "outDir": "./dist",
-    "rootDir": "."
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@/*": ["src/*"],
+      "@qr-menu/shared-config": ["../../packages/shared-config/src"],
+      "@qr-menu/shared-types": ["../../packages/shared-types/src"],
+      "@qr-menu/shared-utils": ["../../packages/shared-utils/src"],
+      "@qr-menu/shared-validation": ["../../packages/shared-validation/src"]
+    }
   },
-  "include": ["src/**/*", "supabase/supabase.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
-} 
+}

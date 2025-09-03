@@ -1,17 +1,6 @@
-import { Create } from "./create";
-import { Update } from "./update";
-import { Delete } from "./delete";
-import { GetById } from "./getById";
-import { Reorder } from "./reorder";
-import { GetAll } from "./getAll";
-// Export all schemas
-
-// Create apiValidation object
-export const Item = {
-  Create,
-  Update,
-  Delete,
-  GetById,
-  Reorder,
-  GetAll,
-};
+export { Create } from "./create";
+export { Update } from "./update";
+export { Delete } from "./delete";
+export { Reorder } from "./reorder";
+export { GetById } from "./getById";
+export { GetAll } from "./getAll";

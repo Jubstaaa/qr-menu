@@ -5,8 +5,6 @@ export interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: Record<string, string>;
   body?: any;
-  credentials?: "omit" | "same-origin" | "include";
-  subdomain?: string;
   query?: Record<string, any>;
   pathParams?: Record<string, string>;
 }
@@ -48,31 +46,19 @@ export class ApiClient {
     endpoint: string,
     options: RequestOptions
   ): Promise<ApiResponse<T>> {
-    const {
-      method = "GET",
-      headers = {},
-      body,
-      credentials,
-      subdomain,
-      pathParams,
-      query,
-    } = options;
+    const { method = "GET", headers = {}, body, pathParams, query } = options;
 
     const finalHeaders: Record<string, string> = {
       "Content-Type": "application/json",
       ...headers,
     };
 
-    if (subdomain) {
-      finalHeaders["x-subdomain"] = subdomain;
-    }
-
     const url = this.buildUrl(endpoint, pathParams, query);
 
     const config: RequestInit = {
       method,
       headers: finalHeaders,
-      credentials,
+      credentials: "include",
     };
 
     if (method !== "GET" && body) {
@@ -84,27 +70,28 @@ export class ApiClient {
       }
     }
 
+    const res = await fetch(url, config);
+    let json: any = null;
+
     try {
-      const res = await fetch(url, config);
-      const json = (await res.json()) as ApiResponse<T>;
-
-      if (!res.ok) {
-        return {
-          data: undefined as unknown as T,
-          message: json.message || `HTTP ${res.status}`,
-        };
-      }
-
-      return {
-        data: json.data,
-        message: json.message,
-      };
-    } catch (err) {
-      return {
-        data: undefined as unknown as T,
-        message: err instanceof Error ? err.message : "Network error",
-      };
+      json = await res.json();
+    } catch {
+      // body yoksa veya geçersiz JSON
     }
+
+    if (!res.ok) {
+      // 200 dışında error fırlat
+      const message =
+        (json && (json.message || json.error?.message)) ||
+        res.statusText ||
+        `HTTP ${res.status}`;
+      throw new Error(message);
+    }
+
+    return {
+      data: (json?.data ?? json) as T,
+      message: json?.message,
+    };
   }
 
   get<T>(endpoint: string, args?: Omit<RequestOptions, "method" | "body">) {

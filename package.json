@@ -14,9 +14,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "types:gen": "cd apps/backend && supabase gen types typescript --linked > ../../packages/shared-types/src/supabase-types.ts",
     "migrate": "cd apps/backend && supabase db push",
-    "prepare": "husky install",
-    "install": "bun install",
-    "install:ci": "bun install --frozen-lockfile"
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

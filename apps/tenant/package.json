@@ -6,7 +6,7 @@
     "dev": "microfrontends proxy --local-apps qr-menu-tenant qr-menu-tenant-dashboard & next dev --turbo --port $(microfrontends port)",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
     "@heroui/react": "^2.8.3",

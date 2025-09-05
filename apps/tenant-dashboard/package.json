@@ -6,7 +6,7 @@
     "dev": "next dev --turbo --port $(microfrontends port)",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

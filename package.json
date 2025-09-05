@@ -2,7 +2,7 @@
   "name": "qr-menu-workspace",
   "version": "1.0.0",
   "description": "Modern QR Menu Management System - Monorepo",
-  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "turbo run dev --parallel --concurrency 11",
     "dev:proxy": "microfrontends proxy --local-apps tenant tenant-dashboard",
@@ -14,7 +14,9 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "types:gen": "cd apps/backend && supabase gen types typescript --linked > ../../packages/shared-types/src/supabase-types.ts",
     "migrate": "cd apps/backend && supabase db push",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "install": "bun install",
+    "install:ci": "bun install --frozen-lockfile"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -29,10 +31,10 @@
     "turbo": "^1.10.0",
     "typescript": "^5.0.0"
   },
-  "packageManager": "pnpm@8.15.0",
+  "packageManager": "bun@1.0.0",
   "engines": {
     "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "bun": ">=1.0.0"
   },
   "license": "MIT",
   "dependencies": {

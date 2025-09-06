@@ -10,7 +10,7 @@ import {
   ModalFooter,
 } from "@heroui/react";
 import { QrCode, Store } from "lucide-react";
-import { useModalContext } from "../contexts/ModalContext";
+import { useModalContext } from "@/contexts/ModalContext";
 import { RestaurantForm } from "./forms/RestaurantForm";
 
 export const CreateMenuModal = () => {

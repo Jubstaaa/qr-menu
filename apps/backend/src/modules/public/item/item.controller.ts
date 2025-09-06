@@ -1,6 +1,6 @@
 import { Controller, Get, Param, UseInterceptors } from "@nestjs/common";
 import { ItemService } from "./item.service";
-import { TransformInterceptor } from "../../../common/interceptors/transform.interceptor";
+import { TransformInterceptor } from "@/common/interceptors/transform.interceptor";
 
 @Controller("public/items")
 @UseInterceptors(TransformInterceptor)

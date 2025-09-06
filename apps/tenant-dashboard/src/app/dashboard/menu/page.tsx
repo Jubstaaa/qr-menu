@@ -4,12 +4,12 @@ import React from "react";
 import { Button, Card, CardBody, CardHeader } from "@heroui/react";
 import { Plus } from "lucide-react";
 
-import CategoryForm from "../../../components/forms/CategoryForm";
-import ItemForm from "../../../components/forms/ItemForm";
-import DeleteConfirmModal from "../../../components/modals/DeleteConfirmModal";
-import SortableCategories from "../../../components/dnd/SortableCategories";
-import SortableItems from "../../../components/dnd/SortableItems";
-import { useMenuManagement } from "../../../hooks/useMenuManagement";
+import CategoryForm from "@/components/forms/CategoryForm";
+import ItemForm from "@/components/forms/ItemForm";
+import DeleteConfirmModal from "@/components/modals/DeleteConfirmModal";
+import SortableCategories from "@/components/dnd/SortableCategories";
+import SortableItems from "@/components/dnd/SortableItems";
+import { useMenuManagement } from "@/hooks/useMenuManagement";
 import { Loading } from "@qr-menu/shared-components";
 
 export default function MenuManagementPage() {

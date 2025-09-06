@@ -6,9 +6,9 @@ import {
   PasswordInput,
   SubmitButton,
 } from "@qr-menu/shared-components";
-import { useLoginForm } from "../../hooks/ui/useLoginForm";
-import { useLoginMutation } from "../../hooks/api/useAuth";
-import { useModalContext } from "../../contexts/ModalContext";
+import { useLoginForm } from "@/hooks/ui/useLoginForm";
+import { useLoginMutation } from "@/hooks/api/useAuth";
+import { useModalContext } from "@/contexts/ModalContext";
 import { ApiType } from "@qr-menu/shared-types";
 
 interface LoginFormProps {}

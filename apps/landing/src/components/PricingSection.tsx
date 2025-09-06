@@ -2,7 +2,7 @@
 
 import { Button, Card, CardBody, Chip } from "@heroui/react";
 import { Check, Crown, Star, Zap } from "lucide-react";
-import { useModalContext } from "../contexts/ModalContext";
+import { useModalContext } from "@/contexts/ModalContext";
 import Link from "next/link";
 
 export const PricingSection: React.FC = () => {

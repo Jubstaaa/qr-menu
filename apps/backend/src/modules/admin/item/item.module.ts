@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ItemController } from "./item.controller";
 import { ItemService } from "./item.service";
-import { SupabaseService } from "../../../common/services/supabase.service";
+import { SupabaseService } from "@/common/services/supabase.service";
 
 @Module({
   controllers: [ItemController],

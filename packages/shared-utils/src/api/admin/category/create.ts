@@ -1,6 +1,6 @@
 import { ENDPOINTS } from "@qr-menu/shared-config";
 import { ApiType } from "@qr-menu/shared-types";
-import { apiClient } from "../../api-client";
+import { apiClient } from "@/api/api-client";
 
 export const create = (data: ApiType.Admin.Category.Create.Request.Data) =>
   apiClient.post<

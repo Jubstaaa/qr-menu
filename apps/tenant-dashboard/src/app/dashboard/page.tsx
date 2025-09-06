@@ -21,8 +21,8 @@ import {
   Calendar,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import RestaurantForm from "../../components/forms/RestaurantForm";
-import { useDashboard } from "../../hooks/useDashboard";
+import RestaurantForm from "@/components/forms/RestaurantForm";
+import { useDashboard } from "@/hooks/useDashboard";
 import { Loading } from "@qr-menu/shared-components";
 
 export default function DashboardPage() {

@@ -3,7 +3,7 @@
 import React from "react";
 import { Button, Card, CardBody, CardHeader } from "@heroui/react";
 import { QrCode } from "lucide-react";
-import { useLoginForm } from "../../../hooks/ui/useLoginForm";
+import { useLoginForm } from "@/hooks/ui/useLoginForm";
 import {
   FormProvider,
   EmailInput,

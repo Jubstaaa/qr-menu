@@ -1,8 +1,8 @@
 import { Injectable, NotFoundException, Inject } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
-import { SupabaseService } from "../../../common/services/supabase.service";
+import { SupabaseService } from "@/common/services/supabase.service";
 import { ApiType } from "@qr-menu/shared-types";
-import { AuthenticatedRequest } from "../../../common/guards/auth.guard";
+import { AuthenticatedRequest } from "@/common/guards/auth.guard";
 
 @Injectable()
 export class CategoryService {

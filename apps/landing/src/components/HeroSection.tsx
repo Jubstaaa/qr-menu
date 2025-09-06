@@ -2,7 +2,7 @@
 
 import { Button } from "@heroui/react";
 import { QrCode, Smartphone } from "lucide-react";
-import { useModalContext } from "../contexts/ModalContext";
+import { useModalContext } from "@/contexts/ModalContext";
 
 export const HeroSection: React.FC = () => {
   const { openAuthModal } = useModalContext();

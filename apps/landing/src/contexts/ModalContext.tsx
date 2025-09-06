@@ -2,8 +2,8 @@
 
 import React, { createContext, useContext } from "react";
 import { useDisclosure } from "@heroui/react";
-import { AuthModal } from "../components/AuthModal";
-import { CreateMenuModal } from "../components/CreateMenuModal";
+import { AuthModal } from "@/components/AuthModal";
+import { CreateMenuModal } from "@/components/CreateMenuModal";
 
 interface ModalContextType {
   // Auth Modal

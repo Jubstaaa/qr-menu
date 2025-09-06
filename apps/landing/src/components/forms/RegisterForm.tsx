@@ -6,9 +6,9 @@ import {
   PasswordInput,
   SubmitButton,
 } from "@qr-menu/shared-components";
-import { useRegisterForm } from "../../hooks/ui/useRegisterForm";
-import { useRegisterMutation } from "../../hooks/api/useAuth";
-import { useModalContext } from "../../contexts/ModalContext";
+import { useRegisterForm } from "@/hooks/ui/useRegisterForm";
+import { useRegisterMutation } from "@/hooks/api/useAuth";
+import { useModalContext } from "@/contexts/ModalContext";
 import { ApiType } from "@qr-menu/shared-types";
 
 interface RegisterFormProps {}

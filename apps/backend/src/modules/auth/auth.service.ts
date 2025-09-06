@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException, Inject } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 import { Request } from "express";
-import { SupabaseService } from "../../common/services/supabase.service";
+import { SupabaseService } from "@/common/services/supabase.service";
 import { ApiType } from "@qr-menu/shared-types";
 import { Database } from "@qr-menu/shared-types";
 

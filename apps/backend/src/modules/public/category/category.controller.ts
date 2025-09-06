@@ -6,7 +6,7 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { CategoryService } from "./category.service";
-import { TransformInterceptor } from "../../../common/interceptors/transform.interceptor";
+import { TransformInterceptor } from "@/common/interceptors/transform.interceptor";
 import { ApiType } from "@qr-menu/shared-types";
 import { ApiValidation } from "@qr-menu/shared-validation";
 import { ZodResponseValidationPipe } from "@/common/pipes/zod-response-validation.pipe";

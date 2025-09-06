@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ApiType } from "@qr-menu/shared-types";
-import { SupabaseService } from "../../../common/services/supabase.service";
+import { SupabaseService } from "@/common/services/supabase.service";
 import { ca } from "zod/v4/locales/index.cjs";
 
 @Injectable()

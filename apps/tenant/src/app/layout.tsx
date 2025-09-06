@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Providers } from "../providers";
-import Header from "../components/Header";
-import Footer from "../components/Footer";
-import WifiPopover from "../components/WifiPopover";
+import { Providers } from "@/providers";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import WifiPopover from "@/components/WifiPopover";
 import { apiUtils } from "@qr-menu/shared-utils";
 import "./globals.css";
 import { headers } from "next/headers";

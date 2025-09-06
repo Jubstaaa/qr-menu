@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileItem } from "../fields/FileInput";
+import { FileItem } from "@/forms/fields/FileInput";
 
 export function useFileUpload(initialImageUrl?: string | null) {
   const [files, setFiles] = useState<FileItem[]>(() => {

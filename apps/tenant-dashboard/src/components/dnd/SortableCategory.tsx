@@ -3,7 +3,7 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import CategoryCard from "../cards/CategoryCard";
+import CategoryCard from "@/components/cards/CategoryCard";
 import { cn } from "@heroui/react";
 import { ApiType } from "@qr-menu/shared-types";
 

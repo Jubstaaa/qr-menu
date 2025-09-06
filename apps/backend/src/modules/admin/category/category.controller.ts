@@ -11,13 +11,12 @@ import {
   Headers,
 } from "@nestjs/common";
 import { CategoryService } from "./category.service";
-import { TransformInterceptor } from "../../../common/interceptors/transform.interceptor";
-import { AuthGuard } from "../../../common/guards/auth.guard";
-import { ZodValidationPipe } from "../../../common/pipes/zod-validation.pipe";
-import { ZodResponseValidationPipe } from "../../../common/pipes/zod-response-validation.pipe";
-import { SetResponseMessage } from "../../../common";
+import { AuthGuard } from "@/common/guards/auth.guard";
+import { ZodValidationPipe } from "@/common/pipes/zod-validation.pipe";
+import { SetResponseMessage } from "@/common";
 import { ApiValidation } from "@qr-menu/shared-validation";
 import { ApiType } from "@qr-menu/shared-types";
+import { ZodResponseValidationPipe } from "@/common/pipes/zod-response-validation.pipe";
 
 @Controller("admin/categories")
 @UseGuards(AuthGuard)

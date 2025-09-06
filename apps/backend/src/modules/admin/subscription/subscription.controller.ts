@@ -1,6 +1,6 @@
 import { Controller, Get, UseInterceptors } from "@nestjs/common";
 import { SubscriptionService } from "./subscription.service";
-import { TransformInterceptor } from "../../../common/interceptors/transform.interceptor";
+import { TransformInterceptor } from "@/common/interceptors/transform.interceptor";
 
 @Controller("admin/subscription")
 @UseInterceptors(TransformInterceptor)

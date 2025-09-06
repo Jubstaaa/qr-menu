@@ -3,7 +3,7 @@
 import React from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import ItemCard from "../cards/ItemCard";
+import ItemCard from "@/components/cards/ItemCard";
 import { ApiType } from "@qr-menu/shared-types";
 
 interface SortableItemProps {

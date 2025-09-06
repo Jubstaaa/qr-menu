@@ -10,7 +10,7 @@ import {
   NavbarItem,
 } from "@heroui/react";
 import { LogOut, QrCode } from "lucide-react";
-import { useLogoutMutation } from "../hooks/api/useAuth";
+import { useLogoutMutation } from "@/hooks/api/useAuth";
 
 export default function DashboardNav() {
   const pathname = usePathname();

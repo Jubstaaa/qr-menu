@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useLoginMutation } from "../api/useAuth";
+import { useLoginMutation } from "@/hooks/api/useAuth";
 import { ApiType } from "@qr-menu/shared-types";
 import { ApiValidation } from "@qr-menu/shared-validation";
 

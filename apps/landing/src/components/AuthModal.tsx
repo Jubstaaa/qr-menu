@@ -9,7 +9,7 @@ import {
   Tabs,
   Tab,
 } from "@heroui/react";
-import { useModalContext } from "../contexts/ModalContext";
+import { useModalContext } from "@/contexts/ModalContext";
 import { LoginForm } from "./forms/LoginForm";
 import { RegisterForm } from "./forms/RegisterForm";
 

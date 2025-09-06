@@ -4,9 +4,9 @@ import {
   TextInput,
   SubmitButton,
 } from "@qr-menu/shared-components";
-import { useRestaurantForm } from "../../hooks/ui/useRestaurantForm";
-import { useCreateMenuMutation } from "../../hooks/api/useCreateMenu";
-import { useModalContext } from "../../contexts/ModalContext";
+import { useRestaurantForm } from "@/hooks/ui/useRestaurantForm";
+import { useCreateMenuMutation } from "@/hooks/api/useCreateMenu";
+import { useModalContext } from "@/contexts/ModalContext";
 import { ApiType } from "@qr-menu/shared-types";
 
 export const RestaurantForm: React.FC = () => {

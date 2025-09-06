@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { apiUtils } from "@qr-menu/shared-utils";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import ProductGrid from "../../../components/ProductGrid";
+import ProductGrid from "@/components/ProductGrid";
 
 export const dynamic = "force-dynamic";
 

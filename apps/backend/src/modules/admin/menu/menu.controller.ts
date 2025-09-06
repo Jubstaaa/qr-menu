@@ -9,11 +9,11 @@ import {
   Param,
 } from "@nestjs/common";
 import { MenuService } from "./menu.service";
-import { AuthGuard } from "../../../common/guards/auth.guard";
+import { AuthGuard } from "@/common/guards/auth.guard";
 import { ApiType } from "@qr-menu/shared-types";
-import { ZodResponseValidationPipe } from "../../../common/pipes/zod-response-validation.pipe";
+import { ZodResponseValidationPipe } from "@/common/pipes/zod-response-validation.pipe";
 import { ApiValidation } from "@qr-menu/shared-validation";
-import { ZodValidationPipe } from "../../../common/pipes/zod-validation.pipe";
+import { ZodValidationPipe } from "@/common/pipes/zod-validation.pipe";
 
 @Controller("admin/menu")
 @UseGuards(AuthGuard)

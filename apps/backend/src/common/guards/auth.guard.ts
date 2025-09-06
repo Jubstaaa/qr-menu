@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { Request } from "express";
-import { SupabaseService } from "../services/supabase.service";
+import { SupabaseService } from "@/common/services/supabase.service";
 import { getCookieConfig } from "@qr-menu/shared-config";
 
 export interface AuthenticatedRequest extends Request {

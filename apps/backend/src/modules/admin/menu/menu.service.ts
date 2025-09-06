@@ -1,8 +1,8 @@
 import { Injectable, Inject, NotFoundException } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 import { Request } from "express";
-import { SupabaseService } from "../../../common/services/supabase.service";
-import { AuthenticatedRequest } from "../../../common/guards/auth.guard";
+import { SupabaseService } from "@/common/services/supabase.service";
+import { AuthenticatedRequest } from "@/common/guards/auth.guard";
 import { ApiType } from "@qr-menu/shared-types";
 
 @Injectable()

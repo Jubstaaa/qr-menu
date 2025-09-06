@@ -18,8 +18,8 @@ import {
   Switch,
 } from "@heroui/react";
 import { QrCode } from "lucide-react";
-import { useAuthQuery, useLogoutMutation } from "../hooks/api/useAuth";
-import { useModalContext } from "../contexts/ModalContext";
+import { useAuthQuery, useLogoutMutation } from "@/hooks/api/useAuth";
+import { useModalContext } from "@/contexts/ModalContext";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import Link from "next/link";
 

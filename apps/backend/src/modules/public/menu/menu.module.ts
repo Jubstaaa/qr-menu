@@ -1,7 +1,7 @@
 import { Module } from "@nestjs/common";
 import { MenuService } from "./menu.service";
 import { MenuController } from "./menu.controller";
-import { SupabaseService } from "../../../common/services/supabase.service";
+import { SupabaseService } from "@/common/services/supabase.service";
 
 @Module({
   controllers: [MenuController],

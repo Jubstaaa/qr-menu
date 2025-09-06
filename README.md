@@ -175,7 +175,6 @@ qr-menu/
 - **Turborepo**: ^1.10.0 (Monorepo build system)
 - **ESLint**: Code linting
 - **Prettier**: Code formatting
-- **Husky**: Git hooks
 
 ## 🚀 Getting Started
 

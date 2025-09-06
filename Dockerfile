@@ -1,31 +1,30 @@
-    FROM oven/bun:1.0-alpine AS builder
+    FROM oven/bun:1.2.21-alpine AS builder
 
     WORKDIR /app
     
     COPY package.json bun.lockb* ./
-    COPY apps/backend/package.json ./apps/backend/
-    COPY packages/*/package.json ./packages/*/
+    COPY apps ./apps
+    COPY packages ./packages
     
     RUN bun install --frozen-lockfile
     
     COPY . .
     
-    RUN bun run build
-    
-    FROM oven/bun:1.0-alpine AS production
+    FROM oven/bun:1.2.21-alpine AS production
     
     WORKDIR /app
     
     COPY package.json bun.lockb* ./
-    COPY apps/backend/package.json ./apps/backend/
+    COPY apps ./apps
+    COPY packages ./packages
+    
     RUN bun install --frozen-lockfile --production
     
-    COPY --from=builder /app/apps/backend/dist ./apps/backend/dist
+    COPY --from=builder /app/apps ./apps
     COPY --from=builder /app/packages ./packages
     
     EXPOSE 8080
     
     WORKDIR /app/apps/backend
-    
-    CMD ["bun", "run", "start"]
+    CMD ["bun", "run", "start:prod"]
     

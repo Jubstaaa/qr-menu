@@ -13,8 +13,7 @@
     "type-check": "turbo run type-check",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "types:gen": "cd apps/backend && supabase gen types typescript --linked > ../../packages/shared-types/src/supabase-types.ts",
-    "migrate": "cd apps/backend && supabase db push",
-    "prepare": "husky install"
+    "migrate": "cd apps/backend && supabase db push"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -23,7 +22,6 @@
     "eslint": "^8.0.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
-    "husky": "^8.0.0",
     "lint-staged": "^15.0.0",
     "prettier": "^3.0.0",
     "turbo": "^1.10.0",

@@ -4,3 +4,5 @@ dist
 .vscode
 .env
 .DS_Store
+.next
+.turbo

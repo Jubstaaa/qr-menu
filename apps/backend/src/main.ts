@@ -4,7 +4,7 @@ import { ValidationPipe, BadRequestException } from "@nestjs/common";
 import { config } from "@qr-menu/shared-config";
 import { AllExceptionsFilter } from "./common/filters/all-exceptions.filter";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
-import cookieParser from "cookie-parser";
+import * as cookieParser from 'cookie-parser';
 import { Reflector } from "@nestjs/core";
 
 async function bootstrap() {

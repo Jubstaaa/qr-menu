@@ -26,5 +26,5 @@
     EXPOSE 8080
     
     WORKDIR /app/apps/backend
-    CMD ["bun", "run", "start:prod"]
+    CMD ["bun", "run", "start"]
     

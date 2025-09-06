@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
+      "dev": "tsc --watch & tsc-alias -w",
+
     "clean": "rm -rf dist"
   },
   "peerDependencies": {

@@ -6,8 +6,8 @@
   "author": "QR Menu Team",
   "license": "MIT",
   "scripts": {
-    "build": "turbo run build --filter=@qr-menu/shared-types --filter=@qr-menu/shared-config --filter=@qr-menu/shared-utils --filter=@qr-menu/shared-validation && nest build",
-    "dev": "bun --watch src/main.ts",
+    "build": "turbo run build --filter=@qr-menu/shared-types --filter=@qr-menu/shared-config --filter=@qr-menu/shared-utils --filter=@qr-menu/shared-validation && nest build && tsc-alias",
+    "dev": "nest start --watch && tsc-alias",
     "dev:nest": "nest start --watch",
     "dev:tsx": "tsx watch src/main.ts",
     "dev:turbo": "turbo run dev --filter=@qrmenu/backend --watch",
@@ -67,6 +67,7 @@
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
     "ts-node": "^10.9.1",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.5",
     "typescript": "^5.1.3"

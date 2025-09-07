@@ -30,7 +30,7 @@ export default function DashboardPage() {
 
   const { menu, loadingStates, modals, handlers } = useDashboard();
 
-  if (loadingStates.menu || loadingStates) {
+  if (loadingStates.menu) {
     return <Loading size="lg" text="Dashboard yükleniyor..." />;
   }
 

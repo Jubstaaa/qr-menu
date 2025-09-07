@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import ProductDetailModal from "./ProductDetailModal";
 import { ApiType } from "@qr-menu/shared-types";
+import { getSpiceLevelText } from "@qr-menu/shared-utils";
 
 type Item = ApiType.Public.Category.GetItemsByCategory.Response[0];
 
@@ -100,18 +101,9 @@ export default function ProductGrid({ items }: { items: Item[] }) {
                       👨‍🍳 Şef Özel
                     </span>
                   )}
-                  {item.spice_level && (
+                  {item.spice_level !== null && (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                      🌶️{" "}
-                      {item.spice_level === 1
-                        ? "Hafif"
-                        : item.spice_level === 2
-                          ? "Orta"
-                          : item.spice_level === 3
-                            ? "Acılı"
-                            : item.spice_level === 4
-                              ? "Çok Acılı"
-                              : `Seviye ${item.spice_level}`}
+                      🌶️ {getSpiceLevelText(item.spice_level)}
                     </span>
                   )}
                   {item.preparation_time && (

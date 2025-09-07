@@ -16,12 +16,8 @@ export const useDashboard = () => {
   const handlers = {
     restaurant: {
       submit: async (data: ApiType.Admin.Menu.Update.Request.Data) => {
-        try {
-          await updateMenuMutation.mutateAsync(data);
-          restaurantModal.onClose();
-        } catch (error) {
-          console.error("Error updating restaurant:", error);
-        }
+        await updateMenuMutation.mutateAsync({ data });
+        restaurantModal.onClose();
       },
     },
   };

@@ -5,9 +5,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-      "dev": "tsc --watch & tsc-alias -w",
-
+    "build": "tsc && tsc-alias",
+    "dev": "tsc --watch & tsc-alias -w",
     "clean": "rm -rf dist"
   },
   "dependencies": {

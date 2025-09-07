@@ -12,6 +12,7 @@ import {
   Chip,
 } from "@heroui/react";
 import { X, Clock, Flame, ChefHat, AlertTriangle, Info } from "lucide-react";
+import { getSpiceLevelText } from "@qr-menu/shared-utils";
 import { ApiType } from "@qr-menu/shared-types";
 
 interface ProductDetailModalProps {
@@ -33,15 +34,6 @@ export default function ProductDetailModal({
     isOpen,
     onClose,
   });
-  const getSpiceLevelText = (level: number) => {
-    const levels = {
-      1: "Hafif",
-      2: "Orta",
-      3: "Acılı",
-      4: "Çok Acılı",
-    };
-    return levels[level as keyof typeof levels] || `Seviye ${level}`;
-  };
 
   return (
     <Modal

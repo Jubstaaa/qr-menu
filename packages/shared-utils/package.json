@@ -9,8 +9,7 @@
   ],
   "scripts": {
     "build": "tsc && tsc-alias",
-      "dev": "tsc --watch & tsc-alias -w",
-
+    "dev": "tsc --watch & tsc-alias -w",
     "clean": "rm -rf dist"
   },
   "dependencies": {

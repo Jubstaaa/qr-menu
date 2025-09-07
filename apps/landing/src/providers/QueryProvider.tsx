@@ -29,8 +29,6 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
           const error = query.state.error as any;
 
           if (error?.status === 403) {
-            console.log("Token geçersiz, auth state temizleniyor...");
-
             queryClient.setQueryData(["auth"], null);
             return;
           }
@@ -42,13 +40,10 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
       .subscribe((event: any) => {
         if (event?.type === "updated") {
           const mutation = event.mutation;
-
           if (mutation.state.status === "error") {
             const error = mutation.state.error as any;
 
             if (error?.status === 403) {
-              console.log("Token geçersiz, auth state temizleniyor...");
-
               queryClient.setQueryData(["auth"], null);
               return;
             }

@@ -16,13 +16,9 @@ import { Edit, Trash, MoreVertical, Star, Clock, Move } from "lucide-react";
 import { ApiType } from "@qr-menu/shared-types";
 
 interface ItemCardProps {
-  item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0];
-  onEdit: (
-    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
-  ) => void;
-  onDelete: (
-    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
-  ) => void;
+  item: ApiType.Admin.Item.GetAll.Response[0];
+  onEdit: (item: ApiType.Admin.Item.GetAll.Response[0]) => void;
+  onDelete: (item: ApiType.Admin.Item.GetAll.Response[0]) => void;
   dragHandleProps?: any;
 }
 

@@ -28,18 +28,7 @@ export default function UpdateRestaurantForm({
 }: UpdateRestaurantFormProps) {
   const methods = useForm<ApiType.Admin.Menu.Update.Request.Data>({
     resolver: zodResolver(ApiValidation.Admin.Menu.Update.Request.Data),
-    defaultValues: {
-      restaurant_name: editingRestaurant.restaurant_name,
-      restaurant_description: editingRestaurant.restaurant_description || "",
-      restaurant_address: editingRestaurant.restaurant_address || "",
-      restaurant_phone: editingRestaurant.restaurant_phone || "",
-      restaurant_email: editingRestaurant.restaurant_email || "",
-      logo_url: editingRestaurant.logo_url || "",
-      opening_time: editingRestaurant.opening_time || "",
-      closing_time: editingRestaurant.closing_time || "",
-      wifi_ssid: editingRestaurant.wifi_ssid || "",
-      wifi_password: editingRestaurant.wifi_password || "",
-    },
+    defaultValues: editingRestaurant,
   });
 
   const { files, setFiles, preparePayload, resetFiles } = useFileUpload(

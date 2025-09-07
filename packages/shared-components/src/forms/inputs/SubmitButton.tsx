@@ -1,7 +1,6 @@
 import React from "react";
 import { Button, ButtonProps } from "@heroui/react";
 import { useFormContext } from "react-hook-form";
-import { Loader2 } from "lucide-react";
 
 interface SubmitButtonProps extends Omit<ButtonProps, "type" | "isLoading"> {
   children: React.ReactNode;
@@ -12,12 +11,17 @@ export const SubmitButton: React.FC<SubmitButtonProps> = ({
   ...props
 }) => {
   const {
-    formState: { isSubmitting },
+    formState: { isSubmitting, isValid },
   } = useFormContext();
 
   return (
-    <Button type="submit" isLoading={isSubmitting} {...props}>
-      {isSubmitting ? <Loader2 className="animate-spin" size={16} /> : children}
+    <Button
+      type="submit"
+      isLoading={isSubmitting}
+      isDisabled={!isValid}
+      {...props}
+    >
+      {children}
     </Button>
   );
 };

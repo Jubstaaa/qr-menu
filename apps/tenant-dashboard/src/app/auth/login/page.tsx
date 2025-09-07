@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button, Card, CardBody, CardHeader } from "@heroui/react";
+import { Card, CardBody, CardHeader } from "@heroui/react";
 import { QrCode } from "lucide-react";
 import { useLoginForm } from "@/hooks/ui/useLoginForm";
 import {
@@ -24,7 +24,7 @@ export default function LoginPage() {
             </div>
           </div>
           <h2 className="text-3xl font-extrabold text-gray-900 dark:text-white">
-            Dashboard'a Giriş Yap
+            Dashboard&apos;a Giriş Yap
           </h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
             Menünüzü yönetmek için giriş yapın

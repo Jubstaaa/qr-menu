@@ -1,12 +1,12 @@
 "use client";
 
 import { Switch } from "@heroui/react";
+import { useFormContext } from "react-hook-form";
 
 interface SwitchFieldProps {
   label: string;
   description?: string;
-  isSelected: boolean;
-  onValueChange: (value: boolean) => void;
+  name: string;
   color?:
     | "default"
     | "primary"
@@ -14,17 +14,22 @@ interface SwitchFieldProps {
     | "success"
     | "warning"
     | "danger";
-  switchLabel?: string;
+  labels?: {
+    true: string;
+    false: string;
+  };
 }
 
 export default function SwitchField({
   label,
   description,
-  isSelected,
-  onValueChange,
+  name,
   color = "success",
-  switchLabel,
+  labels = { true: "Aktif", false: "Pasif" },
 }: SwitchFieldProps) {
+  const { setValue, watch } = useFormContext();
+  const currentValue = watch(name);
+
   return (
     <div className="flex items-center justify-between p-4 bg-default-50 dark:bg-default-900/20 rounded-lg">
       <div className="space-y-1">
@@ -34,11 +39,11 @@ export default function SwitchField({
         )}
       </div>
       <Switch
-        isSelected={isSelected}
-        onValueChange={onValueChange}
+        isSelected={currentValue}
+        onValueChange={(value) => setValue(name, value)}
         color={color}
       >
-        {switchLabel || (isSelected ? "Aktif" : "Pasif")}
+        {currentValue ? labels.true : labels.false}
       </Switch>
     </div>
   );

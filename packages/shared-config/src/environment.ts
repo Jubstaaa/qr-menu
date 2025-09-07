@@ -8,6 +8,7 @@ export interface EnvironmentConfig {
   SUPABASE_URL: string;
   SUPABASE_HOSTNAME: string;
   SUPABASE_SERVICE_ROLE_KEY: string;
+  SUPABASE_ANON_KEY: string;
   SUPABASE_STORAGE_BUCKET: string;
   BASE_DOMAIN: string;
   TEST_SUBDOMAIN?: string;
@@ -22,6 +23,7 @@ export const config: EnvironmentConfig = {
   SUPABASE_URL: process.env.SUPABASE_URL || "",
   SUPABASE_HOSTNAME: process.env.SUPABASE_HOSTNAME || "",
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+  SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY || "",
   SUPABASE_STORAGE_BUCKET: process.env.SUPABASE_STORAGE_BUCKET || "",
   BASE_DOMAIN: process.env.BASE_DOMAIN || "",
   TEST_SUBDOMAIN: process.env.TEST_SUBDOMAIN,

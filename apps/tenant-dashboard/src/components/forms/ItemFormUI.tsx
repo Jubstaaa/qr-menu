@@ -9,11 +9,10 @@ import {
   ModalFooter,
   Button,
   Select,
-  SelectItem,
   Switch,
   Chip,
 } from "@heroui/react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, UseFormReturn } from "react-hook-form";
 import {
   FileInput,
   SwitchField,
@@ -21,8 +20,15 @@ import {
   TextInput,
   NumberInput,
   TextareaInput,
+  SelectInput,
+  SelectItem,
+  ArrayInput,
+  KeyValueInput,
+  FormProvider,
+  SubmitButton,
 } from "@qr-menu/shared-components";
 import { ApiType } from "@qr-menu/shared-types";
+import { getSpiceLevelOptions } from "@qr-menu/shared-utils";
 
 interface ItemFormUIProps {
   isOpen: boolean;
@@ -33,6 +39,8 @@ interface ItemFormUIProps {
   files: FileItem[];
   setFiles: React.Dispatch<React.SetStateAction<FileItem[]>>;
   categories: ApiType.Admin.Category.GetAll.Response;
+  methods: UseFormReturn<ApiType.Admin.Item.Update.Request.Data>;
+  handleFormSubmit: (data: ApiType.Admin.Item.Update.Request.Data) => void;
 }
 
 export default function ItemFormUI({
@@ -44,155 +52,153 @@ export default function ItemFormUI({
   files,
   setFiles,
   categories,
+  methods,
+  handleFormSubmit,
 }: ItemFormUIProps) {
-  const {
-    formState: { isSubmitting },
-    setValue,
-    watch,
-  } = useFormContext();
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="4xl">
       <ModalContent>
-        <ModalHeader>{title}</ModalHeader>
-        <ModalBody>
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <TextInput
-                name="name"
-                label="Ürün Adı *"
-                placeholder="Örn: Karışık Pizza, Çoban Salata"
-                isRequired
-                description="Ürün adı 1-100 karakter arasında olmalıdır"
-              />
-
-              <NumberInput
-                name="price"
-                label="Fiyat (₺) *"
-                step="0.01"
-                min="0"
-                placeholder="0.00"
-                isRequired
-                description="Ürün fiyatı 0'dan büyük olmalıdır"
-              />
-            </div>
-
-            <TextareaInput
-              name="description"
-              label="Ürün Açıklaması"
-              placeholder="Ürün hakkında detaylı bilgi, malzemeler, özellikler..."
-              description="Müşterilerin ürünü daha iyi anlaması için yardımcı olur"
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-3">
-                <FileInput
-                  label="Ürün Görseli"
-                  files={files}
-                  onFilesChange={setFiles}
-                  description="Önerilen boyut: 800x600px, maksimum dosya boyutu: 5MB"
-                />
-              </div>
-
-              <div className="space-y-3">
-                <Select
-                  label="Kategori *"
-                  placeholder="Kategori seçin"
+        <FormProvider methods={methods} onSubmit={handleFormSubmit}>
+          <ModalHeader>{title}</ModalHeader>
+          <ModalBody>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <TextInput
+                  name="name"
+                  label="Ürün Adı *"
+                  placeholder="Örn: Karışık Pizza, Çoban Salata"
                   isRequired
-                  description="Ürünün hangi kategoride yer alacağını seçin"
-                >
-                  {categories.map((category) => (
-                    <SelectItem key={category.id}>{category.name}</SelectItem>
-                  ))}
-                </Select>
+                  description="Ürün adı 1-100 karakter arasında olmalıdır"
+                />
 
                 <NumberInput
-                  name="preparation_time"
-                  label="Hazırlama Süresi (dk)"
+                  name="price"
+                  label="Fiyat (₺) *"
+                  step="0.01"
                   min="0"
-                  placeholder="0"
-                  description="Müşteri bekleme süresini bilmek için önemli"
+                  placeholder="0.00"
+                  isRequired
+                  description="Ürün fiyatı 0'dan büyük olmalıdır"
                 />
               </div>
-            </div>
 
-            <div className="space-y-4">
-              <label className="text-sm font-medium text-default-700">
-                Ürün Özellikleri
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <SwitchField
-                  label="Stok Durumu"
-                  description="Ürün sipariş edilebilir mi?"
-                  isSelected={watch("is_available")}
-                  onValueChange={(value) => setValue("is_available", value)}
-                  color="success"
-                  switchLabel={watch("is_available") ? "Mevcut" : "Tükendi"}
+              <TextareaInput
+                name="description"
+                label="Ürün Açıklaması"
+                placeholder="Ürün hakkında detaylı bilgi, malzemeler, özellikler..."
+                description="Müşterilerin ürünü daha iyi anlaması için yardımcı olur"
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <FileInput
+                    label="Ürün Görseli"
+                    files={files}
+                    onFilesChange={setFiles}
+                    description="Önerilen boyut: 800x600px, maksimum dosya boyutu: 5MB"
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <SelectInput
+                    name="category_id"
+                    label="Kategori *"
+                    placeholder="Kategori seçin"
+                    isRequired
+                    description="Ürünün hangi kategoride yer alacağını seçin"
+                  >
+                    {categories.map(
+                      (category: ApiType.Admin.Category.GetAll.Response[0]) => (
+                        <SelectItem key={category.id}>
+                          {category.name}
+                        </SelectItem>
+                      )
+                    )}
+                  </SelectInput>
+
+                  <NumberInput
+                    name="preparation_time"
+                    label="Hazırlama Süresi (dk)"
+                    min="0"
+                    max="180"
+                    placeholder="0"
+                    description="Müşteri bekleme süresini bilmek için önemli"
+                  />
+
+                  <SelectInput
+                    name="spice_level"
+                    label="Acı Seviyesi"
+                    placeholder="Acı seviyesi seçin"
+                    description="Ürünün acı seviyesini belirtin"
+                    valueAsNumber={true}
+                  >
+                    {getSpiceLevelOptions().map((option) => (
+                      <SelectItem key={option.value}>{option.label}</SelectItem>
+                    ))}
+                  </SelectInput>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <KeyValueInput
+                  name="nutrition_info"
+                  label="Beslenme Bilgileri"
+                  placeholders={{
+                    key: "Kalori, Protein...",
+                    value: "123, 15g...",
+                  }}
+                  description="Müşterilerin beslenme tercihlerini bilmesi için"
                 />
 
-                <SwitchField
-                  label="Popüler Ürün"
-                  description="Ana sayfada öne çıkarılsın mı?"
-                  isSelected={watch("is_popular")}
-                  onValueChange={(value) => setValue("is_popular", value)}
-                  color="warning"
-                  switchLabel={watch("is_popular") ? "Evet" : "Hayır"}
-                />
-
-                <SwitchField
-                  label="Şef Özel"
-                  description="Özel menüde gösterilsin mi?"
-                  isSelected={watch("is_chef_special")}
-                  onValueChange={(value) => setValue("is_chef_special", value)}
-                  color="secondary"
-                  switchLabel={watch("is_chef_special") ? "Evet" : "Hayır"}
+                <ArrayInput
+                  name="allergens"
+                  label="Alerjenler"
+                  placeholder="Gluten, süt, fındık..."
+                  description="Alerjisi olan müşteriler için önemli bilgi"
                 />
               </div>
-            </div>
 
-            <div className="p-4 bg-default-50 dark:bg-default-900/20 rounded-lg">
-              <h4 className="text-sm font-medium text-default-700 mb-3">
-                Önizleme
-              </h4>
-              <div className="flex items-center gap-3">
-                <Chip color="primary" variant="flat">
-                  {watch("name") || "Ürün Adı"}
-                </Chip>
-                <Chip color="success" variant="flat">
-                  ₺{watch("price") || "0.00"}
-                </Chip>
-                {watch("is_popular") && (
-                  <Chip color="warning" variant="flat">
-                    🔥 Popüler
-                  </Chip>
-                )}
-                {watch("is_chef_special") && (
-                  <Chip color="secondary" variant="flat">
-                    👨‍🍳 Şef Özel
-                  </Chip>
-                )}
-                {watch("preparation_time") > 0 && (
-                  <Chip color="default" variant="flat">
-                    ⏱️ {watch("preparation_time")} dk
-                  </Chip>
-                )}
+              <div className="space-y-4">
+                <label className="text-sm font-medium text-default-700">
+                  Ürün Özellikleri
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <SwitchField
+                    name="is_available"
+                    label="Stok Durumu"
+                    description="Ürün sipariş edilebilir mi?"
+                    color="success"
+                    labels={{ true: "Mevcut", false: "Tükendi" }}
+                  />
+
+                  <SwitchField
+                    name="is_popular"
+                    label="Popüler Ürün"
+                    description="Ana sayfada öne çıkarılsın mı?"
+                    color="warning"
+                    labels={{ true: "Evet", false: "Hayır" }}
+                  />
+
+                  <SwitchField
+                    name="is_chef_special"
+                    label="Şef Özel"
+                    description="Özel menüde gösterilsin mi?"
+                    color="secondary"
+                    labels={{ true: "Evet", false: "Hayır" }}
+                  />
+                </div>
               </div>
             </div>
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
-            İptal
-          </Button>
-          <Button
-            type="submit"
-            color="primary"
-            isLoading={isSubmitting}
-            endContent={submitButtonIcon}
-          >
-            {submitButtonText}
-          </Button>
-        </ModalFooter>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" variant="light" onPress={onClose}>
+              İptal
+            </Button>
+            <SubmitButton color="primary" endContent={submitButtonIcon}>
+              {submitButtonText}
+            </SubmitButton>
+          </ModalFooter>
+        </FormProvider>
       </ModalContent>
     </Modal>
   );

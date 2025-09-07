@@ -9,9 +9,7 @@ interface ItemFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: any) => Promise<void>;
-  editingItem?:
-    | ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
-    | null;
+  editingItem?: ApiType.Admin.Item.GetAll.Response[0] | null;
   categories: ApiType.Admin.Category.GetAll.Response;
   selectedCategoryId?: string;
 }

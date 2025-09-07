@@ -7,13 +7,9 @@ import ItemCard from "@/components/cards/ItemCard";
 import { ApiType } from "@qr-menu/shared-types";
 
 interface SortableItemProps {
-  item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0];
-  onEdit: (
-    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
-  ) => void;
-  onDelete: (
-    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
-  ) => void;
+  item: ApiType.Admin.Item.GetAll.Response[0];
+  onEdit: (item: ApiType.Admin.Item.GetAll.Response[0]) => void;
+  onDelete: (item: ApiType.Admin.Item.GetAll.Response[0]) => void;
 }
 
 export default function SortableItem({

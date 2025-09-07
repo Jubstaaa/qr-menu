@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { ApiType } from "@qr-menu/shared-types";
 import { SupabaseService } from "@/common/services/supabase.service";
-import { ca } from "zod/v4/locales/index.cjs";
+import { ZodResponseValidationPipe } from "@/common/pipes/zod-response-validation.pipe";
+import { ApiValidation } from "@qr-menu/shared-validation";
 
 @Injectable()
 export class CategoryService {
@@ -33,7 +34,9 @@ export class CategoryService {
       throw new Error("Kategoriler getirilirken hata");
     }
 
-    return data;
+    return new ZodResponseValidationPipe(
+      ApiValidation.Public.Category.Get.Response
+    ).transform(data);
   }
 
   async findBySlug(
@@ -70,7 +73,9 @@ export class CategoryService {
       throw new NotFoundException(`Kategori bulunamadı`);
     }
 
-    return category;
+    return new ZodResponseValidationPipe(
+      ApiValidation.Public.Category.GetBySlug.Response
+    ).transform(category);
   }
 
   async findItemsByCategorySlug(
@@ -112,6 +117,8 @@ export class CategoryService {
       throw new Error("Ürünler getirilirken hata");
     }
 
-    return items;
+    return new ZodResponseValidationPipe(
+      ApiValidation.Public.Category.GetItemsByCategory.Response
+    ).transform(items);
   }
 }

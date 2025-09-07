@@ -81,7 +81,6 @@ export default function RestaurantFormUI({
                 name="restaurant_address"
                 label="Adres"
                 placeholder="Restoran adresini girin"
-                isRequired
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

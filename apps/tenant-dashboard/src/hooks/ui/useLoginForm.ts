@@ -19,8 +19,8 @@ export const useLoginForm = (): UseLoginFormReturn => {
 
   const loginMutation = useLoginMutation();
 
-  const onSubmit = (data: ApiType.Common.Auth.Login.Request.Data) => {
-    loginMutation.mutate(data, {
+  const onSubmit = async (data: ApiType.Common.Auth.Login.Request.Data) => {
+    await loginMutation.mutateAsync(data, {
       onSuccess: () => {
         router.push("/dashboard");
       },

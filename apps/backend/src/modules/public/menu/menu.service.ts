@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, Inject } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 import { SupabaseService } from "@/common/services/supabase.service";
 import { ApiType } from "@qr-menu/shared-types";
+import { ZodResponseValidationPipe } from "@/common/pipes/zod-response-validation.pipe";
+import { ApiValidation } from "@qr-menu/shared-validation";
 
 @Injectable()
 export class MenuService {
@@ -29,6 +31,8 @@ export class MenuService {
       );
     }
 
-    return menu;
+    return new ZodResponseValidationPipe(
+      ApiValidation.Public.Menu.Get.Response
+    ).transform(menu);
   }
 }

@@ -7,9 +7,6 @@ export namespace Update {
     export type Data = z.infer<
       typeof ApiValidation.Admin.Menu.Update.Request.Data
     >;
-    export type Params = z.infer<
-      typeof ApiValidation.Admin.Menu.Update.Request.Params
-    >;
   }
 
   export type Response = z.infer<

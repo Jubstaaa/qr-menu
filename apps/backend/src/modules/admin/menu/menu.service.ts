@@ -1,9 +1,10 @@
-import { Injectable, Inject, NotFoundException } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
 import { Request } from "express";
 import { SupabaseService } from "@/common/services/supabase.service";
-import { AuthenticatedRequest } from "@/common/guards/auth.guard";
 import { ApiType } from "@qr-menu/shared-types";
+import { ZodResponseValidationPipe } from "@/common/pipes/zod-response-validation.pipe";
+import { ApiValidation } from "@qr-menu/shared-validation";
 
 @Injectable()
 export class MenuService {
@@ -13,84 +14,76 @@ export class MenuService {
   ) {}
 
   async get(): Promise<ApiType.Admin.Menu.Get.Response> {
-    const authenticatedRequest = this.request as AuthenticatedRequest;
-    const userId = authenticatedRequest.user?.id;
+    const supabase = this.supabaseService.getUserClient(
+      this.request.cookies.auth_token
+    );
 
-    if (!userId) {
-      throw new Error("Kullanıcı kimliği bulunamadı");
-    }
-
-    const supabase = this.supabaseService.getClient();
     const { data: menu, error } = await supabase
       .from("menus")
       .select("*")
-      .eq("user_id", userId)
       .single();
 
-    if (error || !menu) {
-      throw new Error("Menü getirilemedi");
+    if (error) {
+      throw new Error("Menü getirilirken bir hata oluştu");
     }
 
-    return menu;
+    return new ZodResponseValidationPipe(
+      ApiValidation.Admin.Menu.Get.Response
+    ).transform(menu);
   }
 
-  async createMenu(createMenuDto: any) {
-    const authenticatedRequest = this.request as AuthenticatedRequest;
-    const userId = authenticatedRequest.user?.id;
+  async createMenu(createMenuDto: ApiType.Admin.Menu.Create.Request.Data) {
+    const supabase = this.supabaseService.getUserClient(
+      this.request.cookies.auth_token
+    );
 
-    if (!userId) {
-      throw new Error("Kullanıcı kimliği bulunamadı");
-    }
-
-    const supabase = this.supabaseService.getClient();
-    // Yeni menü oluştur
-    const { data: newMenu, error } = await supabase
+    const { data: menu, error } = await supabase
       .from("menus")
       .insert({
-        user_id: userId,
-        restaurant_name: createMenuDto.name,
+        restaurant_name: createMenuDto.restaurant_name,
         subdomain: createMenuDto.subdomain,
-        is_active: true,
+        user_id: null,
       })
       .select()
       .single();
 
     if (error) {
-      throw new Error("Menü oluşturulamadı");
+      throw new Error("Menü oluşturulurken bir hata oluştu");
     }
 
-    return {
-      id: newMenu.id,
-      name: newMenu.restaurant_name,
-      subdomain: newMenu.subdomain,
-      categories: [],
-      items: [],
-    };
+    return new ZodResponseValidationPipe(
+      ApiValidation.Admin.Menu.Create.Response
+    ).transform(menu);
   }
 
   async update(
     data: ApiType.Admin.Menu.Update.Request.Data
   ): Promise<ApiType.Admin.Menu.Update.Response> {
-    const supabase = this.supabaseService.getClient();
+    const supabase = this.supabaseService.getUserClient(
+      this.request.cookies.auth_token
+    );
 
-    const authenticatedRequest = this.request as AuthenticatedRequest;
-    const userId = authenticatedRequest.user?.id;
-
-    if (!userId) {
-      throw new NotFoundException("Kullanıcı bulunamadı");
+    const {
+      data: { id },
+      error: errorId,
+    } = await supabase.from("menus").select("id").single();
+    if (errorId) {
+      throw new Error("Menü bulunamadı");
     }
 
     const { data: menu, error } = await supabase
       .from("menus")
       .update(data)
-      .eq("user_id", userId)
+      .eq("id", id)
       .select()
       .single();
 
     if (error) {
-      throw new Error("Menü güncellenemedi");
+      throw new Error("Menü güncellenirken bir hata oluştu");
     }
 
-    return menu;
+    return new ZodResponseValidationPipe(
+      ApiValidation.Admin.Menu.Update.Response
+    ).transform(menu);
   }
 }

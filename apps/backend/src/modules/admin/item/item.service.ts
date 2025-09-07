@@ -1,47 +1,44 @@
-import { Injectable, NotFoundException, Inject } from "@nestjs/common";
+import { Injectable, Inject } from "@nestjs/common";
 import { REQUEST } from "@nestjs/core";
+import { Request } from "express";
 import { SupabaseService } from "@/common/services/supabase.service";
 import { ApiType } from "@qr-menu/shared-types";
-import { AuthenticatedRequest } from "@/common/guards/auth.guard";
+import { ZodResponseValidationPipe } from "@/common/pipes/zod-response-validation.pipe";
+import { ApiValidation } from "@qr-menu/shared-validation";
 
 @Injectable()
 export class ItemService {
   constructor(
     private readonly supabaseService: SupabaseService,
-    @Inject(REQUEST) private readonly request: AuthenticatedRequest
+    @Inject(REQUEST) private readonly request: Request
   ) {}
 
   async create(
     data: ApiType.Admin.Item.Create.Request.Data
   ): Promise<ApiType.Admin.Item.Create.Response> {
-    const supabase = this.supabaseService.getClient();
-
-    if (!this.request.userMenu) {
-      throw new NotFoundException("Menü bulunamadı");
-    }
+    const supabase = this.supabaseService.getUserClient(
+      this.request.cookies.auth_token
+    );
 
     const { data: item, error } = await supabase
       .from("menu_items")
-      .insert({
-        ...data,
-        menu_id: this.request.userMenu.id,
-      })
+      .insert(data)
       .select()
       .single();
 
     if (error) {
-      throw new Error(`Ürün oluşturulurken hata: ${error.message}`);
+      throw new Error("Ürün oluşturulurken bir hata oluştu");
     }
 
-    return this.mapDbItemToApiFull(item);
+    return new ZodResponseValidationPipe(
+      ApiValidation.Admin.Item.Create.Response
+    ).transform(item);
   }
 
   async findAll(): Promise<ApiType.Admin.Item.GetAll.Response> {
-    const supabase = this.supabaseService.getClient();
-
-    if (!this.request.userMenu) {
-      throw new NotFoundException("Menü bulunamadı");
-    }
+    const supabase = this.supabaseService.getUserClient(
+      this.request.cookies.auth_token
+    );
 
     const { data: items, error } = await supabase
       .from("menu_items")
@@ -49,20 +46,20 @@ export class ItemService {
       .order("sort_order");
 
     if (error) {
-      throw new Error(`Ürünler getirilirken hata: ${error.message}`);
+      throw new Error("Ürünler getirilirken bir hata oluştu");
     }
 
-    return (items ?? []).map((it) => this.mapDbItemToApiList(it));
+    return new ZodResponseValidationPipe(
+      ApiValidation.Admin.Item.GetAll.Response
+    ).transform(items);
   }
 
   async findOne(
     params: ApiType.Admin.Item.GetById.Request.Params
   ): Promise<ApiType.Admin.Item.GetById.Response> {
-    const supabase = this.supabaseService.getClient();
-
-    if (!this.request.userMenu) {
-      throw new NotFoundException("Menü bulunamadı");
-    }
+    const supabase = this.supabaseService.getUserClient(
+      this.request.cookies.auth_token
+    );
 
     const { data: item, error } = await supabase
       .from("menu_items")
@@ -70,22 +67,22 @@ export class ItemService {
       .eq("id", params.id)
       .single();
 
-    if (error || !item) {
-      throw new NotFoundException(`ID ${params.id} ile ürün bulunamadı`);
+    if (error) {
+      throw new Error("Ürün getirilirken bir hata oluştu");
     }
 
-    return this.mapDbItemToApiFull(item);
+    return new ZodResponseValidationPipe(
+      ApiValidation.Admin.Item.GetById.Response
+    ).transform(item);
   }
 
   async update(
     params: ApiType.Admin.Item.Update.Request.Params,
     data: ApiType.Admin.Item.Update.Request.Data
   ): Promise<ApiType.Admin.Item.Update.Response> {
-    const supabase = this.supabaseService.getClient();
-
-    if (!this.request.userMenu) {
-      throw new NotFoundException("Menü bulunamadı");
-    }
+    const supabase = this.supabaseService.getUserClient(
+      this.request.cookies.auth_token
+    );
 
     const { data: item, error } = await supabase
       .from("menu_items")
@@ -94,21 +91,21 @@ export class ItemService {
       .select()
       .single();
 
-    if (error || !item) {
-      throw new NotFoundException(`ID ${params.id} ile ürün bulunamadı`);
+    if (error) {
+      throw new Error("Ürün güncellenirken bir hata oluştu");
     }
 
-    return this.mapDbItemToApiFull(item);
+    return new ZodResponseValidationPipe(
+      ApiValidation.Admin.Item.Update.Response
+    ).transform(item);
   }
 
   async remove(
     params: ApiType.Admin.Item.Delete.Request.Params
   ): Promise<void> {
-    const supabase = this.supabaseService.getClient();
-
-    if (!this.request.userMenu) {
-      throw new NotFoundException("Menü bulunamadı");
-    }
+    const supabase = this.supabaseService.getUserClient(
+      this.request.cookies.auth_token
+    );
 
     const { error } = await supabase
       .from("menu_items")
@@ -116,65 +113,24 @@ export class ItemService {
       .eq("id", params.id);
 
     if (error) {
-      throw new Error("Ürün silinirken hata");
+      throw new Error("Ürün silinirken bir hata oluştu");
     }
   }
 
-  // UNDER CONSTRUCTION
-  // UNDER CONSTRUCTION
-  // UNDER CONSTRUCTION
-  // UNDER CONSTRUCTION
-  // UNDER CONSTRUCTION
+  async reorder(data: ApiType.Admin.Item.Reorder.Request.Data): Promise<void> {
+    const supabase = this.supabaseService.getUserClient(
+      this.request.cookies.auth_token
+    );
 
-  // Map to full item response shape (create/getById/update)
-  private mapDbItemToApiFull(
-    item: DbItem
-  ): ApiType.Admin.Item.GetById.Response {
-    return {
-      id: String(item.id),
-      name: String(item.name),
-      description: item.description ?? null,
-      price: Number(item.price),
-      category_id: String(item.category_id),
-      image_url: item.image_url ?? null,
-      is_popular: item.is_popular ?? null,
-      is_chef_special: item.is_chef_special ?? null,
-      spice_level: item.spice_level ?? null,
-      sort_order: item.sort_order ?? null,
-      is_available: item.is_available ?? null,
-      preparation_time: item.preparation_time ?? null,
-      allergens: normalizeAllergens(item.allergens),
-      nutrition_info: item.nutrition_info ?? null,
-      is_active: Boolean(item.is_active),
-    };
-  }
+    for (const change of data) {
+      const { error } = await supabase
+        .from("menu_items")
+        .update({ sort_order: change.newSortOrder })
+        .eq("id", change.id);
 
-  // Map to list response shape (getAll)
-  private mapDbItemToApiList(
-    item: DbItem
-  ): ApiType.Admin.Item.GetAll.Response[number] {
-    return {
-      id: String(item.id),
-      name: String(item.name),
-      description: item.description ?? null,
-      image_url: item.image_url ?? null,
-      category_id: String(item.category_id),
-      sort_order: item.sort_order ?? null,
-      is_available: item.is_available ?? null,
-    };
+      if (error) {
+        throw new Error("Ürün sıralaması güncellenirken bir hata oluştu");
+      }
+    }
   }
 }
-
-type DbItem = Record<string, any>;
-
-function normalizeAllergens(value: unknown): string[] | null {
-  if (value == null) return null;
-  if (Array.isArray(value)) return value.map((v) => String(v));
-  if (typeof value === "string") return [value];
-  // Unsupported shape -> return null to satisfy schema
-  return null;
-}
-// UNDER CONSTRUCTION
-// UNDER CONSTRUCTION
-// UNDER CONSTRUCTION
-// UNDER CONSTRUCTION

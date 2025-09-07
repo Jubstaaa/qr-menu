@@ -21,16 +21,10 @@ import SortableItem from "./SortableItem";
 import { ApiType } from "@qr-menu/shared-types";
 
 interface SortableItemsProps {
-  items: ApiType.Admin.Category.GetAll.Response[0]["menu_items"];
-  onReorder: (
-    items: ApiType.Admin.Category.GetAll.Response[0]["menu_items"]
-  ) => void;
-  onEdit: (
-    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
-  ) => void;
-  onDelete: (
-    item: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0]
-  ) => void;
+  items: ApiType.Admin.Item.GetAll.Response;
+  onReorder: (items: ApiType.Admin.Item.GetAll.Response) => void;
+  onEdit: (item: ApiType.Admin.Item.GetAll.Response[0]) => void;
+  onDelete: (item: ApiType.Admin.Item.GetAll.Response[0]) => void;
 }
 
 export default function SortableItems({

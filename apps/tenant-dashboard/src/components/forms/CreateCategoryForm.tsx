@@ -59,6 +59,8 @@ export default function CreateCategoryForm({
         submitButtonIcon="✨"
         files={files}
         setFiles={setFiles}
+        methods={methods}
+        handleFormSubmit={handleFormSubmit}
       />
     </FormProvider>
   );

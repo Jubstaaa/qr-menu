@@ -28,11 +28,7 @@ export default function UpdateCategoryForm({
 }: UpdateCategoryFormProps) {
   const methods = useForm<ApiType.Admin.Category.Update.Request.Data>({
     resolver: zodResolver(ApiValidation.Admin.Category.Update.Request.Data),
-    defaultValues: {
-      name: editingCategory.name,
-      description: editingCategory.description || "",
-      is_active: editingCategory.is_active ?? true,
-    },
+    defaultValues: editingCategory,
   });
 
   const { files, setFiles, preparePayload, resetFiles } = useFileUpload(
@@ -41,11 +37,7 @@ export default function UpdateCategoryForm({
 
   React.useEffect(() => {
     if (editingCategory) {
-      methods.reset({
-        name: editingCategory.name,
-        description: editingCategory.description || "",
-        is_active: editingCategory.is_active ?? true,
-      });
+      methods.reset(editingCategory);
     }
   }, [editingCategory, methods]);
 
@@ -64,16 +56,16 @@ export default function UpdateCategoryForm({
   };
 
   return (
-    <FormProvider methods={methods} onSubmit={handleFormSubmit}>
-      <CategoryFormUI
-        isOpen={isOpen}
-        onClose={onClose}
-        title="Kategori Düzenle"
-        submitButtonText="Güncelle"
-        submitButtonIcon="🔄"
-        files={files}
-        setFiles={setFiles}
-      />
-    </FormProvider>
+    <CategoryFormUI
+      methods={methods}
+      handleFormSubmit={handleFormSubmit}
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Kategori Düzenle"
+      submitButtonText="Güncelle"
+      submitButtonIcon="🔄"
+      files={files}
+      setFiles={setFiles}
+    />
   );
 }

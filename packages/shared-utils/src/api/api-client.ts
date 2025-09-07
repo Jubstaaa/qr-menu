@@ -47,7 +47,6 @@ export class ApiClient {
     options: RequestOptions
   ): Promise<ApiResponse<T>> {
     const { method = "GET", headers = {}, body, pathParams, query } = options;
-
     const finalHeaders: Record<string, string> = {
       "Content-Type": "application/json",
       ...headers,

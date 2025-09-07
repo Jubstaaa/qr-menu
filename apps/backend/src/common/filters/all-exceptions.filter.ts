@@ -38,6 +38,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       ) {
         message = (exceptionResponse as any).message || "Bad request";
       }
+    } else if (exception instanceof Error) {
+      this.logger.error(`Detailed error: ${exception.message}`);
+      message = "Bir hata oluştu";
     }
 
     const errorResponse = {

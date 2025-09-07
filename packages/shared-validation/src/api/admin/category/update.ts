@@ -4,13 +4,13 @@ import { z } from "zod";
 export const Update = {
   Request: {
     Params: z.object({
-      id: z.string().uuid("Geçerli kategori ID gerekli"),
+      id: z.uuid("Geçerli ID gerekli"),
     }),
     Data: z.object({
-      name: z.string().min(1, "Kategori adı zorunludur").optional(),
-      description: z.string().optional(),
-      image_url: z.string().nullable().optional(),
-      is_active: z.boolean().optional().nullable(),
+      name: z.string().min(1, "Kategori adı zorunludur"),
+      description: z.string().nullable(),
+      image_url: z.string().nullable(),
+      is_active: z.boolean().nullable(),
     }),
   },
   Response: z.object({

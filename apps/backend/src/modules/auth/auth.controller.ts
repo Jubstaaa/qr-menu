@@ -1,8 +1,7 @@
 import { Controller, Post, Body, UseInterceptors, Res } from "@nestjs/common";
 import { AuthService } from "./auth.service";
 import { TransformInterceptor } from "@/common/interceptors/transform.interceptor";
-import { ZodValidationPipe } from "@/common/pipes/zod-validation.pipe";
-import { ZodResponseValidationPipe } from "@/common/pipes/zod-response-validation.pipe";
+import { ZodRequestValidationPipe } from "@/common/pipes/zod-request-validation.pipe";
 import { SetResponseMessage } from "@/common";
 import { ApiValidation } from "@qr-menu/shared-validation";
 import { ApiType } from "@qr-menu/shared-types";
@@ -16,7 +15,9 @@ export class AuthController {
   @Post("login")
   @SetResponseMessage("Giriş başarılı")
   async login(
-    @Body(new ZodValidationPipe(ApiValidation.Common.Auth.Login.Request.Data))
+    @Body(
+      new ZodRequestValidationPipe(ApiValidation.Common.Auth.Login.Request.Data)
+    )
     loginDto: ApiType.Common.Auth.Login.Request.Data,
     @Res({ passthrough: true }) res: Response
   ): Promise<ApiType.Common.Auth.Login.Response> {
@@ -27,23 +28,20 @@ export class AuthController {
       getCookieConfig(result.session.expires_in)
     );
 
-    return new ZodResponseValidationPipe(
-      ApiValidation.Common.Auth.Login.Response
-    ).transform(result);
+    return result;
   }
 
   @Post("register")
   @SetResponseMessage("Kayıt başarılı")
   async register(
     @Body(
-      new ZodValidationPipe(ApiValidation.Common.Auth.Register.Request.Data)
+      new ZodRequestValidationPipe(
+        ApiValidation.Common.Auth.Register.Request.Data
+      )
     )
     registerDto: ApiType.Common.Auth.Register.Request.Data
   ): Promise<ApiType.Common.Auth.Register.Response> {
-    const result = await this.authService.register(registerDto);
-    return new ZodResponseValidationPipe(
-      ApiValidation.Common.Auth.Register.Response
-    ).transform(result);
+    return await this.authService.register(registerDto);
   }
 
   @Post("logout")
@@ -55,10 +53,7 @@ export class AuthController {
   }
 
   @Post("checkAuth")
-  async checkAuth(): Promise<void> {
-    const result = await this.authService.checkAuth();
-    return new ZodResponseValidationPipe(
-      ApiValidation.Common.Auth.CheckAuth.Response
-    ).transform(result);
+  async checkAuth() {
+    return await this.authService.checkAuth();
   }
 }

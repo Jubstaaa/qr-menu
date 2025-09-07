@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SpiceLevel } from "@/enums";
 
 // Get Category By Slug Request Schema
 export const GetItemsByCategory = {
@@ -21,7 +22,7 @@ export const GetItemsByCategory = {
       is_popular: z.boolean(),
       is_chef_special: z.boolean(),
       preparation_time: z.number(),
-      spice_level: z.number().nullable(),
+      spice_level: z.enum(SpiceLevel).nullable(),
     })
   ),
 };

@@ -9,14 +9,17 @@ import {
   ModalFooter,
   Button,
 } from "@heroui/react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, UseFormReturn } from "react-hook-form";
 import {
   FileInput,
   SwitchField,
   type FileItem,
   TextInput,
   TextareaInput,
+  FormProvider,
+  SubmitButton,
 } from "@qr-menu/shared-components";
+import { ApiType } from "@qr-menu/shared-types";
 
 interface CategoryFormUIProps {
   isOpen: boolean;
@@ -26,6 +29,8 @@ interface CategoryFormUIProps {
   submitButtonIcon: string;
   files: FileItem[];
   setFiles: React.Dispatch<React.SetStateAction<FileItem[]>>;
+  methods: UseFormReturn<ApiType.Admin.Category.Update.Request.Data>;
+  handleFormSubmit: (data: ApiType.Admin.Category.Update.Request.Data) => void;
 }
 
 export default function CategoryFormUI({
@@ -36,19 +41,19 @@ export default function CategoryFormUI({
   submitButtonIcon,
   files,
   setFiles,
+  methods,
+  handleFormSubmit,
 }: CategoryFormUIProps) {
-  const {
-    formState: { isSubmitting },
-    setValue,
-    watch,
-  } = useFormContext();
-
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">
       <ModalContent>
-        <ModalHeader>{title}</ModalHeader>
-        <ModalBody>
-          <div className="space-y-6">
+        <FormProvider
+          methods={methods}
+          onSubmit={handleFormSubmit}
+          className="space-y-6"
+        >
+          <ModalHeader>{title}</ModalHeader>
+          <ModalBody>
             <TextInput
               name="name"
               label="Kategori Adı *"
@@ -71,26 +76,20 @@ export default function CategoryFormUI({
             />
 
             <SwitchField
+              name="is_active"
               label="Kategori Durumu"
               description="Aktif kategoriler menüde görünür"
-              isSelected={watch("is_active")}
-              onValueChange={(value) => setValue("is_active", value)}
             />
-          </div>
-        </ModalBody>
-        <ModalFooter>
-          <Button color="danger" variant="light" onPress={onClose}>
-            İptal
-          </Button>
-          <Button
-            type="submit"
-            color="primary"
-            isLoading={isSubmitting}
-            endContent={submitButtonIcon}
-          >
-            {submitButtonText}
-          </Button>
-        </ModalFooter>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" variant="light" onPress={onClose}>
+              İptal
+            </Button>
+            <SubmitButton color="primary" endContent={submitButtonIcon}>
+              {submitButtonText}
+            </SubmitButton>
+          </ModalFooter>
+        </FormProvider>
       </ModalContent>
     </Modal>
   );

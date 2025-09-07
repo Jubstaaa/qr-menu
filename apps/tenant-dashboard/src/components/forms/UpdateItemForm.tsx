@@ -17,7 +17,7 @@ interface UpdateItemFormProps {
       image_url?: string;
     }
   ) => Promise<void>;
-  editingItem: ApiType.Admin.Category.GetAll.Response[0]["menu_items"][0];
+  editingItem: ApiType.Admin.Item.GetAll.Response[0];
   categories: ApiType.Admin.Category.GetAll.Response;
 }
 
@@ -30,16 +30,7 @@ export default function UpdateItemForm({
 }: UpdateItemFormProps) {
   const methods = useForm<ApiType.Admin.Item.Update.Request.Data>({
     resolver: zodResolver(ApiValidation.Admin.Item.Update.Request.Data),
-    defaultValues: {
-      name: editingItem.name,
-      description: editingItem.description || "",
-      price: editingItem.price || 0,
-      is_available: editingItem.is_available ?? true,
-      is_popular: editingItem.is_popular ?? false,
-      is_chef_special: editingItem.is_chef_special ?? false,
-      preparation_time: editingItem.preparation_time || 0,
-      category_id: editingItem.category_id,
-    },
+    defaultValues: editingItem,
   });
 
   const { files, setFiles, preparePayload, resetFiles } = useFileUpload(
@@ -59,17 +50,17 @@ export default function UpdateItemForm({
   };
 
   return (
-    <FormProvider methods={methods} onSubmit={handleFormSubmit}>
-      <ItemFormUI
-        isOpen={isOpen}
-        onClose={onClose}
-        title="Ürün Düzenle"
-        submitButtonText="Güncelle"
-        submitButtonIcon="🔄"
-        files={files}
-        setFiles={setFiles}
-        categories={categories}
-      />
-    </FormProvider>
+    <ItemFormUI
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Ürün Düzenle"
+      submitButtonText="Güncelle"
+      submitButtonIcon="🔄"
+      files={files}
+      setFiles={setFiles}
+      categories={categories}
+      methods={methods}
+      handleFormSubmit={handleFormSubmit}
+    />
   );
 }

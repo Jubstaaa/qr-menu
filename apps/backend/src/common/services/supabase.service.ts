@@ -5,7 +5,8 @@ import { config } from "@qr-menu/shared-config";
 
 @Injectable()
 export class SupabaseService {
-  private supabase: SupabaseClient<Database>;
+  private supabaseAdmin: SupabaseClient<Database>;
+  private supabaseUrl: string;
 
   constructor() {
     const supabaseUrl = config.SUPABASE_URL;
@@ -15,23 +16,45 @@ export class SupabaseService {
       throw new Error("Missing Supabase environment variables");
     }
 
-    this.supabase = createClient<Database>(supabaseUrl, supabaseServiceKey);
+    this.supabaseUrl = supabaseUrl;
+
+    this.supabaseAdmin = createClient<Database>(
+      supabaseUrl,
+      supabaseServiceKey
+    );
   }
 
+  // Admin client - RLS bypass eder
+  getAdminClient(): SupabaseClient<Database> {
+    return this.supabaseAdmin;
+  }
+
+  // User client - RLS politikaları aktif
+  getUserClient(userToken: string): SupabaseClient<Database> {
+    return createClient<Database>(this.supabaseUrl, config.SUPABASE_ANON_KEY, {
+      global: {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      },
+    });
+  }
+
+  // Backward compatibility için eski method
   getClient(): SupabaseClient<Database> {
-    return this.supabase;
+    return this.supabaseAdmin;
   }
 
   async getUser(token: string) {
     const {
       data: { user },
       error,
-    } = await this.supabase.auth.getUser(token);
+    } = await this.supabaseAdmin.auth.getUser(token);
     return { user, error };
   }
 
   async getMenuByUserId(userId: string) {
-    const { data: menu, error } = await this.supabase
+    const { data: menu, error } = await this.supabaseAdmin
       .from("menus")
       .select("id, user_id, subdomain, restaurant_name")
       .eq("user_id", userId)
@@ -42,7 +65,7 @@ export class SupabaseService {
   }
 
   async checkItemOwnership(itemId: string, menuId: string) {
-    const { data: item, error } = await this.supabase
+    const { data: item, error } = await this.supabaseAdmin
       .from("menu_items")
       .select(
         `

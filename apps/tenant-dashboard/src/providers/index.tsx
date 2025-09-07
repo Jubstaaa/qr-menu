@@ -8,7 +8,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <HeroUIProvider>
       <QueryProvider>
         {children}
-        <ToastProvider />
+        <ToastProvider
+          toastProps={{ classNames: { description: "whitespace-pre-line" } }}
+        />
       </QueryProvider>
     </HeroUIProvider>
   );

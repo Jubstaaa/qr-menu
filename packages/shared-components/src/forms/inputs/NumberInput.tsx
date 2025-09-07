@@ -1,4 +1,5 @@
 import React from "react";
+import { useFormContext } from "react-hook-form";
 import { BaseInput, BaseInputProps } from "./BaseInput";
 
 interface NumberInputProps extends Omit<BaseInputProps, "type"> {
@@ -10,17 +11,25 @@ interface NumberInputProps extends Omit<BaseInputProps, "type"> {
 
 export const NumberInput: React.FC<NumberInputProps> = ({
   name,
+  error,
   placeholder = "Sayı giriniz",
   min,
   max,
   step,
   ...props
 }) => {
+  const { register } = useFormContext();
+
+  const registerOptions = register(name, {
+    setValueAs: (value) => {
+      return value === "" ? null : parseFloat(value);
+    },
+  });
+
   return (
     <BaseInput
-      name={name}
+      {...registerOptions}
       type="number"
-      placeholder={placeholder}
       min={min?.toString()}
       max={max?.toString()}
       step={step?.toString()}

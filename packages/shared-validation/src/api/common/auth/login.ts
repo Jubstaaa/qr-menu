@@ -24,6 +24,6 @@ export const Login = {
         restaurant_name: z.string(),
         subdomain: z.string(),
       })
-      .optional(),
+      .nullable(),
   }),
 };

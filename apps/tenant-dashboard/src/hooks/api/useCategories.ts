@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiType } from "@qr-menu/shared-types";
+import { ApiType, ApiResponse } from "@qr-menu/shared-types";
 import { apiUtils } from "@qr-menu/shared-utils";
 
 export const useCategoriesQuery = () => {
@@ -39,24 +39,26 @@ export const useUpdateCategoryMutation = () => {
 
   return useMutation({
     mutationFn: async ({
-      id,
+      params,
       data,
     }: {
-      id: string;
+      params: ApiType.Admin.Category.Update.Request.Params;
       data: ApiType.Admin.Category.Update.Request.Data & { file?: File | null };
-    }): Promise<ApiType.Admin.Category.Update.Response> => {
-      const response = await apiUtils.admin.category.update({ id }, data);
-      return response.data;
+    }) => {
+      const response = await apiUtils.admin.category.update(params, data);
+      return response;
     },
     onSuccess: (
-      updatedCategory: ApiType.Admin.Category.Update.Response,
+      response: ApiResponse<ApiType.Admin.Category.Update.Response>,
       variables
     ) => {
       queryClient.setQueryData(
         ["categories"],
         (prev: ApiType.Admin.Category.GetAll.Response | undefined) =>
           (prev || []).map((category) =>
-            category.id === variables.id ? updatedCategory : category
+            category.id === variables.params.id
+              ? { ...category, ...response.data }
+              : category
           )
       );
     },
@@ -82,10 +84,8 @@ export const useDeleteCategoryMutation = () => {
 };
 export const useReorderCategoriesMutation = () => {
   return useMutation({
-    mutationFn: async (
-      changes: Array<{ id: string; newSortOrder: number }>
-    ) => {
-      const response = await apiUtils.admin.category.reorder({ changes });
+    mutationFn: async (data: ApiType.Admin.Category.Reorder.Request.Data) => {
+      const response = await apiUtils.admin.category.reorder(data);
       return response;
     },
   });

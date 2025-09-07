@@ -4,9 +4,9 @@ export const Create = {
   Request: {
     Data: z.object({
       name: z.string().min(1, "Kategori adı zorunludur"),
-      description: z.string().optional(),
-      image_url: z.string().nullable().optional(),
-      is_active: z.boolean().optional(),
+      description: z.string().nullable(),
+      image_url: z.string().nullable().nullable(),
+      is_active: z.boolean().nullable(),
     }),
     Params: z.object({}),
   },

@@ -12,7 +12,10 @@ interface CreateItemFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: ApiType.Admin.Item.Create.Request.Data & { file?: File; image_url?: string }
+    data: ApiType.Admin.Item.Update.Request.Data & {
+      file?: File;
+      image_url?: string;
+    }
   ) => Promise<void>;
   categories: ApiType.Admin.Category.GetAll.Response;
   selectedCategoryId?: string;
@@ -25,8 +28,8 @@ export default function CreateItemForm({
   categories,
   selectedCategoryId,
 }: CreateItemFormProps) {
-  const methods = useForm<ApiType.Admin.Item.Create.Request.Data>({
-    resolver: zodResolver(ApiValidation.Admin.Item.Create.Request.Data),
+  const methods = useForm<ApiType.Admin.Item.Update.Request.Data>({
+    resolver: zodResolver(ApiValidation.Admin.Item.Update.Request.Data),
     defaultValues: {
       name: "",
       description: "",
@@ -41,7 +44,9 @@ export default function CreateItemForm({
 
   const { files, setFiles, preparePayload, resetFiles } = useFileUpload();
 
-  const handleFormSubmit = async (data: ApiType.Admin.Item.Create.Request.Data) => {
+  const handleFormSubmit = async (
+    data: ApiType.Admin.Item.Update.Request.Data
+  ) => {
     try {
       const payload = preparePayload(data);
       await onSubmit(payload);
@@ -64,6 +69,8 @@ export default function CreateItemForm({
         files={files}
         setFiles={setFiles}
         categories={categories}
+        methods={methods}
+        handleFormSubmit={handleFormSubmit}
       />
     </FormProvider>
   );

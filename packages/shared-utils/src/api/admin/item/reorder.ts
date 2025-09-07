@@ -3,7 +3,7 @@ import { ApiType } from "@qr-menu/shared-types";
 import { apiClient } from "@/api/api-client";
 
 export const reorder = (data: ApiType.Admin.Item.Reorder.Request.Data) =>
-  apiClient.post<
+  apiClient.put<
     ApiType.Admin.Item.Reorder.Response,
     ApiType.Admin.Item.Reorder.Request.Data
   >(ENDPOINTS.ADMIN.ITEM.REORDER, data);

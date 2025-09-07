@@ -20,6 +20,9 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
           },
           mutations: {
             retry: 0,
+            onError: (error) => {
+              throw error;
+            },
           },
         },
       })
@@ -27,45 +30,41 @@ export const QueryProvider: React.FC<{ children: React.ReactNode }> = ({
 
   useEffect(() => {
     // Query error handling
-    const queryUnsubscribe = queryClient
-      .getQueryCache()
-      .subscribe((event: any) => {
-        if (event?.type === "error") {
-          const query = event.query;
-          const error = query.state.error as any;
+    const queryUnsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event?.type === "updated") {
+        const query = event.query;
+        const error = query.state.error as Error & { status?: number };
 
-          if (error?.status === 403) {
-            console.log("Token geçersiz, logout yapılıyor...");
-
-            router.replace("/auth/login");
-            return;
-          }
+        if (error?.status === 403) {
+          router.replace("/auth/login");
+          return;
         }
-      });
+      }
+    });
 
     const mutationUnsubscribe = queryClient
       .getMutationCache()
-      .subscribe((event: any) => {
+      .subscribe((event) => {
         if (event?.type === "updated") {
           const mutation = event.mutation;
 
           if (mutation.state.status === "error") {
-            const error = mutation.state.error as any;
+            const error = mutation.state.error as Error & { status?: number };
 
             addToast({
-              title: error?.message || "İşlem başarısız!",
+              title: "İşlem başarısız!",
+              description: error?.message || "Bilinmeyen bir hata oluştu",
               color: "danger",
             });
 
             if (error?.status === 403) {
-              console.log("Token geçersiz, logout yapılıyor...");
-
               router.replace("/auth/login");
               return;
             }
           } else if (mutation.state.status === "success") {
             addToast({
-              title: mutation.state.data?.message || "İşlem başarılı!",
+              title: "İşlem başarılı!",
+              description: mutation.state.data?.message || "İşlem başarılı!",
               color: "success",
             });
           }

@@ -4,6 +4,8 @@ import { Request } from "express";
 import { SupabaseService } from "@/common/services/supabase.service";
 import { ApiType } from "@qr-menu/shared-types";
 import { Database } from "@qr-menu/shared-types";
+import { ZodResponseValidationPipe } from "@/common/pipes/zod-response-validation.pipe";
+import { ApiValidation } from "@qr-menu/shared-validation";
 
 @Injectable()
 export class AuthService {
@@ -29,7 +31,9 @@ export class AuthService {
 
     const { menu } = await this.supabaseService.getMenuByUserId(data.user.id);
 
-    return {
+    return new ZodResponseValidationPipe(
+      ApiValidation.Common.Auth.Login.Response
+    ).transform({
       session: {
         access_token: data.session.access_token,
         expires_in: data.session.expires_in,
@@ -45,7 +49,7 @@ export class AuthService {
             subdomain: menu.subdomain,
           }
         : undefined,
-    };
+    });
   }
 
   async register(
@@ -63,12 +67,14 @@ export class AuthService {
       throw new UnauthorizedException("Kayıt işlemi başarısız");
     }
 
-    return {
+    return new ZodResponseValidationPipe(
+      ApiValidation.Common.Auth.Register.Response
+    ).transform({
       user: {
         id: data.user.id,
         email: data.user.email,
       },
-    };
+    });
   }
 
   async logout(): Promise<void> {
@@ -84,19 +90,21 @@ export class AuthService {
     }
 
     const { user, error } = await this.supabaseService.getUser(token);
-
+ 
     if (error || !user) {
       throw new UnauthorizedException("Geçersiz token");
     }
 
     const { menu } = await this.supabaseService.getMenuByUserId(user.id);
 
-    return {
+    return new ZodResponseValidationPipe(
+      ApiValidation.Common.Auth.CheckAuth.Response
+    ).transform({
       user: {
         id: user.id,
         email: user.email,
       },
       menu: menu || null,
-    };
+    });
   }
 }

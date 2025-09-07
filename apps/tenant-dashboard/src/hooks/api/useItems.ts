@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiType } from "@qr-menu/shared-types";
+import { ApiResponse, ApiType } from "@qr-menu/shared-types";
 import { apiUtils } from "@qr-menu/shared-utils";
 
 export const useItemsQuery = () => {
@@ -7,21 +7,8 @@ export const useItemsQuery = () => {
     queryKey: ["items"],
     queryFn: async (): Promise<ApiType.Admin.Item.GetAll.Response> => {
       const response = await apiUtils.admin.item.getAll();
-      return response.data as unknown as ApiType.Admin.Item.GetAll.Response;
+      return response.data;
     },
-  });
-};
-
-export const useItemsByCategoryQuery = (categoryId: string) => {
-  return useQuery({
-    queryKey: ["items", categoryId],
-    queryFn: async (): Promise<ApiType.Admin.Item.GetAll.Response> => {
-      const response = await apiUtils.admin.item.getAll();
-      return response.data.filter(
-        (item: any) => item.category_id === categoryId
-      ) as unknown as ApiType.Admin.Item.GetAll.Response;
-    },
-    enabled: !!categoryId,
   });
 };
 
@@ -35,17 +22,13 @@ export const useCreateItemMutation = () => {
       const response = await apiUtils.admin.item.create(data);
       return response.data;
     },
-    onSuccess: (newItem: ApiType.Admin.Item.Create.Response, variables) => {
-      queryClient.setQueryData(["categories"], (prev: any) =>
-        prev.map((category: any) => {
-          if (category.id === variables.category_id) {
-            return {
-              ...category,
-              menu_items: [...(category.menu_items || []), newItem],
-            };
-          }
-          return category;
-        })
+    onSuccess: (response: ApiType.Admin.Item.Create.Response) => {
+      queryClient.setQueryData(
+        ["items"],
+        (prev: ApiType.Admin.Item.GetAll.Response | undefined) => [
+          ...(prev || []),
+          response,
+        ]
       );
     },
   });
@@ -56,24 +39,27 @@ export const useUpdateItemMutation = () => {
 
   return useMutation({
     mutationFn: async ({
-      id,
+      params,
       data,
     }: {
-      id: string;
+      params: ApiType.Admin.Item.Update.Request.Params;
       data: ApiType.Admin.Item.Update.Request.Data & { file?: File | null };
-    }): Promise<ApiType.Admin.Item.Update.Response> => {
-      const response = await apiUtils.admin.item.update({ id }, data);
-      return response.data;
+    }) => {
+      const response = await apiUtils.admin.item.update(params, data);
+      return response;
     },
-    onSuccess: (updatedItem: ApiType.Admin.Item.Update.Response, variables) => {
-      queryClient.setQueryData(["categories"], (prev: any) =>
-        prev.map((category: any) => ({
-          ...category,
-          menu_items:
-            category.menu_items?.map((item: any) =>
-              item.id === variables.id ? updatedItem : item
-            ) || [],
-        }))
+    onSuccess: (
+      response: ApiResponse<ApiType.Admin.Item.Update.Response>,
+      variables
+    ) => {
+      queryClient.setQueryData(
+        ["items"],
+        (prev: ApiType.Admin.Item.GetAll.Response) =>
+          (prev || []).map((item) =>
+            item.id === variables.params.id
+              ? { ...item, ...response.data }
+              : item
+          )
       );
     },
   });
@@ -83,34 +69,25 @@ export const useDeleteItemMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (
-      id: string
-    ): Promise<ApiType.Admin.Item.Delete.Response> => {
-      const response = await apiUtils.admin.item.delete({ id });
-      return response.data as ApiType.Admin.Item.Delete.Response;
+    mutationFn: async (params: ApiType.Admin.Item.Delete.Request.Params) => {
+      const response = await apiUtils.admin.item.delete(params);
+      return response;
     },
     onSuccess: (_, variables) => {
-      queryClient.setQueryData(["categories"], (prev: any) =>
-        prev.map((category: any) => ({
-          ...category,
-          menu_items:
-            category.menu_items?.filter((item: any) => item.id !== variables) ||
-            [],
-        }))
+      queryClient.setQueryData(
+        ["items"],
+        (prev: ApiType.Admin.Item.GetAll.Response | undefined) =>
+          (prev || []).filter((item) => item.id !== variables.id)
       );
     },
   });
 };
 
-export const useReorderItemsInCategoryMutation = () => {
+export const useReorderItemsMutation = () => {
   return useMutation({
-    mutationFn: async (
-      changes: Array<{ id: string; newSortOrder: number }>
-    ): Promise<ApiType.Admin.Item.Reorder.Response> => {
-      const response = await apiUtils.admin.item.reorder({
-        itemIds: changes.map((item) => item.id),
-      });
-      return response.data as ApiType.Admin.Item.Reorder.Response;
+    mutationFn: async (data: ApiType.Admin.Item.Reorder.Request.Data) => {
+      const response = await apiUtils.admin.item.reorder(data);
+      return response;
     },
   });
 };
